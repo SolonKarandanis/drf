@@ -1,7 +1,12 @@
 from django.db import models
+from django.contrib.auth.models import AbstractUser
 
 
 # Create your models here.
+class User(AbstractUser):
+    pass
+
+
 class Product(models.Model):
     title = models.CharField(max_length=120)
     content = models.TextField(blank=True, null=True)
@@ -9,4 +14,4 @@ class Product(models.Model):
 
     @property
     def sale_price(self):
-        return "%.2f" %(float(self.price) * 0.8)
+        return "%.2f" % (float(self.price) * 0.8)
