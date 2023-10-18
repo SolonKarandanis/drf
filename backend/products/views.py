@@ -5,8 +5,6 @@ from rest_framework.decorators import api_view
 from rest_framework.response import Response
 from django.shortcuts import get_object_or_404
 
-from auth.authentication import TokenAuthentication
-
 
 class ProductMixinView(
     mixins.CreateModelMixin,
@@ -44,10 +42,6 @@ product_list_create_view = ProductListCreateAPIView.as_view()
 class ProductCreateAPIView(generics.CreateAPIView):
     queryset = Product.objects.all()
     serializer_class = ProductSerializer
-    authentication_classes = [
-        authentication.SessionAuthentication,
-        TokenAuthentication
-    ]
     permission_classes = [permissions.DjangoModelPermissions]
 
     def perform_create(self, serializer):
