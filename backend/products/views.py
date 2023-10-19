@@ -4,7 +4,7 @@ from rest_framework import generics, mixins, permissions,authentication
 from rest_framework.decorators import api_view
 from rest_framework.response import Response
 from django.shortcuts import get_object_or_404
-from auth.mixins import StaffEditorPermissionMixin
+from auth.mixins import StaffEditorPermissionMixin, UserQuerySetMixin
 
 
 class ProductMixinView(
@@ -30,7 +30,7 @@ class ProductMixinView(
 product_mixin_view = ProductMixinView.as_view()
 
 
-class ProductListCreateAPIView(generics.ListCreateAPIView, StaffEditorPermissionMixin):
+class ProductListCreateAPIView(generics.ListCreateAPIView, StaffEditorPermissionMixin, UserQuerySetMixin):
     queryset = Product.objects.all()
     serializer_class = ProductSerializer
     authentication_classes = [authentication.SessionAuthentication]
