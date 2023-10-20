@@ -10,6 +10,11 @@ class UserType(models.Model):
         (CUSTOMER, 'Customer')
     )
 
+    id = models.PositiveSmallIntegerField(choices=TYPE_CHOICES, primary_key=True)
+    
+    def __str__(self):
+        return self.get_id_display()
+
 
 # Create your models here.
 class User(AbstractUser):
