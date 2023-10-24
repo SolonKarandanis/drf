@@ -10,6 +10,10 @@ class ProductQuerySet(models.QuerySet):
     def is_public(self):
         return self.filter(public=True)
 
+    def with_owner(self):
+        # prefetch_related()
+        return self.select_related('user')
+
     def search(self, query, user=None):
         lookup = Q(title__icontains=query) | Q(content__icontains=query)
         qs = self.is_public().filter(lookup)
@@ -33,6 +37,7 @@ class Product(models.Model):
     content = models.TextField(blank=True, null=True)
     price = models.DecimalField(max_digits=15, decimal_places=2, default=99.99)
     public = models.BooleanField(default=True)
+    inventory = models.IntegerField(blank=True, null=True)
 
     class Meta:
         ordering = ['title']
