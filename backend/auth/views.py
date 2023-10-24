@@ -13,6 +13,7 @@ logger = logging.getLogger('django')
 
 @api_view(['GET'])
 @permission_classes([IsAuthenticated])
+# @permission_required("blog.view_post")
 def get_all_users(request):
     queryset = User.objects.all()
     data = UserSerializer(queryset, many=True).data

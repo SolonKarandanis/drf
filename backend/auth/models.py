@@ -4,11 +4,22 @@ from django.contrib.auth.base_user import BaseUserManager
 from django.utils.translation import gettext_lazy as _
 
 
+class UserQuerySet(models.QuerySet):
+    def is_active(self):
+        return self.filter(is_active=True)
+
+    def is_staff(self):
+        return self.filter(is_staff=True)
+
+
 class UserManager(BaseUserManager):
     """
     Custom user model manager where email is the unique identifiers
     for authentication instead of usernames.
     """
+
+    def get_queryset(self, *args, **kwargs):
+        return UserQuerySet(self.model, using=self._db)
 
     def create_user(self, email, password, **extra_fields):
         """
@@ -57,6 +68,9 @@ class User(AbstractUser):
     created_date = models.DateTimeField(auto_now_add=True, null=False)
     updated_date = models.DateTimeField(auto_now=True, null=False)
     email = models.EmailField(_("email address"), unique=True)
+
+    class Meta:
+        ordering = ['username']
 
     objects = UserManager()
 
