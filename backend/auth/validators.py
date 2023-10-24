@@ -1,16 +1,18 @@
+
+
 from rest_framework import serializers
 from .models import User
 
 
-def validate_username(self, value):
-    qs = User.objects.filter(username=value)
+def validate_username(self):
+    qs = User.objects.filter(username=self)
     if qs.exists():
-        raise serializers.ValidationError(f"Username: {value} already exists")
-    return value
+        raise serializers.ValidationError(f"Username: {self} already exists")
+    return self
 
 
-def validate_email(self, value):
-    qs = User.objects.filter(email=value)
+def validate_email(self):
+    qs = User.objects.filter(email=self)
     if qs.exists():
-        raise serializers.ValidationError(f"Email: {value} already exists")
-    return value
+        raise serializers.ValidationError(f"Email: {self} already exists")
+    return self
