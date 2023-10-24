@@ -1,4 +1,5 @@
 import logging
+from django.core.paginator import Paginator, EmptyPage
 from rest_framework import status
 from rest_framework.response import Response
 from rest_framework.decorators import api_view, permission_classes
@@ -14,9 +15,17 @@ logger = logging.getLogger('django')
 
 @api_view(['GET'])
 def get_all_users(request):
+    page = request.GET.get('page', 1)
+    size = request.GET.get('size', 10)
+    logger.info(f'page: {page}')
+    logger.info(f'size: {size}')
     queryset = User.objects.all()
-    data = UserSerializer(queryset, many=True).data
-    logger.info(f'data: {data}')
+    paginator = Paginator(queryset, size)
+    try:
+        page_obj = paginator.page(page)
+    except EmptyPage:
+        return Response({"invalid": "Page not Found"}, status=status.HTTP_400_BAD_REQUEST)
+    data = UserSerializer(page_obj, many=True).data
     return Response(data)
 
 
