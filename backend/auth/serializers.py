@@ -1,6 +1,6 @@
 from rest_framework import serializers
-from django.contrib.auth import get_user_model
 
+from .validators import validate_username, validate_email
 from .models import User
 
 
@@ -20,6 +20,9 @@ class UserPublicSerializer(serializers.Serializer):
 
 
 class UserSerializer(serializers.ModelSerializer):
+    username = serializers.CharField(validators=[validate_username])
+    email = serializers.CharField(validators=[validate_email])
+
     class Meta:
         model = User
         fields = [
