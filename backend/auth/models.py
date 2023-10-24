@@ -1,6 +1,6 @@
 from django.db import models
 from django.contrib.auth.models import AbstractUser
-from django.utils.timezone import now
+#from django.utils.timezone import now
 
 
 class UserType(models.Model):
@@ -20,8 +20,8 @@ class UserType(models.Model):
 # Create your models here.
 class User(AbstractUser):
     user_type = models.ManyToManyField(UserType)
-    created_date = models.DateTimeField(default=now, null=False)
-    updated_date = models.DateTimeField(default=now,null=False)
+    created_date = models.DateTimeField(auto_now_add=True, null=False)
+    updated_date = models.DateTimeField(auto_now=True, null=False)
 
     def __str__(self):
         return f"{self.username}"
