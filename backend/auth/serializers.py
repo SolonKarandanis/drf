@@ -1,7 +1,7 @@
 from rest_framework import serializers
 from django.contrib.auth import get_user_model
 
-User = get_user_model()
+from .models import User
 
 
 class UserProductInlineSerializer(serializers.Serializer):
@@ -17,3 +17,18 @@ class UserPublicSerializer(serializers.Serializer):
     username = serializers.CharField(read_only=True)
     this_is_not_real = serializers.CharField(read_only=True)
     id = serializers.IntegerField(read_only=True)
+
+
+class UserSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = User
+        fields = [
+            'id',
+            'username',
+            'first_name',
+            'last_name',
+            'email',
+            'is_active',
+            'created_date',
+            'updated_date'
+        ]
