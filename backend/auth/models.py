@@ -23,10 +23,17 @@ class UserManager(BaseUserManager):
 
     def create_user(self, email, password, **extra_fields):
         """
-               Create and save a user with the given email and password.
-               """
+       Create and save a user with the given email and password.
+       """
+        extra_fields.setdefault("is_staff", False)
+        extra_fields.setdefault("is_superuser", False)
+        extra_fields.setdefault("is_active", True)
         if not email:
             raise ValueError(_("The Email must be set"))
+        if extra_fields.get("is_staff") is not False:
+            raise ValueError(_("User cannot have is_staff=True."))
+        if extra_fields.get("is_superuser") is not False:
+            raise ValueError(_("User cannot have is_superuser=True."))
         email = self.normalize_email(email)
         user = self.model(email=email, **extra_fields)
         user.set_password(password)
