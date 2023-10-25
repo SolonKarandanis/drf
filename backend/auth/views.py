@@ -14,6 +14,7 @@ logger = logging.getLogger('django')
 # Create your views here.
 
 @api_view(['GET'])
+@permission_classes([IsAuthenticated])
 def get_all_users(request):
     page = request.GET.get('page', 1)
     size = request.GET.get('size', 10)
@@ -30,6 +31,7 @@ def get_all_users(request):
 
 
 @api_view(['POST'])
+@permission_classes([IsAuthenticated])
 def create_user(request):
     serializer = CreateUserSerializer(data=request.data)
     if serializer.is_valid(raise_exception=True):
