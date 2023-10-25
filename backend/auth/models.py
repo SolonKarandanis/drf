@@ -76,6 +76,8 @@ class User(AbstractUser):
     updated_date = models.DateTimeField(auto_now=True, null=False)
     email = models.EmailField(_("email address"), unique=True)
 
+    date_joined = None
+
     class Meta:
         ordering = ['username']
 
