@@ -1,5 +1,6 @@
 import logging
 from django.core.paginator import Paginator, EmptyPage
+from django.shortcuts import get_object_or_404
 from rest_framework import status
 from rest_framework.response import Response
 from rest_framework.decorators import api_view, permission_classes
@@ -37,3 +38,11 @@ def create_user(request):
         serializer.save()
         return Response(serializer.data, status=status.HTTP_201_CREATED)
     return Response({"invalid": "not good data"}, status=status.HTTP_400_BAD_REQUEST)
+
+
+@api_view(['GET'])
+@permission_classes([IsAuthenticated])
+def get_user(request, pk):
+    obj = get_object_or_404(User, pk=pk)
+    data = UserSerializer(obj).data
+    return Response(data)
