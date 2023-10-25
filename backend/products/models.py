@@ -33,6 +33,7 @@ class ProductManager(models.Manager):
 
 class Product(models.Model):
     user = models.ForeignKey(User, default=1, null=True, on_delete=models.SET_NULL)
+    sku = models.CharField(max_length=120, default=None)
     title = models.CharField(max_length=120)
     content = models.TextField(blank=True, null=True)
     price = models.DecimalField(max_digits=15, decimal_places=2, default=99.99)
@@ -40,7 +41,7 @@ class Product(models.Model):
     inventory = models.IntegerField(blank=True, null=True)
 
     class Meta:
-        ordering = ['title']
+        ordering = ['sku']
 
     objects = ProductManager()
 
