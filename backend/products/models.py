@@ -53,7 +53,7 @@ class Product(models.Model):
         return "%.2f" % (float(self.price) * 0.8)
 
     @classmethod
-    def update_price(cls, product_id, price):
+    def update_price(cls, product_id: int, price: float):
         product = cls.objects.get(pk=product_id)
         product = product.price = price
         product.save()
