@@ -11,7 +11,6 @@ class ProductQuerySet(models.QuerySet):
         return self.filter(public=True)
 
     def with_owner(self):
-        # prefetch_related()
         return self.select_related('user')
 
     def search(self, query, user=None):

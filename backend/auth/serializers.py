@@ -1,5 +1,5 @@
 from rest_framework import serializers
-
+from django.contrib.auth.models import Group
 from .validators import validate_username, validate_email
 from .models import User
 
@@ -20,7 +20,6 @@ class UserPublicSerializer(serializers.Serializer):
 
 
 class UserSerializer(serializers.ModelSerializer):
-
     class Meta:
         model = User
         fields = [
@@ -32,6 +31,30 @@ class UserSerializer(serializers.ModelSerializer):
             'is_active',
             'created_date',
             'updated_date'
+        ]
+
+
+class GroupSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = Group
+        fields = ('name',)
+
+
+class UserDetailSerializer(serializers.ModelSerializer):
+    groups = GroupSerializer(many=True)
+
+    class Meta:
+        model = User
+        fields = [
+            'id',
+            'username',
+            'first_name',
+            'last_name',
+            'email',
+            'is_active',
+            'created_date',
+            'updated_date',
+            'groups'
         ]
 
 

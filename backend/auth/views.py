@@ -6,7 +6,7 @@ from rest_framework.response import Response
 from rest_framework.decorators import api_view, permission_classes
 from rest_framework.permissions import IsAuthenticated
 from .models import User
-from .serializers import UserSerializer, CreateUserSerializer
+from .serializers import UserSerializer, CreateUserSerializer, UserDetailSerializer
 
 logger = logging.getLogger('django')
 
@@ -43,6 +43,6 @@ def create_user(request):
 @api_view(['GET'])
 @permission_classes([IsAuthenticated])
 def get_user(request, pk):
-    obj = get_object_or_404(User, pk=pk)
-    data = UserSerializer(obj).data
+    obj = User.objects.get_queryset().with_groups().get(pk=pk)
+    data = UserDetailSerializer(obj).data
     return Response(data)

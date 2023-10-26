@@ -11,6 +11,9 @@ class UserQuerySet(models.QuerySet):
     def is_staff(self):
         return self.filter(is_staff=True)
 
+    def with_groups(self):
+        return self.prefetch_related('groups')
+
 
 class UserManager(BaseUserManager):
     """
