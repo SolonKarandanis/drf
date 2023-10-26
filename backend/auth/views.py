@@ -1,13 +1,13 @@
 import logging
 from django.core.paginator import Paginator, EmptyPage
-from django.contrib.auth.models import Permission
 from rest_framework import status
 from rest_framework.response import Response
 from rest_framework.decorators import api_view, permission_classes
 from rest_framework.permissions import IsAuthenticated
+from celery.result import AsyncResult
 from .models import User
 from .serializers import UserSerializer, CreateUserSerializer, UserDetailSerializer
-from .tasks import test
+from .tasks import create_task
 
 logger = logging.getLogger('django')
 
@@ -56,7 +56,19 @@ def get_account(request):
     return Response(data)
 
 
+@api_view(['POST'])
+def run_task(request):
+    task_type = request.data['type']
+    task = create_task.delay(int(task_type))
+    return Response({"task_id": task.id}, status=202)
+
+
 @api_view(['GET'])
-def test(request):
-    test.delay()
-    return Response(status=status.HTTP_200_OK)
+def get_status(request, task_id):
+    task_result = AsyncResult(task_id)
+    result = {
+        "task_id": task_id,
+        "task_status": task_result.status,
+        "task_result": task_result.result
+    }
+    return Response(result, status=200)

@@ -39,6 +39,7 @@ INSTALLED_APPS = [
     'rest_framework',
     'rest_framework.authtoken',
     "debug_toolbar",
+    "django_celery_results",
     'auth',
     'products',
     'cart',
@@ -198,3 +199,4 @@ CELERY_ACCEPT_CONTENT = ['application/json']
 CELERY_RESULT_SERIALIZER = 'json'
 CELERY_TASK_SERIALIZER = 'json'
 CELERY_TIMEZONE = 'Europe/Athens'
+CELERY_RESULT_BACKEND = 'redis://192.168.1.5:6379/0'
