@@ -1,7 +1,9 @@
+
 from rest_framework import serializers
 from django.contrib.auth.models import Group
 from .validators import validate_username, validate_email
 from .models import User
+
 
 
 class UserProductInlineSerializer(serializers.Serializer):
@@ -42,6 +44,7 @@ class GroupSerializer(serializers.ModelSerializer):
 
 class UserDetailSerializer(serializers.ModelSerializer):
     groups = GroupSerializer(many=True)
+    permissions = serializers.SerializerMethodField()
 
     class Meta:
         model = User
@@ -54,8 +57,12 @@ class UserDetailSerializer(serializers.ModelSerializer):
             'is_active',
             'created_date',
             'updated_date',
-            'groups'
+            'groups',
+            'permissions'
         ]
+
+    def get_permissions(self, obj):
+        return obj.get_group_permissions()
 
 
 class CreateUserSerializer(serializers.ModelSerializer):
