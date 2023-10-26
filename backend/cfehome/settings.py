@@ -40,6 +40,7 @@ INSTALLED_APPS = [
     'rest_framework.authtoken',
     "debug_toolbar",
     "django_celery_results",
+    'django_celery_beat',
     'auth',
     'products',
     'cart',
@@ -200,3 +201,4 @@ CELERY_RESULT_SERIALIZER = 'json'
 CELERY_TASK_SERIALIZER = 'json'
 CELERY_TIMEZONE = 'Europe/Athens'
 CELERY_RESULT_BACKEND = 'redis://192.168.1.5:6379/0'
+CELERY_BEAT_SCHEDULER = 'django_celery_beat.schedulers:DatabaseScheduler'
