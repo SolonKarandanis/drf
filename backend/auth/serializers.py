@@ -1,9 +1,7 @@
-
 from rest_framework import serializers
 from django.contrib.auth.models import Group
 from .validators import validate_username, validate_email
 from .models import User
-
 
 
 class UserProductInlineSerializer(serializers.Serializer):
