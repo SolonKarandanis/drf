@@ -46,3 +46,10 @@ def get_user(request, pk):
     obj = User.objects.get_queryset().with_groups().get(pk=pk)
     data = UserDetailSerializer(obj).data
     return Response(data)
+
+
+@api_view(['GET'])
+@permission_classes([IsAuthenticated])
+def get_account(request):
+    data = UserDetailSerializer(request.user).data
+    return Response(data)

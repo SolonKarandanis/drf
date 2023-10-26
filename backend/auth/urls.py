@@ -1,7 +1,7 @@
 from django.urls import path
 from rest_framework.authtoken.views import obtain_auth_token
 from rest_framework_simplejwt.views import TokenObtainPairView, TokenRefreshView, TokenVerifyView
-from .views import get_all_users, create_user, get_user
+from .views import get_all_users, create_user, get_user, get_account
 
 urlpatterns = [
     path('', obtain_auth_token),
@@ -11,4 +11,5 @@ urlpatterns = [
     path('users/', get_all_users,  name='get-users'),
     path('users/create/', create_user,  name='create-user'),
     path('users/<int:pk>/', get_user,  name='get-user'),
+    path('users/account/', get_account,  name='get-account'),
 ]
