@@ -38,6 +38,7 @@ INSTALLED_APPS = [
     'corsheaders',
     'rest_framework',
     'rest_framework.authtoken',
+    "debug_toolbar",
     'auth',
     'products',
     'cart',
@@ -53,6 +54,7 @@ MIDDLEWARE = [
     'django.contrib.auth.middleware.AuthenticationMiddleware',
     'django.contrib.messages.middleware.MessageMiddleware',
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
+    "debug_toolbar.middleware.DebugToolbarMiddleware",
 ]
 
 ROOT_URLCONF = 'cfehome.urls'
@@ -186,3 +188,6 @@ SIMPLE_JWT = {
     "AUTH_HEADER_TYPES": ["Bearer"],
     "ACCESS_TOKEN_LIFETIME": datetime.timedelta(minutes=30),
 }
+INTERNAL_IPS = [
+    "127.0.0.1",
+]
