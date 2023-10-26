@@ -191,3 +191,10 @@ SIMPLE_JWT = {
 INTERNAL_IPS = [
     "127.0.0.1",
 ]
+
+# Celery Settings
+CELERY_BROKER_URL = 'redis://192.168.1.5:6379/0'
+CELERY_ACCEPT_CONTENT = ['application/json']
+CELERY_RESULT_SERIALIZER = 'json'
+CELERY_TASK_SERIALIZER = 'json'
+CELERY_TIMEZONE = 'Europe/Athens'
