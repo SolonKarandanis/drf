@@ -7,6 +7,7 @@ from rest_framework.decorators import api_view, permission_classes
 from rest_framework.permissions import IsAuthenticated
 from .models import User
 from .serializers import UserSerializer, CreateUserSerializer, UserDetailSerializer
+from .tasks import test
 
 logger = logging.getLogger('django')
 
@@ -53,3 +54,9 @@ def get_user(request, pk):
 def get_account(request):
     data = UserDetailSerializer(request.user).data
     return Response(data)
+
+
+@api_view(['GET'])
+def test(request):
+    test.delay()
+    return Response(status=status.HTTP_200_OK)
