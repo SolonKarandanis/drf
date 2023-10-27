@@ -44,7 +44,8 @@ INSTALLED_APPS = [
     'auth',
     'products',
     'cart',
-    'orders'
+    'orders',
+    'mail'
 ]
 
 MIDDLEWARE = [
@@ -199,7 +200,8 @@ CELERY_BROKER_URL = 'redis://192.168.1.5:6379/0'
 accept_content = ['application/json']
 result_serializer = 'json'
 task_serializer = 'json'
-timezone = 'Europe/Athens'
+CELERY_TIMEZONE = 'Europe/Athens'
+CELERY_ENABLE_UTC = False
 CELERY_RESULT_BACKEND = 'redis://192.168.1.5:6379/0'
 CELERY_BEAT_SCHEDULER = 'django_celery_beat.schedulers:DatabaseScheduler'
 
