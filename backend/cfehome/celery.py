@@ -13,8 +13,8 @@ app.config_from_object(settings, namespace='CELERY')
 
 app.conf.beat_schedule = {
     'send-mail': {
-        'task': 'mail_app.tasks.send_mail_task',
-        'scheduled': crontab(hour='8', minute='56'),
+        'task': 'mail.tasks.send_mail_task',
+        'scheduled': crontab(hour='8', minute='13'),
         'args': (2)
     }
 }
