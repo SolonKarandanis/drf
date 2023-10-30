@@ -14,7 +14,7 @@ def send_mail_task(self, data):
     users = get_user_model().objects.all()
     usernames = [user.username for user in users]
     comma_seperated_usernames = ','.join(usernames)
-    logger.info(f" SENDINF MAIL TO USERS: {comma_seperated_usernames}")
+    logger.info(f" SENDING MAIL TO USERS: {comma_seperated_usernames}")
     for user in users:
         mail_subject = "Testing"
         message = "Hey"
