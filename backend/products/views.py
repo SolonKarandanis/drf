@@ -24,7 +24,7 @@ def get_product(request, pk, *args, **kwargs):
 
 @api_view(['GET'])
 @permission_classes([IsAuthenticated])
-def get_seller_product(request, pk):
+def get_supplier_product(request, pk):
     logged_in_user = request.user
     product = Product.objects.get_queryset().owned_by(logged_in_user).get(pk=pk)
     data = ProductSerializer(product, many=False).data
@@ -45,7 +45,7 @@ def get_all_products(request):
 
 @api_view(['GET'])
 @permission_classes([IsAuthenticated])
-def get_all_seller_products(request):
+def get_all_supplier_products(request):
     logged_in_user = request.user
     queryset = Product.objects.get_queryset().owned_by(logged_in_user)
     try:
