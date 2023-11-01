@@ -3,11 +3,11 @@ from rest_framework.validators import UniqueValidator
 from .models import Product
 
 
-def validate_title(self, value):
-    qs = Product.objects.filter(title=value)
+def validate_sku(self):
+    qs = Product.objects.filter(sku=self)
     if qs.exists():
-        raise serializers.ValidationError(f"{value} is already a product name")
-    return value
+        raise serializers.ValidationError(f"{self} is already a product sku")
+    return self
 
 
 unique_product_title = UniqueValidator(queryset=Product.objects.all(), lookup='iexact')

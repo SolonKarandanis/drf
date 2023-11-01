@@ -13,6 +13,9 @@ class ProductQuerySet(models.QuerySet):
     def with_owner(self):
         return self.select_related('user')
 
+    def owned_by(self, user):
+        return self.filter(user=user)
+
     def search(self, query, user=None):
         lookup = Q(title__icontains=query) | Q(content__icontains=query)
         qs = self.is_public().filter(lookup)
