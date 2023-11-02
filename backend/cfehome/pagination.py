@@ -10,8 +10,8 @@ class CustomPagination(pagination.LimitOffsetPagination):
 
     def paginate_queryset(self, queryset, request, view=None):
 
-        limit = request.query_params.get('limit')
-        offset = request.query_params.get('offset')
+        offset = request.GET.get('page', 1)
+        limit = request.GET.get('size', 10)
 
         if limit:
             limit = int(limit)

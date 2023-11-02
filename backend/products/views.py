@@ -1,6 +1,6 @@
 import logging
 
-from .serializers import ProductSerializer, CreateProductSerializer, ProductListSerializer
+from .serializers import ProductSerializer, CreateProductSerializer, PaginatedProductListSerializer
 from .models import Product
 from rest_framework import status
 from rest_framework import generics, mixins, permissions, authentication
@@ -35,12 +35,8 @@ def get_supplier_product(request, pk):
 @permission_classes([IsAuthenticated])
 def get_all_products(request):
     queryset = Product.objects.all()
-    try:
-        page_obj = create_page_obj(request, queryset)
-    except EmptyPage:
-        return Response({"invalid": "Page not Found"}, status=status.HTTP_400_BAD_REQUEST)
-    data = ProductListSerializer(page_obj, many=True).data
-    return Response(data)
+    serializer = PaginatedProductListSerializer(queryset, request)
+    return Response(serializer.data)
 
 
 @api_view(['GET'])
@@ -48,12 +44,8 @@ def get_all_products(request):
 def get_all_supplier_products(request):
     logged_in_user = request.user
     queryset = Product.objects.get_queryset().owned_by(logged_in_user)
-    try:
-        page_obj = create_page_obj(request, queryset)
-    except EmptyPage:
-        return Response({"invalid": "Page not Found"}, status=status.HTTP_400_BAD_REQUEST)
-    data = ProductListSerializer(page_obj, many=True).data
-    return Response(data)
+    serializer = PaginatedProductListSerializer(queryset, request)
+    return Response(serializer.data)
 
 
 def create_page_obj(request, queryset):
