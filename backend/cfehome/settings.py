@@ -49,6 +49,7 @@ INSTALLED_APPS = [
     'orders',
     'mail',
     'notifications',
+    'chat',
 ]
 
 MIDDLEWARE = [
