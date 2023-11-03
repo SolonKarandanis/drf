@@ -4,7 +4,7 @@ from django.core.paginator import Paginator, EmptyPage, PageNotAnInteger
 logger = logging.getLogger('django')
 
 
-class ModelListSerializer:
+class ModelPaginationSerializer:
     """
     Serializes page objects of querysets.
     """

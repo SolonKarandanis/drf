@@ -1,11 +1,10 @@
 import logging
 
 from rest_framework import serializers
-from django.core.paginator import Paginator, EmptyPage, PageNotAnInteger
 from .models import Product
 from .validators import unique_product_title, validate_sku
 from auth.serializers import UserPublicSerializer
-from cfehome.serializers import ModelListSerializer
+from cfehome.serializers import ModelPaginationSerializer
 
 logger = logging.getLogger('django')
 
@@ -42,7 +41,7 @@ class ProductListSerializer(serializers.ModelSerializer):
         ]
 
 
-class PaginatedProductListSerializer(ModelListSerializer):
+class PaginatedProductListSerializer(ModelPaginationSerializer):
     """
     Serializes page objects of product querysets.
     """

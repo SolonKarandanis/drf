@@ -6,10 +6,21 @@ from products.models import Product
 User = settings.AUTH_USER_MODEL
 
 
+class CartQuerySet(models.QuerySet):
+    def owned_by(self, user):
+        return self.filter(user=user)
+
+    def with_cart_items(self):
+        return self.prefetch_related('cart_items')
+
+
 class CartManager(models.Manager):
     def create_cart(self, user):
         cart = self.create(user=user)
         return cart
+
+    def get_queryset(self, *args, **kwargs):
+        return CartQuerySet(self.model, using=self._db)
 
 
 # Create your models here.
