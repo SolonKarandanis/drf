@@ -5,6 +5,7 @@ from django.core.paginator import Paginator, EmptyPage, PageNotAnInteger
 from .models import Product
 from .validators import unique_product_title, validate_sku
 from auth.serializers import UserPublicSerializer
+from cfehome.serializers import ModelListSerializer
 
 logger = logging.getLogger('django')
 
@@ -41,30 +42,16 @@ class ProductListSerializer(serializers.ModelSerializer):
         ]
 
 
-class PaginatedProductListSerializer:
+class PaginatedProductListSerializer(ModelListSerializer):
     """
     Serializes page objects of product querysets.
     """
 
     def __init__(self, data, request):
-        page = request.GET.get('page', 1)
-        size = request.GET.get('size', 10)
-        logger.info(f'page: {page}')
-        logger.info(f'size: {size}')
-        paginator = Paginator(data, size)
-        try:
-            data = paginator.page(page)
-        except PageNotAnInteger:
-            data = paginator.page(1)
-        except EmptyPage:
-            data = paginator.page(paginator.num_pages)
-        count = paginator.count
-
-        previous = None if not data.has_previous() else data.previous_page_number()
-        next = None if not data.has_next() else data.next_page_number()
+        super().__init__(data, request)
         serializer = ProductListSerializer(data, many=True)
-        self.data = {'count': count, 'previous': previous,
-                     'next': next, 'data': serializer.data}
+        self.data = {'count': self.page_data.get('count'), 'previous': self.page_data.get('previous'),
+                     'next': self.page_data.get('next'), 'data': serializer.data}
 
 
 class CreateProductSerializer(serializers.ModelSerializer):
