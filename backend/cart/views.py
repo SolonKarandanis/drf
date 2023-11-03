@@ -17,3 +17,27 @@ def get_user_cart(request):
     cart = Cart.objects.get_queryset().with_cart_items().owned_by(logged_in_user)
     data = CartSerializer(cart, many=False).data
     return Response(data)
+
+
+@api_view(['POST'])
+@permission_classes([IsAuthenticated])
+def add_cart_items(request):
+    pass
+
+
+@api_view(['PUT'])
+@permission_classes([IsAuthenticated])
+def update_quantities(request):
+    pass
+
+
+@api_view(['DELETE'])
+@permission_classes([IsAuthenticated])
+def delete_cart_items(request):
+    pass
+
+
+@api_view(['PUT'])
+@permission_classes([IsAuthenticated])
+def clear_cart(request):
+    pass
