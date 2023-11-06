@@ -32,6 +32,14 @@ class Cart(models.Model):
     date_modified = models.DateTimeField(auto_now=True, null=False)
     objects = CartManager()
 
+    class Meta:
+        constraints = [
+            models.UniqueConstraint(
+                name='one_cart_per_user',
+                fields=['id', 'user']
+            )
+        ]
+
     def add_item_to_cart(self, products_id: int, quantity: int, price: float) -> None:
         existing_cart_item = next(filter(lambda ci: ci.products_id == products_id, self.cart_items), None)
         if existing_cart_item is None:
