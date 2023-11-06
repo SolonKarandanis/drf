@@ -200,8 +200,10 @@ INTERNAL_IPS = [
     "127.0.0.1",
 ]
 
+REDIS_URL = 'redis://192.168.1.5:6379/0'
+
 # Celery Settings
-CELERY_BROKER_URL = 'redis://192.168.1.5:6379/0'
+CELERY_BROKER_URL = REDIS_URL
 accept_content = ['application/json']
 result_serializer = 'json'
 task_serializer = 'json'
@@ -227,3 +229,10 @@ CHANNEL_LAYERS = {
         },
     },
 }
+
+# CACHES = {
+#     "default": {
+#         "BACKEND": "redis_cache.RedisCache",
+#         "LOCATION": REDIS_URL
+#     }
+# }
