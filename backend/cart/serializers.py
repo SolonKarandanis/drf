@@ -25,7 +25,7 @@ class PaginatedCartItemListSerializer(ModelPaginationSerializer):
 
 
 class CartSerializer(serializers.ModelSerializer):
-    cart_items = CartItemSerializer(source='cart_items', read_only=True)
+    cart_items = CartItemSerializer(many=True, read_only=True)
 
     class Meta:
         model = Cart
