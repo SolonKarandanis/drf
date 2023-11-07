@@ -1,9 +1,12 @@
+import logging
+
 from django.db import models
 from django.conf import settings
 
 from products.models import Product
 
 User = settings.AUTH_USER_MODEL
+logger = logging.getLogger('django')
 
 
 class CartQuerySet(models.QuerySet):
@@ -19,8 +22,20 @@ class CartManager(models.Manager):
         cart = self.create(user=user)
         return cart
 
+    def update_cart(self):
+        cart = self.save()
+        return cart
+
     def get_queryset(self, *args, **kwargs):
         return CartQuerySet(self.model, using=self._db)
+
+    def add_items_to_cart(self, data_dict, products_to_be_added):
+        cart_items =[]
+        for product in products_to_be_added:
+            product_id = product.id
+            quantity = data_dict[product_id]
+            price = product.price
+            self.car_items.append()
 
 
 # Create your models here.
@@ -41,14 +56,14 @@ class Cart(models.Model):
         ]
 
     def add_item_to_cart(self, products_id: int, quantity: int, price: float) -> None:
-        existing_cart_item = next(filter(lambda ci: ci.products_id == products_id, self.cart_items), None)
+        existing_cart_item = next(filter(lambda ci: ci.products_id == products_id, self.cart_items.all()), None)
         if existing_cart_item is None:
             cart_item = CartItem(quantity=quantity,
                                  modification_alert=False,
                                  unit_price=price,
                                  total_price=quantity * price,
-                                 products_id=products_id)
-            self.cart_items.append(cart_item)
+                                 product_id=products_id)
+            self.cart_items.add(cart_item)
         else:
             new_quantity = existing_cart_item.quantity + quantity
             existing_cart_item.quantity = new_quantity
@@ -72,10 +87,10 @@ class Cart(models.Model):
         self.update_cart_total_price()
 
     def update_cart_total_price(self) -> None:
-        self.total_price = sum(ci.total_price for ci in self.cart_items)
+        self.total_price = sum(ci.total_price for ci in self.cart_items.all())
 
     def __repr__(self):
-        return f"<Cart {self.id}>"
+        return f"<Cart id:{self.id} >"
 
 
 class CartItem(models.Model):

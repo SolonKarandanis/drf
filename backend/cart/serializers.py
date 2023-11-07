@@ -2,7 +2,7 @@ from rest_framework import serializers
 from cfehome.serializers import ModelPaginationSerializer
 
 from .models import CartItem, Cart
-
+from .validators import is_quantity_valid
 
 class CartItemSerializer(serializers.ModelSerializer):
     class Meta:
@@ -37,3 +37,11 @@ class CartSerializer(serializers.ModelSerializer):
             'date_modified',
             'cart_items',
         ]
+
+
+class AddToCart(serializers.Serializer):
+    product_id = serializers.IntegerField()
+    quantity = serializers.IntegerField( validators=[is_quantity_valid])
+
+    def __repr__(self):
+        return f"<AddToCart ProductId:{self.product_id},  Quantity:{self.quantity}>"
