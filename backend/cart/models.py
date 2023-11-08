@@ -83,22 +83,6 @@ class Cart(models.Model):
         self.cart_items.add(*items, bulk=False)
         self.update_cart_total_price()
 
-    def add_item_to_cart(self, products_id: int, quantity: int, price: float) -> None:
-        existing_cart_item = next(filter(lambda ci: ci.product_id == products_id, self.cart_items.all()), None)
-        if existing_cart_item is None:
-            cart_item = CartItem(quantity=quantity,
-                                 modification_alert=False,
-                                 unit_price=price,
-                                 total_price=quantity * price,
-                                 product_id=products_id)
-            self.cart_items.add(cart_item, bulk=False)
-        else:
-            new_quantity = existing_cart_item.quantity + quantity
-            existing_cart_item.quantity = new_quantity
-            existing_cart_item.total_price = new_quantity * price
-
-        self.update_cart_total_price()
-
     def update_item_quantity(self, cart_item_id: int, quantity: int) -> None:
         existing_cart_item = next(filter(lambda ci: ci.id == cart_item_id, self.cart_items), None)
         if existing_cart_item is not None:
