@@ -11,7 +11,11 @@ logger = logging.getLogger('django')
 
 class CartQuerySet(models.QuerySet):
     def owned_by(self, user):
-        return self.filter(user=user)
+        carts = self.filter(user=user)
+        if len(carts) == 1:
+            return carts[0]
+        else:
+            return self.create(user=user, total_price=0)
 
     def with_cart_items(self):
         return self.prefetch_related('cart_items')
@@ -19,7 +23,7 @@ class CartQuerySet(models.QuerySet):
 
 class CartManager(models.Manager):
     def create_cart(self, user):
-        cart = self.create(user=user)
+        cart = self.create(user=user, total_price=0)
         return cart
 
     def update_cart(self):
@@ -30,7 +34,7 @@ class CartManager(models.Manager):
         return CartQuerySet(self.model, using=self._db)
 
     def add_items_to_cart(self, data_dict, products_to_be_added):
-        cart_items =[]
+        cart_items = []
         for product in products_to_be_added:
             product_id = product.id
             quantity = data_dict[product_id]
@@ -55,15 +59,39 @@ class Cart(models.Model):
             )
         ]
 
+    def add_items_to_cart(self, product_quantities_dict, products_to_be_added):
+        items = []
+        for product in products_to_be_added:
+            product_id = product.id
+            quantity = product_quantities_dict[product_id]
+            price = product.price
+            existing_cart_item = next(filter(lambda ci: ci.product_id == product_id, self.cart_items.all()), None)
+            logger.info(f'existing_cart_item: {existing_cart_item}')
+            if existing_cart_item is None:
+                cart_item = CartItem(quantity=quantity,
+                                     modification_alert=False,
+                                     unit_price=price,
+                                     total_price=quantity * price,
+                                     product_id=product_id)
+                items.append(cart_item)
+            else:
+                new_quantity = existing_cart_item.quantity + quantity
+                existing_cart_item.quantity = new_quantity
+                existing_cart_item.total_price = new_quantity * price
+                items.append(existing_cart_item)
+        logger.info(f'items: {items}')
+        self.cart_items.add(*items, bulk=False)
+        self.update_cart_total_price()
+
     def add_item_to_cart(self, products_id: int, quantity: int, price: float) -> None:
-        existing_cart_item = next(filter(lambda ci: ci.products_id == products_id, self.cart_items.all()), None)
+        existing_cart_item = next(filter(lambda ci: ci.product_id == products_id, self.cart_items.all()), None)
         if existing_cart_item is None:
             cart_item = CartItem(quantity=quantity,
                                  modification_alert=False,
                                  unit_price=price,
                                  total_price=quantity * price,
                                  product_id=products_id)
-            self.cart_items.add(cart_item)
+            self.cart_items.add(cart_item, bulk=False)
         else:
             new_quantity = existing_cart_item.quantity + quantity
             existing_cart_item.quantity = new_quantity
@@ -88,6 +116,7 @@ class Cart(models.Model):
 
     def update_cart_total_price(self) -> None:
         self.total_price = sum(ci.total_price for ci in self.cart_items.all())
+        self.save()
 
     def __repr__(self):
         return f"<Cart id:{self.id} >"
