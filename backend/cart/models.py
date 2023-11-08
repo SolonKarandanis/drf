@@ -1,6 +1,6 @@
 import logging
 
-from django.db import models
+from django.db import models, transaction
 from django.conf import settings
 
 from products.models import Product
@@ -59,6 +59,7 @@ class Cart(models.Model):
             )
         ]
 
+    @transaction.atomic
     def add_items_to_cart(self, product_quantities_dict, products_to_be_added):
         items = []
         for product in products_to_be_added:
