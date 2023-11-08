@@ -7,7 +7,7 @@ import logging
 # Create your views here.
 from .models import Cart
 from products.models import Product
-from .serializers import CartSerializer, AddToCart
+from .serializers import CartSerializer, AddOrUpdateCart, DeleteCartItems
 
 logger = logging.getLogger('django')
 
@@ -32,15 +32,14 @@ def add_cart_items(request):
         .with_cart_items() \
         .owned_by(logged_in_user)
     logger.info(f'cart: {cart}')
-    serializer = AddToCart(data=request.data, many=True)
+    serializer = AddOrUpdateCart(data=request.data, many=True)
     if serializer.is_valid(raise_exception=True):
         data = serializer.data
         data_list = [dict(item) for item in data]
         product_ids = [d['product_id'] for d in data_list]
         products_to_be_added = Product.objects.filter(pk__in=product_ids)
         product_quantities_dict = {d['product_id']: d['quantity'] for d in data_list}
-        cart.add_items_to_cart(product_quantities_dict,products_to_be_added)
-
+        cart.add_items_to_cart(product_quantities_dict, products_to_be_added)
         data = CartSerializer(cart).data
         return Response(data, status=status.HTTP_201_CREATED)
     return Response({"invalid": "not good data"}, status=status.HTTP_400_BAD_REQUEST)
@@ -50,15 +49,34 @@ def add_cart_items(request):
 @permission_classes([IsAuthenticated])
 def update_quantities(request):
     logged_in_user = request.user
+    cart = Cart.objects.get_queryset() \
+        .with_cart_items() \
+        .owned_by(logged_in_user)
+    logger.info(f'cart: {cart}')
+    serializer = AddOrUpdateCart(data=request.data, many=False)
+    if serializer.is_valid(raise_exception=True):
+        data = serializer.data
+        logger.info(f'data: {data}')
+        return Response(status=status.HTTP_201_CREATED)
+    return Response({"invalid": "not good data"}, status=status.HTTP_400_BAD_REQUEST)
 
 
 @api_view(['DELETE'])
 @permission_classes([IsAuthenticated])
 def delete_cart_items(request):
     logged_in_user = request.user
+    cart = Cart.objects.get_queryset() \
+        .with_cart_items() \
+        .owned_by(logged_in_user)
+    logger.info(f'cart: {cart}')
+    serializer = DeleteCartItems(data=request.data, many=True)
 
 
 @api_view(['PUT'])
 @permission_classes([IsAuthenticated])
 def clear_cart(request):
     logged_in_user = request.user
+    cart = Cart.objects.get_queryset() \
+        .with_cart_items() \
+        .owned_by(logged_in_user)
+    logger.info(f'cart: {cart}')

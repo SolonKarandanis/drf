@@ -41,9 +41,13 @@ class CartSerializer(serializers.ModelSerializer):
         ]
 
 
-class AddToCart(serializers.Serializer):
+class AddOrUpdateCart(serializers.Serializer):
     product_id = serializers.IntegerField()
     quantity = serializers.IntegerField(validators=[is_quantity_valid])
 
     def __repr__(self):
-        return f"<AddToCart ProductId:{self.product_id},  Quantity:{self.quantity}>"
+        return f"<AddOrUpdateCart ProductId:{self.product_id},  Quantity:{self.quantity}>"
+
+
+class DeleteCartItems(serializers.Serializer):
+    product_id = serializers.IntegerField()
