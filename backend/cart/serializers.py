@@ -41,7 +41,7 @@ class CartSerializer(serializers.ModelSerializer):
         ]
 
 
-class AddOrUpdateCart(serializers.Serializer):
+class AddToCart(serializers.Serializer):
     product_id = serializers.IntegerField()
     quantity = serializers.IntegerField(validators=[is_quantity_valid])
 
@@ -49,5 +49,9 @@ class AddOrUpdateCart(serializers.Serializer):
         return f"<AddOrUpdateCart ProductId:{self.product_id},  Quantity:{self.quantity}>"
 
 
+class UpdateQuantity(serializers.Serializer):
+    quantity = serializers.IntegerField(validators=[is_quantity_valid])
+
+
 class DeleteCartItems(serializers.Serializer):
-    product_id = serializers.IntegerField()
+    cart_item_id = serializers.IntegerField()

@@ -2,6 +2,7 @@ import logging
 
 from django.db import models, transaction
 from django.conf import settings
+from typing import List
 
 from products.models import Product
 
@@ -84,17 +85,23 @@ class Cart(models.Model):
         self.cart_items.add(*items, bulk=False)
         self.update_cart_total_price()
 
+    @transaction.atomic
     def update_item_quantity(self, cart_item_id: int, quantity: int) -> None:
-        existing_cart_item = next(filter(lambda ci: ci.id == cart_item_id, self.cart_items), None)
+        existing_cart_item = next(filter(lambda ci: ci.id == cart_item_id, self.cart_items.all()), None)
         if existing_cart_item is not None:
             existing_cart_item.quantity = quantity
             existing_cart_item.total_price = quantity * existing_cart_item.unit_price
             self.update_cart_total_price()
 
-    def remove_from_cart(self, cart_item) -> None:
-        self.cart_items.remove(cart_item)
-        self.update_cart_total_price()
+    @transaction.atomic
+    def remove_from_cart(self, cart_item_ids: List[int]) -> None:
+        existing_cart_items = list(filter(lambda ci: ci.id in cart_item_ids, self.cart_items.all()))
+        logger.info(f'items: {existing_cart_items}')
+        if existing_cart_items is not None:
+            self.cart_items.remove(*existing_cart_items)
+            self.update_cart_total_price()
 
+    @transaction.atomic
     def clear_cart(self) -> None:
         self.cart_items.clear()
         self.update_cart_total_price()
@@ -112,7 +119,7 @@ class CartItem(models.Model):
     quantity = models.IntegerField(blank=True, null=True)
     unit_price = models.FloatField()
     total_price = models.FloatField()
-    cart = models.ForeignKey(Cart, on_delete=models.CASCADE, related_name='cart_items')
+    cart = models.ForeignKey(Cart, on_delete=models.CASCADE, related_name='cart_items', null=True)
     product = models.ForeignKey(Product, on_delete=models.PROTECT)
 
     def __repr__(self):

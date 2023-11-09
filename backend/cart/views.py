@@ -7,7 +7,7 @@ import logging
 # Create your views here.
 from .models import Cart
 from products.models import Product
-from .serializers import CartSerializer, AddOrUpdateCart, DeleteCartItems
+from .serializers import CartSerializer, AddToCart, UpdateQuantity, DeleteCartItems
 
 logger = logging.getLogger('django')
 
@@ -32,7 +32,7 @@ def add_cart_items(request):
         .with_cart_items() \
         .owned_by(logged_in_user)
     logger.info(f'cart: {cart}')
-    serializer = AddOrUpdateCart(data=request.data, many=True)
+    serializer = AddToCart(data=request.data, many=True)
     if serializer.is_valid(raise_exception=True):
         data = serializer.data
         data_list = [dict(item) for item in data]
@@ -47,17 +47,19 @@ def add_cart_items(request):
 
 @api_view(['PUT'])
 @permission_classes([IsAuthenticated])
-def update_quantities(request):
+def update_quantities(request, pk):
     logged_in_user = request.user
     cart = Cart.objects.get_queryset() \
         .with_cart_items() \
         .owned_by(logged_in_user)
     logger.info(f'cart: {cart}')
-    serializer = AddOrUpdateCart(data=request.data, many=False)
+    serializer = UpdateQuantity(data=request.data, many=False)
     if serializer.is_valid(raise_exception=True):
         data = serializer.data
-        logger.info(f'data: {data}')
-        return Response(status=status.HTTP_201_CREATED)
+        quantity = data['quantity']
+        cart.update_item_quantity(pk, quantity)
+        data = CartSerializer(cart).data
+        return Response(data, status=status.HTTP_200_OK)
     return Response({"invalid": "not good data"}, status=status.HTTP_400_BAD_REQUEST)
 
 
@@ -70,6 +72,14 @@ def delete_cart_items(request):
         .owned_by(logged_in_user)
     logger.info(f'cart: {cart}')
     serializer = DeleteCartItems(data=request.data, many=True)
+    if serializer.is_valid(raise_exception=True):
+        data = serializer.data
+        data_list = [dict(item) for item in data]
+        cart_item_ids = [d['cart_item_id'] for d in data_list]
+        cart.remove_from_cart(cart_item_ids)
+        data = CartSerializer(cart).data
+        return Response(data, status=status.HTTP_200_OK)
+    return Response({"invalid": "not good data"}, status=status.HTTP_400_BAD_REQUEST)
 
 
 @api_view(['PUT'])
@@ -80,3 +90,6 @@ def clear_cart(request):
         .with_cart_items() \
         .owned_by(logged_in_user)
     logger.info(f'cart: {cart}')
+    cart.clear_cart()
+    data = CartSerializer(cart).data
+    return Response(data, status=status.HTTP_200_OK)
