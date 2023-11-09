@@ -236,6 +236,10 @@ CACHES = {
         'LOCATION': REDIS_URL,
         'OPTIONS': {
             'CLIENT_CLASS': 'django_redis.client.DefaultClient',
+            "SOCKET_CONNECT_TIMEOUT": 5,  # seconds
+            "SOCKET_TIMEOUT": 5,  # seconds
+            "COMPRESSOR": "django_redis.compressors.zlib.ZlibCompressor",
+            "IGNORE_EXCEPTIONS": True,
         }
     }
 }
