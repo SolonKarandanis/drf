@@ -230,9 +230,12 @@ CHANNEL_LAYERS = {
     },
 }
 
-# CACHES = {
-#     "default": {
-#         "BACKEND": "redis_cache.RedisCache",
-#         "LOCATION": REDIS_URL
-#     }
-# }
+CACHES = {
+    'default': {
+        'BACKEND': 'django_redis.cache.RedisCache',
+        'LOCATION': REDIS_URL,
+        'OPTIONS': {
+            'CLIENT_CLASS': 'django_redis.client.DefaultClient',
+        }
+    }
+}
