@@ -1,14 +1,16 @@
+import logging
+
 from celery import shared_task
 from channels.layers import get_channel_layer
-from asgiref.sync import async_to_sync
 from .models import BroadcastNotification
 import json
-from celery import Celery, states
 from celery.exceptions import Ignore
 import asyncio
 
+logger = logging.getLogger('django')
 
-@shared_task(bind=True)
+
+@shared_task(bind=True, autoretry_for=Exception, retry_backoff=True, retry_kwargs={'max_retries': 7})
 def broadcast_notification(self, data):
     print(data)
     try:
@@ -29,6 +31,7 @@ def broadcast_notification(self, data):
             return 'Done'
 
         else:
+            logger.error('broadcast_notification task failed')
             self.update_state(
                 state='FAILURE',
                 meta={'exe': "Not Found"}
@@ -36,7 +39,8 @@ def broadcast_notification(self, data):
 
             raise Ignore()
 
-    except:
+    except Exception as e:
+        logger.error('broadcast_notification task failed')
         self.update_state(
             state='FAILURE',
             meta={

@@ -8,7 +8,7 @@ from django.conf import settings
 logger = logging.getLogger('django')
 
 
-@shared_task(bind=True)
+@shared_task(bind=True, autoretry_for=Exception, retry_backoff=True, retry_kwargs={'max_retries': 7})
 def send_mail_task(self, data):
     logger.info('STARTED SEND MAIL TASK')
     users = get_user_model().objects.all()
@@ -19,11 +19,16 @@ def send_mail_task(self, data):
         mail_subject = "Testing"
         message = "Hey"
         to_email = user.email
-        send_mail(
-            subject=mail_subject,
-            message=message,
-            from_email=settings.EMAIL_HOST_USER,
-            recipient_list=[to_email],
-            fail_silently=True
-        )
-    return "Done"
+        try:
+            send_mail(
+                subject=mail_subject,
+                message=message,
+                from_email=settings.EMAIL_HOST_USER,
+                recipient_list=[to_email],
+                fail_silently=True
+            )
+            return "Done"
+        except Exception as e:
+            logger.error('broadcast_notification task failed')
+
+
