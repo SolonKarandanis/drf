@@ -87,11 +87,13 @@ def clear_cart(request):
 
 
 def fetch_user_cart(logged_in_user):
+    user_id = logged_in_user.id
+    cache_key = f'cart-{user_id}'
     cart = cache.get('cart')
     if cart is None:
         cart = Cart.objects.get_queryset() \
             .with_cart_items() \
             .owned_by(logged_in_user)
-        cache.set('cart', cart, timeout=120)
+        cache.set(cache_key, cart, timeout=120)
     logger.info(f'cart: {cart}')
     return cart

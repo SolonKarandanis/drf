@@ -132,6 +132,9 @@ AUTH_PASSWORD_VALIDATORS = [
 #     }
 # }
 
+#CONN_MAX_AGE = 60
+#CONN_HEALTH_CHECKS = True
+
 LOGGING = {
     'version': 1,
     'disable_existing_loggers': False,

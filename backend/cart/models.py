@@ -24,7 +24,7 @@ class CartQuerySet(models.QuerySet):
         return self.prefetch_related('cart_items')
 
     def update(self, **kwargs):
-        cache.delete('product_objects')
+        cache.delete('cart')
         super(CartQuerySet, self).update(**kwargs)
 
 
@@ -125,20 +125,28 @@ class CartItem(models.Model):
 
 
 @receiver(post_delete, sender=CartItem, dispatch_uid='cart_item_deleted')
-def cart_item_post_delete_handler(sender, **kwargs):
-    cache.delete('cart')
+def cart_item_post_delete_handler(sender, instance, **kwargs):
+    user_id = instance.cart.user.id
+    cache_key = f'cart-{user_id}'
+    cache.delete(cache_key)
 
 
 @receiver(post_save, sender=CartItem, dispatch_uid='cart_item_updated')
-def cart_item_post_save_handler(sender, **kwargs):
-    cache.delete('cart')
+def cart_item_post_save_handler(sender, instance, **kwargs):
+    user_id = instance.cart.user.id
+    cache_key = f'cart-{user_id}'
+    cache.delete(cache_key)
 
 
 @receiver(post_delete, sender=Cart, dispatch_uid='cart_deleted')
-def cart__post_delete_handler(sender, **kwargs):
-    cache.delete('cart')
+def cart__post_delete_handler(sender, instance, **kwargs):
+    user_id = instance.user.id
+    cache_key = f'cart-{user_id}'
+    cache.delete(cache_key)
 
 
 @receiver(post_save, sender=Cart, dispatch_uid='cart_updated')
-def cart_post_save_handler(sender, **kwargs):
-    cache.delete('cart')
+def cart_post_save_handler(sender, instance, **kwargs):
+    user_id = instance.user.id
+    cache_key = f'cart-{user_id}'
+    cache.delete(cache_key)
