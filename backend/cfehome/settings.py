@@ -240,6 +240,7 @@ CACHES = {
             "SOCKET_TIMEOUT": 5,  # seconds
             "COMPRESSOR": "django_redis.compressors.zlib.ZlibCompressor",
             "IGNORE_EXCEPTIONS": True,
-        }
+        },
+        "KEY_PREFIX": "drf"
     }
 }

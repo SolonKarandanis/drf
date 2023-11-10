@@ -2,6 +2,7 @@ from rest_framework.response import Response
 from rest_framework.permissions import IsAuthenticated
 from rest_framework.decorators import api_view, permission_classes
 from rest_framework import status
+from django.core.cache import cache
 import logging
 
 # Create your views here.
@@ -16,10 +17,8 @@ logger = logging.getLogger('django')
 @permission_classes([IsAuthenticated])
 def get_user_cart(request):
     logged_in_user = request.user
-    cart = Cart.objects.get_queryset() \
-        .with_cart_items() \
-        .owned_by(logged_in_user)
-    logger.info(f'cart: {cart}')
+    logger.info(f'logged_in_user: {logged_in_user}')
+    cart = fetch_user_cart(logged_in_user)
     data = CartSerializer(cart).data
     return Response(data)
 
@@ -28,10 +27,8 @@ def get_user_cart(request):
 @permission_classes([IsAuthenticated])
 def add_cart_items(request):
     logged_in_user = request.user
-    cart = Cart.objects.get_queryset() \
-        .with_cart_items() \
-        .owned_by(logged_in_user)
-    logger.info(f'cart: {cart}')
+    logger.info(f'logged_in_user: {logged_in_user}')
+    cart = fetch_user_cart(logged_in_user)
     serializer = AddToCart(data=request.data, many=True)
     if serializer.is_valid(raise_exception=True):
         data = serializer.data
@@ -49,10 +46,8 @@ def add_cart_items(request):
 @permission_classes([IsAuthenticated])
 def update_quantities(request, pk):
     logged_in_user = request.user
-    cart = Cart.objects.get_queryset() \
-        .with_cart_items() \
-        .owned_by(logged_in_user)
-    logger.info(f'cart: {cart}')
+    logger.info(f'logged_in_user: {logged_in_user}')
+    cart = fetch_user_cart(logged_in_user)
     serializer = UpdateQuantity(data=request.data, many=False)
     if serializer.is_valid(raise_exception=True):
         data = serializer.data
@@ -67,10 +62,8 @@ def update_quantities(request, pk):
 @permission_classes([IsAuthenticated])
 def delete_cart_items(request):
     logged_in_user = request.user
-    cart = Cart.objects.get_queryset() \
-        .with_cart_items() \
-        .owned_by(logged_in_user)
-    logger.info(f'cart: {cart}')
+    logger.info(f'logged_in_user: {logged_in_user}')
+    cart = fetch_user_cart(logged_in_user)
     serializer = DeleteCartItems(data=request.data, many=True)
     if serializer.is_valid(raise_exception=True):
         data = serializer.data
@@ -86,10 +79,19 @@ def delete_cart_items(request):
 @permission_classes([IsAuthenticated])
 def clear_cart(request):
     logged_in_user = request.user
-    cart = Cart.objects.get_queryset() \
-        .with_cart_items() \
-        .owned_by(logged_in_user)
-    logger.info(f'cart: {cart}')
+    logger.info(f'logged_in_user: {logged_in_user}')
+    cart = fetch_user_cart(logged_in_user)
     cart.clear_cart()
     data = CartSerializer(cart).data
     return Response(data, status=status.HTTP_200_OK)
+
+
+def fetch_user_cart(logged_in_user):
+    cart = cache.get('cart')
+    if cart is None:
+        cart = Cart.objects.get_queryset() \
+            .with_cart_items() \
+            .owned_by(logged_in_user)
+        cache.set('cart', cart, timeout=120)
+    logger.info(f'cart: {cart}')
+    return cart

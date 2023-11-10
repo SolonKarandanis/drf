@@ -1,5 +1,7 @@
 import logging
-
+from django.core.cache import cache
+from django.db.models.signals import post_delete, post_save
+from django.dispatch import receiver
 from django.db import models, transaction
 from django.conf import settings
 from typing import List
@@ -21,6 +23,10 @@ class CartQuerySet(models.QuerySet):
     def with_cart_items(self):
         return self.prefetch_related('cart_items')
 
+    def update(self, **kwargs):
+        cache.delete('product_objects')
+        super(CartQuerySet, self).update(**kwargs)
+
 
 class CartManager(models.Manager):
     def create_cart(self, user):
@@ -33,14 +39,6 @@ class CartManager(models.Manager):
 
     def get_queryset(self, *args, **kwargs):
         return CartQuerySet(self.model, using=self._db)
-
-    def add_items_to_cart(self, data_dict, products_to_be_added):
-        cart_items = []
-        for product in products_to_be_added:
-            product_id = product.id
-            quantity = data_dict[product_id]
-            price = product.price
-            self.car_items.append()
 
 
 # Create your models here.
@@ -124,3 +122,23 @@ class CartItem(models.Model):
 
     def __repr__(self):
         return f"<CartItem {self.id}>"
+
+
+@receiver(post_delete, sender=CartItem, dispatch_uid='cart_item_deleted')
+def cart_item_post_delete_handler(sender, **kwargs):
+    cache.delete('cart')
+
+
+@receiver(post_save, sender=CartItem, dispatch_uid='cart_item_updated')
+def cart_item_post_save_handler(sender, **kwargs):
+    cache.delete('cart')
+
+
+@receiver(post_delete, sender=Cart, dispatch_uid='cart_deleted')
+def cart__post_delete_handler(sender, **kwargs):
+    cache.delete('cart')
+
+
+@receiver(post_save, sender=Cart, dispatch_uid='cart_updated')
+def cart_post_save_handler(sender, **kwargs):
+    cache.delete('cart')
