@@ -1,6 +1,6 @@
 from typing import List
 
-from django.db import models
+from django.db import models, transaction
 from django.conf import settings
 from django.utils import timezone
 
@@ -10,6 +10,27 @@ from cart.models import CartItem
 User = settings.AUTH_USER_MODEL
 
 
+class OrderQuerySet(models.QuerySet):
+    def with_order_items(self):
+        return self.prefetch_related('order_items')
+
+    def owned_by(self, user):
+        return self.filter(user=user)
+
+
+class OrderManager(models.Manager):
+    def create_order(self, user):
+        order = self.create(user=user, total_price=0)
+        return order
+
+    def update_order(self):
+        order = self.save()
+        return order
+
+    def get_queryset(self, *args, **kwargs):
+        return OrderQuerySet(self.model, using=self._db)
+
+
 # Create your models here.
 class Order(models.Model):
     date_created = models.DateTimeField(auto_now_add=True, null=False)
@@ -17,6 +38,7 @@ class Order(models.Model):
     total_price = models.FloatField()
     comments = models.TextField(blank=True, null=True)
     user = models.ForeignKey(User, on_delete=models.CASCADE)
+    objects = OrderManager()
 
     class Meta:
         ordering = ['-date_created']
@@ -24,7 +46,9 @@ class Order(models.Model):
     def __repr__(self):
         return f"<Order {self.id}>"
 
+    @transaction.atomic
     def add_order_items(self, cart_items: List[CartItem]) -> None:
+        items = []
         for cart_item in cart_items:
             order_item = OrderItem(product_id=cart_item.products_id,
                                    product_name=cart_item.product.name,
@@ -35,7 +59,13 @@ class Order(models.Model):
                                    price=cart_item.unit_price,
                                    quantity=cart_item.quantity,
                                    total_price=cart_item.total_price)
-            self.order_items.append(order_item)
+            items.append(order_item)
+        self.order_items.append(*items, bulk=False)
+        self.update_order_total_price()
+
+    def update_order_total_price(self) -> None:
+        self.total_price = sum(oi.total_price for oi in self.order_items.all())
+        self.save()
 
 
 class OrderItem(models.Model):

@@ -58,6 +58,13 @@ class Cart(models.Model):
             )
         ]
 
+        indexes = [
+            models.Index(
+                name='user_id',
+                fields=['user_id'],
+            )
+        ]
+
     @transaction.atomic
     def add_items_to_cart(self, product_quantities_dict, products_to_be_added):
         items = []
