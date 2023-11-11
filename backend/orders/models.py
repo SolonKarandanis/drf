@@ -38,10 +38,31 @@ class Order(models.Model):
     total_price = models.FloatField()
     comments = models.TextField(blank=True, null=True)
     user = models.ForeignKey(User, on_delete=models.CASCADE)
+    is_shipped = models.BooleanField(default=False)
     objects = OrderManager()
 
     class Meta:
         ordering = ['-date_created']
+
+        constraints = [
+            models.UniqueConstraint(
+                name='limit_pending_orders',
+                fields=['user_id', 'is_shipped'],
+                condition=models.Q(is_shipped=False)
+            )
+        ]
+
+        indexes = [
+            models.Index(
+                name='unshipped_orders',
+                fields=['id'],
+                condition=models.Q(is_shipped=False)
+            ),
+            models.Index(
+                name='order_user_id',
+                fields=['user_id']
+            )
+        ]
 
     def __repr__(self):
         return f"<Order {self.id}>"

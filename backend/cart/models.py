@@ -60,7 +60,7 @@ class Cart(models.Model):
 
         indexes = [
             models.Index(
-                name='user_id',
+                name='cart_user_id',
                 fields=['user_id'],
             )
         ]
