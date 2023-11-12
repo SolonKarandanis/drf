@@ -25,7 +25,7 @@ class OrderItemSerializer(serializers.ModelSerializer):
 
 class PaginatedOrderSerializer(ModelPaginationSerializer):
     """
-    Serializes page objects of product querysets.
+    Serializes page objects of order querysets.
     """
 
     def __init__(self, data, request):
