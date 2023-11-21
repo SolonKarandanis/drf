@@ -1,5 +1,6 @@
 from django.shortcuts import get_object_or_404
 from django.conf import settings
+from typing import List
 
 from cfehome.repository import IRepository
 from .models import Product
@@ -7,7 +8,7 @@ from .models import Product
 User = settings.AUTH_USER_MODEL
 
 
-class ProductRepository():
+class ProductRepository:
 
     def find_by_id(self, product_id: int) -> Product:
         product = get_object_or_404(Product, pk=product_id)
@@ -17,10 +18,15 @@ class ProductRepository():
         product = Product.objects.get_queryset().owned_by(logged_in_user).get(pk=product_id)
         return product
 
-    def find_all_products(self):
+    def find_all_products(self) -> List[Product]:
         products = Product.objects.all()
         return products
 
-    def find_supplier_products(self, logged_in_user: User):
+    def find_supplier_products(self, logged_in_user: User) -> List[Product]:
         products = Product.objects.get_queryset().owned_by(logged_in_user)
         return products
+
+    def find_products_by_ids(self, product_ids: List[int]) -> List[Product]:
+        products = Product.objects.filter(pk__in=product_ids)
+        return products
+
