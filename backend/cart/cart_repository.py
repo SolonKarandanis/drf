@@ -13,7 +13,7 @@ class CartRepository:
     def fetch_user_cart(self, logged_in_user: User) -> Cart:
         user_id = logged_in_user.id
         cache_key = f'cart-{user_id}'
-        cart = cache.get('cart')
+        cart = cache.get(cache_key)
         if cart is None:
             cart = Cart.objects.get_queryset() \
                 .with_cart_items() \

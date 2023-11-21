@@ -14,17 +14,19 @@ logger = logging.getLogger('django')
 
 class CartQuerySet(models.QuerySet):
     def owned_by(self, user):
-        carts = self.filter(user=user)
-        if len(carts) == 1:
-            return carts[0]
-        else:
-            return self.create(user=user, total_price=0)
+        cart = self.get(user=user)
+        if cart is None:
+            cart = self.create(user=user, total_price=0)
+        return cart
 
     def with_cart_items(self):
         return self.prefetch_related('cart_items')
 
     def update(self, **kwargs):
-        cache.delete('cart')
+        user = kwargs.get("user")
+        user_id = user.id
+        cache_key = f'cart-{user_id}'
+        cache.delete(cache_key)
         super(CartQuerySet, self).update(**kwargs)
 
 
