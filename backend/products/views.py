@@ -8,8 +8,11 @@ from rest_framework.decorators import api_view, permission_classes
 from rest_framework.response import Response
 from rest_framework.permissions import IsAuthenticated
 from django.shortcuts import get_object_or_404
-from django.core.paginator import Paginator, EmptyPage
+from django.core.paginator import Paginator
 from auth.mixins import StaffEditorPermissionMixin, UserQuerySetMixin
+from .product_repository import ProductRepository
+
+repo = ProductRepository()
 
 logger = logging.getLogger('django')
 
@@ -17,7 +20,7 @@ logger = logging.getLogger('django')
 @api_view(['GET'])
 @permission_classes([IsAuthenticated])
 def get_product(request, pk, *args, **kwargs):
-    product = get_object_or_404(Product, pk=pk)
+    product = repo.find_by_id(pk)
     data = ProductSerializer(product, many=False).data
     return Response(data)
 
@@ -26,7 +29,7 @@ def get_product(request, pk, *args, **kwargs):
 @permission_classes([IsAuthenticated])
 def get_supplier_product(request, pk):
     logged_in_user = request.user
-    product = Product.objects.get_queryset().owned_by(logged_in_user).get(pk=pk)
+    product = repo.find_users_product_by_id(pk, logged_in_user)
     data = ProductSerializer(product, many=False).data
     return Response(data)
 
@@ -34,7 +37,7 @@ def get_supplier_product(request, pk):
 @api_view(['GET'])
 @permission_classes([IsAuthenticated])
 def get_all_products(request):
-    queryset = Product.objects.all()
+    queryset = repo.find_all_products()
     serializer = PaginatedProductListSerializer(queryset, request)
     return Response(serializer.data)
 
@@ -43,7 +46,7 @@ def get_all_products(request):
 @permission_classes([IsAuthenticated])
 def get_all_supplier_products(request):
     logged_in_user = request.user
-    queryset = Product.objects.get_queryset().owned_by(logged_in_user)
+    queryset = repo.find_supplier_products(logged_in_user)
     serializer = PaginatedProductListSerializer(queryset, request)
     return Response(serializer.data)
 
