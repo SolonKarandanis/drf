@@ -16,6 +16,9 @@ class ProductQuerySet(models.QuerySet):
     def owned_by(self, user):
         return self.filter(user=user)
 
+    def inventory_number(self):
+        return self.only('inventory')
+
     def search(self, query, user=None):
         lookup = Q(title__icontains=query) | Q(content__icontains=query)
         qs = self.is_public().filter(lookup)
