@@ -20,6 +20,12 @@ class OrderQuerySet(models.QuerySet):
     def order_ids_with_is_shipped(self):
         return self.values('id', 'is_shipped')
 
+    def max_total_price(self):
+        return self.aggregate(max=models.Max('total_price'))
+
+    def sum_total_price(self):
+        return self.aggregate(sum=models.Sum('total_price'))
+
 
 class OrderManager(models.Manager):
     def create_order(self, user):

@@ -39,3 +39,7 @@ class ProductRepository:
     def find_public_products(self) -> List[Product]:
         products = Product.objects.get_queryset().is_public()
         return products
+
+    def find_product_skus(self) -> List[str]:
+        return Product.objects.get_queryset().product_skus()
+

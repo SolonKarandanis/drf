@@ -19,6 +19,9 @@ class ProductQuerySet(models.QuerySet):
     def inventory_number(self):
         return self.only('inventory')
 
+    def product_skus(self):
+        return self.values_list('sku', flat=True)
+
     def search(self, query, user=None):
         lookup = Q(title__icontains=query) | Q(content__icontains=query)
         qs = self.is_public().filter(lookup)
