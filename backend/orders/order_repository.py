@@ -15,4 +15,6 @@ class OrderRepository:
 
     def find_users_sum_order_price(self, user: User):
         return Order.objects.get_queryset().owned_by(user=user).sum_total_price()
-    
+
+    def find_total_sales_per_user(self):
+        return Order.objects.get_queryset().total_sales()

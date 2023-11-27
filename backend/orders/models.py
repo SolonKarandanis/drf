@@ -26,6 +26,10 @@ class OrderQuerySet(models.QuerySet):
     def sum_total_price(self):
         return self.aggregate(sum=models.Sum('total_price'))
 
+    def total_sales(self):
+        return self.values('user')\
+            .annotate(total_sales=models.Sum('total_price')).values('user__id', 'user__name', 'total_price')
+
 
 class OrderManager(models.Manager):
     def create_order(self, user):
