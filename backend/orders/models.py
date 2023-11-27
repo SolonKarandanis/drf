@@ -17,6 +17,9 @@ class OrderQuerySet(models.QuerySet):
     def owned_by(self, user):
         return self.filter(user=user)
 
+    def order_ids_with_is_shipped(self):
+        return self.values('id', 'is_shipped')
+
 
 class OrderManager(models.Manager):
     def create_order(self, user):
@@ -39,6 +42,7 @@ class Order(models.Model):
     comments = models.TextField(blank=True, null=True)
     user = models.ForeignKey(User, on_delete=models.CASCADE)
     is_shipped = models.BooleanField(default=False)
+    date_shipped = models.DateTimeField(null=True)
     objects = OrderManager()
 
     class Meta:
