@@ -32,7 +32,6 @@ def get_all_users(request):
 
 
 @api_view(['POST'])
-@permission_classes([IsAuthenticated])
 def create_user(request):
     serializer = CreateUserSerializer(data=request.data)
     if serializer.is_valid(raise_exception=True):
