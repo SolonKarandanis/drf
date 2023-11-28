@@ -30,9 +30,7 @@ class ProductRepository:
         products = Product.objects.filter(pk__in=product_ids)
         return products
 
-    def update_product_price(self, product_id: int, new_price: float) -> Product:
-        product = self.find_by_id(product_id)
-        product.price = new_price
+    def update_product_price(self, product: Product) -> Product:
         product.save(update_fields=['price'])
         return product
 
