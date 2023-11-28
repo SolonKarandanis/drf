@@ -117,7 +117,7 @@ class Order(Model):
             ),
             Index(
                 name='order_supplier_id',
-                fields=['supplier'],
+                fields=['supplier_id'],
                 condition=Q(is_shipped=False)
             )
         ]
