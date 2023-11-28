@@ -1,12 +1,12 @@
-from django.db import models
-from django.db.models import Q
+from django.db.models import Q, QuerySet, Manager, Model, SET_NULL, ForeignKey, CharField, TextField, \
+    FloatField, BooleanField, IntegerField
 from django.conf import settings
 
 # Create your models here.
 User = settings.AUTH_USER_MODEL
 
 
-class ProductQuerySet(models.QuerySet):
+class ProductQuerySet(QuerySet):
     def is_public(self):
         return self.filter(public=True)
 
@@ -31,7 +31,7 @@ class ProductQuerySet(models.QuerySet):
         return qs
 
 
-class ProductManager(models.Manager):
+class ProductManager(Manager):
     def get_queryset(self, *args, **kwargs):
         return ProductQuerySet(self.model, using=self._db)
 
@@ -39,14 +39,14 @@ class ProductManager(models.Manager):
         return self.get_queryset().search(query, user=user)
 
 
-class Product(models.Model):
-    user = models.ForeignKey(User, default=1, null=True, on_delete=models.SET_NULL)
-    sku = models.CharField(max_length=120, default=None)
-    title = models.CharField(max_length=120)
-    content = models.TextField(blank=True, null=True)
-    price = models.FloatField()
-    public = models.BooleanField(default=True)
-    inventory = models.IntegerField(blank=True, null=True)
+class Product(Model):
+    user = ForeignKey(User, default=1, null=True, on_delete=SET_NULL)
+    sku = CharField(max_length=120, default=None)
+    title = CharField(max_length=120)
+    content = TextField(blank=True, null=True)
+    price = FloatField()
+    public = BooleanField(default=True)
+    inventory = IntegerField(blank=True, null=True)
 
     class Meta:
         ordering = ['sku']

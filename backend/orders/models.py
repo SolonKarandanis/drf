@@ -1,6 +1,8 @@
 from typing import List
 
-from django.db import models, transaction
+from django.db import transaction
+from django.db.models import Q, Max, Sum, Manager, QuerySet, Model, DateTimeField, CharField, FloatField, TextField, \
+    ForeignKey, BooleanField, CASCADE, UniqueConstraint, Index, IntegerField, PROTECT
 from django.conf import settings
 from django.utils import timezone
 
@@ -10,7 +12,7 @@ from cart.models import CartItem
 User = settings.AUTH_USER_MODEL
 
 
-class OrderQuerySet(models.QuerySet):
+class OrderQuerySet(QuerySet):
     def with_order_items(self):
         return self.prefetch_related('order_items')
 
@@ -21,17 +23,17 @@ class OrderQuerySet(models.QuerySet):
         return self.values('id', 'is_shipped')
 
     def max_total_price(self):
-        return self.aggregate(max=models.Max('total_price'))
+        return self.aggregate(max=Max('total_price'))
 
     def sum_total_price(self):
-        return self.aggregate(sum=models.Sum('total_price'))
+        return self.aggregate(sum=Sum('total_price'))
 
     def total_sales(self):
-        return self.values('user')\
-            .annotate(total_sales=models.Sum('total_price')).values('user__id', 'user__name', 'total_price')
+        return self.values('user') \
+            .annotate(total_sales=Sum('total_price')).values('user__id', 'user__name', 'total_price')
 
 
-class OrderManager(models.Manager):
+class OrderManager(Manager):
     def create_order(self, user):
         order = self.create(user=user, total_price=0)
         return order
@@ -45,34 +47,34 @@ class OrderManager(models.Manager):
 
 
 # Create your models here.
-class Order(models.Model):
-    date_created = models.DateTimeField(auto_now_add=True, null=False)
-    status = models.CharField(max_length=40)
-    total_price = models.FloatField()
-    comments = models.TextField(blank=True, null=True)
-    user = models.ForeignKey(User, on_delete=models.CASCADE)
-    is_shipped = models.BooleanField(default=False)
-    date_shipped = models.DateTimeField(null=True)
+class Order(Model):
+    date_created = DateTimeField(auto_now_add=True, null=False)
+    status = CharField(max_length=40)
+    total_price = FloatField()
+    comments = TextField(blank=True, null=True)
+    user = ForeignKey(User, on_delete=CASCADE)
+    is_shipped = BooleanField(default=False)
+    date_shipped = DateTimeField(null=True)
     objects = OrderManager()
 
     class Meta:
         ordering = ['-date_created']
 
         constraints = [
-            models.UniqueConstraint(
+            UniqueConstraint(
                 name='limit_pending_orders',
                 fields=['user_id', 'is_shipped'],
-                condition=models.Q(is_shipped=False)
+                condition=Q(is_shipped=False)
             )
         ]
 
         indexes = [
-            models.Index(
+            Index(
                 name='unshipped_orders',
                 fields=['id'],
-                condition=models.Q(is_shipped=False)
+                condition=Q(is_shipped=False)
             ),
-            models.Index(
+            Index(
                 name='order_user_id',
                 fields=['user_id']
             )
@@ -103,18 +105,34 @@ class Order(models.Model):
         self.save()
 
 
-class OrderItem(models.Model):
-    product_name = models.CharField(max_length=255)
-    sku = models.CharField(max_length=120, default=None)
-    manufacturer = models.CharField(max_length=255, default=None)
-    start_date = models.DateTimeField(auto_now_add=True, null=False)
-    end_date = models.DateTimeField(null=False)
-    status = models.CharField(max_length=40)
-    price = models.FloatField()
-    quantity = models.IntegerField(blank=True, null=True)
-    total_price = models.FloatField()
-    Order = models.ForeignKey(Order, on_delete=models.CASCADE, related_name='order_items')
-    product = models.ForeignKey(Product, on_delete=models.PROTECT)
+class OrderItemQuerySet(QuerySet):
+
+    def search_order_items(self, query, user=None):
+        lookup = Q(title__icontains=query) | Q(content__icontains=query)
+        qs = self.is_public().filter(lookup)
+        if user is not None:
+            qs2 = self.filter(user=user).filter(lookup)
+            qs = (qs | qs2).distinct()
+        return qs
+
+
+class OrderItemManager(Manager):
+    def get_queryset(self, *args, **kwargs):
+        return OrderItemQuerySet(self.model, using=self._db)
+
+
+class OrderItem(Model):
+    product_name = CharField(max_length=255)
+    sku = CharField(max_length=120, default=None)
+    manufacturer = CharField(max_length=255, default=None)
+    start_date = DateTimeField(auto_now_add=True, null=False)
+    end_date = DateTimeField(null=False)
+    status = CharField(max_length=40)
+    price = FloatField()
+    quantity = IntegerField(blank=True, null=True)
+    total_price = FloatField()
+    Order = ForeignKey(Order, on_delete=CASCADE, related_name='order_items')
+    product = ForeignKey(Product, on_delete=PROTECT)
 
     def __repr__(self):
         return f"<OrderItem {self.id}>"
