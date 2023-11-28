@@ -9,10 +9,12 @@ from .models import Cart
 from products.models import Product
 from .serializers import CartSerializer, AddToCart, UpdateQuantity, DeleteCartItems
 from .cart_repository import CartRepository
+from .cart_service import CartService
 from products.product_repository import ProductRepository
 
 product_repo = ProductRepository()
 cart_repo = CartRepository()
+cart_service = CartService()
 
 logger = logging.getLogger('django')
 
@@ -22,7 +24,7 @@ logger = logging.getLogger('django')
 def get_user_cart(request):
     logged_in_user = request.user
     logger.info(f'logged_in_user: {logged_in_user}')
-    cart = cart_repo.fetch_user_cart(logged_in_user)
+    cart = cart_service.fetch_user_cart(logged_in_user)
     data = CartSerializer(cart).data
     return Response(data)
 

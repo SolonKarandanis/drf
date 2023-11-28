@@ -11,7 +11,7 @@ from .user_service import UserService
 
 logger = logging.getLogger('django')
 
-userService = UserService()
+user_service = UserService()
 
 
 # Create your views here.
@@ -19,7 +19,7 @@ userService = UserService()
 @api_view(['GET'])
 @permission_classes([IsAuthenticated])
 def get_all_users(request):
-    queryset = userService.find_all_users()
+    queryset = user_service.find_all_users()
     serializer = PaginatedUserSerializer(queryset, request)
     return Response(serializer.page_data)
 
@@ -36,7 +36,7 @@ def create_user(request):
 @api_view(['GET'])
 @permission_classes([IsAuthenticated])
 def get_user(request, pk):
-    obj = userService.find_user_by_id(pk)
+    obj = user_service.find_user_by_id(pk)
     data = UserDetailSerializer(obj).data
     return Response(data)
 
