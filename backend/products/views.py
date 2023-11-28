@@ -7,8 +7,7 @@ from rest_framework import generics, mixins, permissions, authentication
 from rest_framework.decorators import api_view, permission_classes
 from rest_framework.response import Response
 from rest_framework.permissions import IsAuthenticated
-from django.shortcuts import get_object_or_404
-from django.core.paginator import Paginator
+from django.core.paginator import Paginator, EmptyPage
 from auth.mixins import StaffEditorPermissionMixin, UserQuerySetMixin
 from .product_repository import ProductRepository
 
@@ -39,7 +38,7 @@ def get_supplier_product(request, pk):
 def get_all_products(request):
     queryset = repo.find_all_products()
     serializer = PaginatedProductListSerializer(queryset, request)
-    return Response(serializer.data)
+    return Response(serializer.page_data)
 
 
 @api_view(['GET'])
