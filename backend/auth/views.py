@@ -1,5 +1,4 @@
 import logging
-from django.core.paginator import Paginator, EmptyPage
 from rest_framework import status
 from rest_framework.response import Response
 from rest_framework.decorators import api_view, permission_classes
@@ -8,11 +7,11 @@ from celery.result import AsyncResult
 from .models import User
 from .serializers import PaginatedUserSerializer, CreateUserSerializer, UserDetailSerializer
 from .tasks import create_task
-from .user_repository import UserRepository
+from .user_service import UserService
 
 logger = logging.getLogger('django')
 
-repo = UserRepository()
+userService = UserService()
 
 
 # Create your views here.
@@ -20,7 +19,7 @@ repo = UserRepository()
 @api_view(['GET'])
 @permission_classes([IsAuthenticated])
 def get_all_users(request):
-    queryset = repo.find_all_users()
+    queryset = userService.find_all_users()
     serializer = PaginatedUserSerializer(queryset, request)
     return Response(serializer.page_data)
 
@@ -37,7 +36,7 @@ def create_user(request):
 @api_view(['GET'])
 @permission_classes([IsAuthenticated])
 def get_user(request, pk):
-    obj = repo.find_user_by_id(pk)
+    obj = userService.find_user_by_id(pk)
     data = UserDetailSerializer(obj).data
     return Response(data)
 
