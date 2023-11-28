@@ -34,7 +34,7 @@ def get_user_cart(request):
 def add_cart_items(request):
     logged_in_user = request.user
     logger.info(f'logged_in_user: {logged_in_user}')
-    cart = cart_repo.fetch_user_cart(logged_in_user)
+    cart = cart_service.fetch_user_cart(logged_in_user)
     serializer = AddToCart(data=request.data, many=True)
     if serializer.is_valid(raise_exception=True):
         data = serializer.data
@@ -53,7 +53,7 @@ def add_cart_items(request):
 def update_quantities(request, pk):
     logged_in_user = request.user
     logger.info(f'logged_in_user: {logged_in_user}')
-    cart = cart_repo.fetch_user_cart(logged_in_user)
+    cart = cart_service.fetch_user_cart(logged_in_user)
     serializer = UpdateQuantity(data=request.data, many=False)
     if serializer.is_valid(raise_exception=True):
         data = serializer.data
@@ -69,7 +69,7 @@ def update_quantities(request, pk):
 def delete_cart_items(request):
     logged_in_user = request.user
     logger.info(f'logged_in_user: {logged_in_user}')
-    cart = cart_repo.fetch_user_cart(logged_in_user)
+    cart = cart_service.fetch_user_cart(logged_in_user)
     serializer = DeleteCartItems(data=request.data, many=True)
     if serializer.is_valid(raise_exception=True):
         data = serializer.data
@@ -86,7 +86,7 @@ def delete_cart_items(request):
 def clear_cart(request):
     logged_in_user = request.user
     logger.info(f'logged_in_user: {logged_in_user}')
-    cart = cart_repo.fetch_user_cart(logged_in_user)
+    cart = cart_service.fetch_user_cart(logged_in_user)
     cart.clear_cart()
     data = CartSerializer(cart).data
     return Response(data, status=status.HTTP_200_OK)
