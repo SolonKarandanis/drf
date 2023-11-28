@@ -32,6 +32,10 @@ class OrderQuerySet(QuerySet):
         return self.values('user') \
             .annotate(total_sales=Sum('total_price')).values('user__id', 'user__name', 'total_price')
 
+    def recently_shipped(self):
+        recently_shipped = Q(date_shipped__gt=timezone.now() - timezone.timedelta(days=30))
+        return self.filter(recently_shipped)
+
 
 class OrderManager(Manager):
     def create_order(self, user):
@@ -52,9 +56,10 @@ class Order(Model):
     status = CharField(max_length=40)
     total_price = FloatField()
     comments = TextField(blank=True, null=True)
-    user = ForeignKey(User, on_delete=CASCADE)
+    buyer = ForeignKey(User, on_delete=CASCADE, related_name='buyer')
     is_shipped = BooleanField(default=False)
     date_shipped = DateTimeField(null=True)
+    seller = ForeignKey(User, on_delete=CASCADE, related_name='seller')
     objects = OrderManager()
 
     class Meta:
@@ -63,7 +68,7 @@ class Order(Model):
         constraints = [
             UniqueConstraint(
                 name='limit_pending_orders',
-                fields=['user_id', 'is_shipped'],
+                fields=['buyer_id', 'is_shipped'],
                 condition=Q(is_shipped=False)
             )
         ]
@@ -75,8 +80,14 @@ class Order(Model):
                 condition=Q(is_shipped=False)
             ),
             Index(
-                name='order_user_id',
-                fields=['user_id']
+                name='order_buyer_id',
+                fields=['buyer_id'],
+                condition=Q(is_shipped=False)
+            ),
+            Index(
+                name='order_seller_id',
+                fields=['seller_id'],
+                condition=Q(is_shipped=False)
             )
         ]
 
