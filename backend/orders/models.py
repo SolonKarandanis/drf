@@ -108,10 +108,10 @@ class Order(Model):
 class OrderItemQuerySet(QuerySet):
 
     def search_order_items(self, query, user=None):
-        lookup = Q(title__icontains=query) | Q(content__icontains=query)
-        qs = self.is_public().filter(lookup)
+        lookup = Q(sku__icontains=query) | Q(product_name__icontains=query) | Q(manufacturer__icontains=query)
+        qs = self.filter(lookup)
         if user is not None:
-            qs2 = self.filter(user=user).filter(lookup)
+            qs2 = self.filter(order__user=user).filter(lookup)
             qs = (qs | qs2).distinct()
         return qs
 
@@ -131,7 +131,7 @@ class OrderItem(Model):
     price = FloatField()
     quantity = IntegerField(blank=True, null=True)
     total_price = FloatField()
-    Order = ForeignKey(Order, on_delete=CASCADE, related_name='order_items')
+    order = ForeignKey(Order, on_delete=CASCADE, related_name='order_items')
     product = ForeignKey(Product, on_delete=PROTECT)
 
     def __repr__(self):
