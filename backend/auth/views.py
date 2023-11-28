@@ -37,7 +37,7 @@ def create_user(request):
 @api_view(['GET'])
 @permission_classes([IsAuthenticated])
 def get_user(request, pk):
-    obj = User.objects.get_queryset().with_groups().get(pk=pk)
+    obj = repo.find_user_by_id(pk)
     data = UserDetailSerializer(obj).data
     return Response(data)
 
