@@ -1,9 +1,11 @@
+from typing import List
+
 from .models import User
 
 class UserRepository:
 
-    def find_users(self):
-        pass
+    def find_all_users(self) -> List[User]:
+        return User.objects.all()
 
     def user_email_exists(self, email: str) -> bool:
         exists = User.objects.filter(email=email).exists()

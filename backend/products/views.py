@@ -47,7 +47,7 @@ def get_all_supplier_products(request):
     logged_in_user = request.user
     queryset = repo.find_supplier_products(logged_in_user)
     serializer = PaginatedProductListSerializer(queryset, request)
-    return Response(serializer.data)
+    return Response(serializer.page_data)
 
 
 def create_page_obj(request, queryset):

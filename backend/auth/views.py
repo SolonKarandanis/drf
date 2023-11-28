@@ -6,10 +6,13 @@ from rest_framework.decorators import api_view, permission_classes
 from rest_framework.permissions import IsAuthenticated
 from celery.result import AsyncResult
 from .models import User
-from .serializers import UserSerializer, CreateUserSerializer, UserDetailSerializer
+from .serializers import PaginatedUserSerializer, CreateUserSerializer, UserDetailSerializer
 from .tasks import create_task
+from .user_repository import UserRepository
 
 logger = logging.getLogger('django')
+
+repo = UserRepository()
 
 
 # Create your views here.
@@ -17,18 +20,9 @@ logger = logging.getLogger('django')
 @api_view(['GET'])
 @permission_classes([IsAuthenticated])
 def get_all_users(request):
-    page = request.GET.get('page', 1)
-    size = request.GET.get('size', 10)
-    logger.info(f'page: {page}')
-    logger.info(f'size: {size}')
-    queryset = User.objects.all()
-    paginator = Paginator(queryset, size)
-    try:
-        page_obj = paginator.page(page)
-    except EmptyPage:
-        return Response({"invalid": "Page not Found"}, status=status.HTTP_400_BAD_REQUEST)
-    data = UserSerializer(page_obj, many=True).data
-    return Response(data)
+    queryset = repo.find_all_users()
+    serializer = PaginatedUserSerializer(queryset, request)
+    return Response(serializer.page_data)
 
 
 @api_view(['POST'])

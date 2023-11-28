@@ -5,7 +5,6 @@ from django.core.paginator import Paginator
 from .models import Product
 from .validators import unique_product_title, validate_sku
 from auth.serializers import UserPublicSerializer
-from cfehome.serializers import ModelPaginationSerializer
 
 logger = logging.getLogger('django')
 
