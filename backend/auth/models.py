@@ -1,11 +1,11 @@
-from django.db import models
+from django.db.models import QuerySet, DateTimeField, EmailField
 from django.contrib.auth.models import AbstractUser
 from django.contrib.auth.base_user import BaseUserManager
 from django.utils.translation import gettext_lazy as _
 from django.db.models.functions import Lower
 
 
-class UserQuerySet(models.QuerySet):
+class UserQuerySet(QuerySet):
     def is_active(self):
         return self.filter(is_active=True)
 
@@ -61,9 +61,9 @@ class UserManager(BaseUserManager):
 
 # Create your models here.
 class User(AbstractUser):
-    created_date = models.DateTimeField(auto_now_add=True, null=False)
-    updated_date = models.DateTimeField(auto_now=True, null=False)
-    email = models.EmailField(_("email address"), unique=True)
+    created_date = DateTimeField(auto_now_add=True, null=False)
+    updated_date = DateTimeField(auto_now=True, null=False)
+    email = EmailField(_("email address"), unique=True)
 
     date_joined = None
 

@@ -2,7 +2,9 @@ import logging
 from django.core.cache import cache
 from django.db.models.signals import post_delete, post_save
 from django.dispatch import receiver
-from django.db import models, transaction
+from django.db import transaction
+from django.db.models import QuerySet, DateTimeField, Manager, Model, OneToOneField, FloatField, BooleanField, CASCADE, \
+    UniqueConstraint, Index, IntegerField, ForeignKey, PROTECT
 from django.conf import settings
 from typing import List
 
@@ -12,7 +14,7 @@ User = settings.AUTH_USER_MODEL
 logger = logging.getLogger('django')
 
 
-class CartQuerySet(models.QuerySet):
+class CartQuerySet(QuerySet):
     def owned_by(self, user):
         cart = self.get(user=user)
         if cart is None:
@@ -30,7 +32,7 @@ class CartQuerySet(models.QuerySet):
         super(CartQuerySet, self).update(**kwargs)
 
 
-class CartManager(models.Manager):
+class CartManager(Manager):
     def create_cart(self, user):
         cart = self.create(user=user, total_price=0)
         return cart
@@ -44,24 +46,24 @@ class CartManager(models.Manager):
 
 
 # Create your models here.
-class Cart(models.Model):
-    user = models.OneToOneField(User, on_delete=models.CASCADE)
-    total_price = models.FloatField()
-    modification_alert = models.BooleanField(default=False)
-    date_created = models.DateTimeField(auto_now_add=True, null=False)
-    date_modified = models.DateTimeField(auto_now=True, null=False)
+class Cart(Model):
+    user = OneToOneField(User, on_delete=CASCADE)
+    total_price = FloatField()
+    modification_alert = BooleanField(default=False)
+    date_created = DateTimeField(auto_now_add=True, null=False)
+    date_modified = DateTimeField(auto_now=True, null=False)
     objects = CartManager()
 
     class Meta:
         constraints = [
-            models.UniqueConstraint(
+            UniqueConstraint(
                 name='one_cart_per_user',
                 fields=['id', 'user']
             )
         ]
 
         indexes = [
-            models.Index(
+            Index(
                 name='cart_user_id',
                 fields=['user_id'],
             )
@@ -121,13 +123,13 @@ class Cart(models.Model):
         return f"<Cart id:{self.id} >"
 
 
-class CartItem(models.Model):
-    modification_alert = models.BooleanField(default=False)
-    quantity = models.IntegerField(blank=True, null=True)
-    unit_price = models.FloatField()
-    total_price = models.FloatField()
-    cart = models.ForeignKey(Cart, on_delete=models.CASCADE, related_name='cart_items', null=True)
-    product = models.ForeignKey(Product, on_delete=models.PROTECT)
+class CartItem(Model):
+    modification_alert = BooleanField(default=False)
+    quantity = IntegerField(blank=True, null=True)
+    unit_price = FloatField()
+    total_price = FloatField()
+    cart = ForeignKey(Cart, on_delete=CASCADE, related_name='cart_items', null=True)
+    product = ForeignKey(Product, on_delete=PROTECT)
 
     def __repr__(self):
         return f"<CartItem {self.id}>"
