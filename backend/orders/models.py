@@ -2,7 +2,7 @@ from typing import List
 
 from django.db import transaction
 from django.db.models import Q, Max, Sum, Manager, QuerySet, Model, DateTimeField, CharField, FloatField, TextField, \
-    ForeignKey, BooleanField, CASCADE, UniqueConstraint, Index, IntegerField, PROTECT
+    ForeignKey, BooleanField, CASCADE, UniqueConstraint, Index, IntegerField, PROTECT, Case, When, TextChoices
 from django.conf import settings
 from django.utils import timezone
 
@@ -36,6 +36,13 @@ class OrderQuerySet(QuerySet):
         recently_shipped = Q(date_shipped__gt=timezone.now() - timezone.timedelta(days=30))
         return self.filter(recently_shipped)
 
+    def shipped(self, shipped: bool):
+        self.annotate(
+            is_shipped=Case(
+                When(is_shipped)
+            )
+        )
+
 
 class OrderManager(Manager):
     def create_order(self, user):
@@ -52,14 +59,22 @@ class OrderManager(Manager):
 
 # Create your models here.
 class Order(Model):
+    class OrderStatus(TextChoices):
+        DRAFT = 'purchase.order.draft',
+        BUYER_REJECTED = 'purchase.order.buyer.rejected',
+        SUPPLIER_REJECTED = 'purchase.order.supplier.rejected',
+        APPROVED = 'purchase.order.approved',
+        SHIPPED = 'purchase.order.shipped',
+        RECEIVED = 'purchase.order.received'
+
     date_created = DateTimeField(auto_now_add=True, null=False)
-    status = CharField(max_length=40)
+    status = CharField(max_length=40, choices=OrderStatus.choices)
     total_price = FloatField()
     comments = TextField(blank=True, null=True)
     buyer = ForeignKey(User, on_delete=CASCADE, related_name='buyer')
     is_shipped = BooleanField(default=False)
     date_shipped = DateTimeField(null=True)
-    seller = ForeignKey(User, on_delete=CASCADE, related_name='seller')
+    supplier = ForeignKey(User, on_delete=CASCADE, related_name='supplier')
     objects = OrderManager()
 
     class Meta:
@@ -85,8 +100,8 @@ class Order(Model):
                 condition=Q(is_shipped=False)
             ),
             Index(
-                name='order_seller_id',
-                fields=['seller_id'],
+                name='order_supplier_id',
+                fields=['supplier'],
                 condition=Q(is_shipped=False)
             )
         ]
