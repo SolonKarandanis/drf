@@ -2,7 +2,8 @@ from typing import List
 
 from django.db import transaction
 from django.db.models import Q, Max, Sum, Manager, QuerySet, Model, DateTimeField, CharField, FloatField, TextField, \
-    ForeignKey, BooleanField, CASCADE, UniqueConstraint, Index, IntegerField, PROTECT, Case, When, TextChoices
+    ForeignKey, BooleanField, CASCADE, UniqueConstraint, Index, IntegerField, PROTECT, Case, When, TextChoices, Count,\
+    Value
 from django.conf import settings
 from django.utils import timezone
 
@@ -33,15 +34,30 @@ class OrderQuerySet(QuerySet):
             .annotate(total_sales=Sum('total_price')).values('user__id', 'user__name', 'total_price')
 
     def recently_shipped(self):
-        recently_shipped = Q(date_shipped__gt=timezone.now() - timezone.timedelta(days=30))
+        recently_shipped = Q(is_shipped=True) & \
+                           Q(date_shipped__gt=timezone.now() - timezone.timedelta(days=30))
         return self.filter(recently_shipped)
 
-    def shipped(self, shipped: bool):
+    def received(self):
+        received = Order.OrderStatus.RECEIVED
         self.annotate(
-            is_shipped=Case(
-                When(is_shipped)
+            is_received=Case(
+                When(status=received, then=True),
+                default=False
             )
-        )
+        ).filter(is_received=True)
+
+    def by_status(self, requested_status: str):
+        order_status = Order.OrderStatus
+        return self.annotate(
+            Case(
+                When(Q(status=order_status.BUYER_REJECTED) |
+                     Q(status=order_status.SUPPLIER_REJECTED), then=Value("rejected")),
+                When(Q(status=order_status.APPROVED) | Q(status=order_status.SHIPPED) |
+                     Q(status=order_status.RECEIVED), then=Value("successful")),
+                default=Value("draft")
+            )
+        ).filter(order_status=requested_status)
 
 
 class OrderManager(Manager):
@@ -141,6 +157,15 @@ class OrderItemQuerySet(QuerySet):
             qs = (qs | qs2).distinct()
         return qs
 
+    def is_popular(self):
+        self.annotate(number_of_sales=Count('product'))
+        return self.annotate(
+            is_popular=Case(
+                When(number_of_sales__gt=9, then=True),
+                default=False
+            )
+        ).filter(is_popular=True)
+
 
 class OrderItemManager(Manager):
     def get_queryset(self, *args, **kwargs):
@@ -159,6 +184,8 @@ class OrderItem(Model):
     total_price = FloatField()
     order = ForeignKey(Order, on_delete=CASCADE, related_name='order_items')
     product = ForeignKey(Product, on_delete=PROTECT)
+
+    objects = OrderItemManager()
 
     def __repr__(self):
         return f"<OrderItem {self.id}>"
