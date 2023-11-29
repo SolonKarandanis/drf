@@ -51,6 +51,7 @@ class AddToCart(serializers.Serializer):
 
 class UpdateQuantity(serializers.Serializer):
     quantity = serializers.IntegerField(validators=[is_quantity_valid])
+    cart_item_id: serializers.IntegerField()
 
 
 class DeleteCartItems(serializers.Serializer):

@@ -1,23 +1,24 @@
 import logging
 from django.core.cache import cache
+from django.core.exceptions import ObjectDoesNotExist
 from django.db.models.signals import post_delete, post_save
 from django.dispatch import receiver
-from django.db import transaction
 from django.db.models import QuerySet, DateTimeField, Manager, Model, OneToOneField, FloatField, BooleanField, CASCADE, \
     UniqueConstraint, Index, IntegerField, ForeignKey, PROTECT
 from django.conf import settings
-from typing import List
 
 from products.models import Product
 
 User = settings.AUTH_USER_MODEL
+key_prefix = settings.CACHES.get('default').get('KEY_PREFIX')
 logger = logging.getLogger('django')
 
 
 class CartQuerySet(QuerySet):
     def owned_by(self, user):
-        cart = self.get(user=user)
-        if cart is None:
+        try:
+            cart = self.get(user=user)
+        except ObjectDoesNotExist:
             cart = self.create(user=user, total_price=0)
         return cart
 
@@ -27,7 +28,7 @@ class CartQuerySet(QuerySet):
     def update(self, **kwargs):
         user = kwargs.get("user")
         user_id = user.id
-        cache_key = f'cart-{user_id}'
+        cache_key = f'{key_prefix}:1:cart-{user_id}'
         cache.delete(cache_key)
         super(CartQuerySet, self).update(**kwargs)
 
@@ -37,8 +38,8 @@ class CartManager(Manager):
         cart = self.create(user=user, total_price=0)
         return cart
 
-    def update_cart(self):
-        cart = self.save()
+    def update_cart(self, cart):
+        cart = cart.save()
         return cart
 
     def get_queryset(self, *args, **kwargs):
@@ -69,58 +70,19 @@ class Cart(Model):
             )
         ]
 
-    @transaction.atomic
-    def add_items_to_cart(self, product_quantities_dict, products_to_be_added):
-        items = []
-        for product in products_to_be_added:
-            product_id = product.id
-            quantity = product_quantities_dict[product_id]
-            price = product.price
-            existing_cart_item = next(filter(lambda ci: ci.product_id == product_id, self.cart_items.all()), None)
-            logger.info(f'existing_cart_item: {existing_cart_item}')
-            if existing_cart_item is None:
-                cart_item = CartItem(quantity=quantity,
-                                     modification_alert=False,
-                                     unit_price=price,
-                                     total_price=quantity * price,
-                                     product_id=product_id)
-                items.append(cart_item)
-            else:
-                new_quantity = existing_cart_item.quantity + quantity
-                existing_cart_item.quantity = new_quantity
-                existing_cart_item.total_price = new_quantity * price
-                items.append(existing_cart_item)
-        logger.info(f'items: {items}')
-        self.cart_items.add(*items, bulk=False)
-        self.update_cart_total_price()
-
-    @transaction.atomic
-    def update_item_quantity(self, cart_item_id: int, quantity: int) -> None:
-        existing_cart_item = next(filter(lambda ci: ci.id == cart_item_id, self.cart_items.all()), None)
-        if existing_cart_item is not None:
-            existing_cart_item.quantity = quantity
-            existing_cart_item.total_price = quantity * existing_cart_item.unit_price
-            self.update_cart_total_price()
-
-    @transaction.atomic
-    def remove_from_cart(self, cart_item_ids: List[int]) -> None:
-        existing_cart_items = list(filter(lambda ci: ci.id in cart_item_ids, self.cart_items.all()))
-        logger.info(f'items: {existing_cart_items}')
-        if existing_cart_items is not None:
-            self.cart_items.remove(*existing_cart_items)
-            self.update_cart_total_price()
-
-    @transaction.atomic
-    def clear_cart(self) -> None:
-        self.cart_items.clear()
-        self.update_cart_total_price()
-
-    def update_cart_total_price(self) -> None:
+    def recalculate_cart_total_price(self) -> None:
         self.total_price = sum(ci.total_price for ci in self.cart_items.all())
-        self.save()
 
     def __repr__(self):
         return f"<Cart id:{self.id} >"
+
+
+class CartItemManager(Manager):
+
+    def create_cart_item(self, quantity: int, unit_price: float, total_price: float, product_id: int):
+        cart_item = self.create(quantity=quantity, unit_price=unit_price, total_price=total_price,
+                                product_id=product_id)
+        return cart_item
 
 
 class CartItem(Model):
@@ -131,6 +93,8 @@ class CartItem(Model):
     cart = ForeignKey(Cart, on_delete=CASCADE, related_name='cart_items', null=True)
     product = ForeignKey(Product, on_delete=PROTECT)
 
+    objects = CartItemManager()
+
     def __repr__(self):
         return f"<CartItem {self.id}>"
 
@@ -138,26 +102,26 @@ class CartItem(Model):
 @receiver(post_delete, sender=CartItem, dispatch_uid='cart_item_deleted')
 def cart_item_post_delete_handler(sender, instance, **kwargs):
     user_id = instance.cart.user.id
-    cache_key = f'cart-{user_id}'
+    cache_key = f'{key_prefix}:1:cart-{user_id}'
     cache.delete(cache_key)
 
 
 @receiver(post_save, sender=CartItem, dispatch_uid='cart_item_updated')
 def cart_item_post_save_handler(sender, instance, **kwargs):
     user_id = instance.cart.user.id
-    cache_key = f'cart-{user_id}'
+    cache_key = f'{key_prefix}:1:cart-{user_id}'
     cache.delete(cache_key)
 
 
 @receiver(post_delete, sender=Cart, dispatch_uid='cart_deleted')
 def cart__post_delete_handler(sender, instance, **kwargs):
     user_id = instance.user.id
-    cache_key = f'cart-{user_id}'
+    cache_key = f'{key_prefix}:1:cart-{user_id}'
     cache.delete(cache_key)
 
 
 @receiver(post_save, sender=Cart, dispatch_uid='cart_updated')
 def cart_post_save_handler(sender, instance, **kwargs):
     user_id = instance.user.id
-    cache_key = f'cart-{user_id}'
+    cache_key = f'{key_prefix}:1:cart-{user_id}'
     cache.delete(cache_key)
