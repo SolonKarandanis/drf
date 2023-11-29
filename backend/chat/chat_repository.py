@@ -14,4 +14,3 @@ class ChatRepository:
 
     def get_room_online_count(self):
         pass
-    
