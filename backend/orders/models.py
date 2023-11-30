@@ -6,7 +6,7 @@ from django.db.models import Q, Max, Sum, Manager, QuerySet, Model, DateTimeFiel
     Value, UUIDField
 from django.conf import settings
 from django.utils import timezone
-from django.contrib.postgres import indexes, search as fts,
+from django.contrib.postgres import indexes, search as fts
 import uuid
 from products.models import Product
 from cart.models import CartItem
