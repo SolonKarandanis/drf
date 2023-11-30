@@ -35,7 +35,10 @@ idna==3.4
 incremental==22.10.0
 kombu==5.3.2
 msgpack==1.0.7
+packaging==23.2
+plotly==5.18.0
 prompt-toolkit==3.0.39
+psycopg2==2.9.9
 pyasn1==0.5.0
 pyasn1-modules==0.3.0
 pycparser==2.21
@@ -50,6 +53,7 @@ requests==2.31.0
 service-identity==23.1.0
 six==1.16.0
 sqlparse==0.4.4
+tenacity==8.2.3
 twisted==23.8.0
 txaio==23.1.1
 typing-extensions==4.8.0
