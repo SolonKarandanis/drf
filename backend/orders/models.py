@@ -162,6 +162,8 @@ class OrderItemQuerySet(QuerySet):
         return qs
 
     def fts_search(self, query, user=None):
+        # Django 5
+        # OrderItem.objects.filter(search="meanings")
         doc = fts.SearchQuery(query, search_type='websearch')
         qs = self.annotate(doc=s).filter(doc=doc)
         if user is not None:
