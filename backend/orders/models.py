@@ -3,10 +3,10 @@ from typing import List
 from django.db import transaction
 from django.db.models import Q, Max, Sum, Manager, QuerySet, Model, DateTimeField, CharField, FloatField, TextField, \
     ForeignKey, BooleanField, CASCADE, UniqueConstraint, Index, IntegerField, PROTECT, Case, When, TextChoices, Count,\
-    Value
+    Value, UUIDField
 from django.conf import settings
 from django.utils import timezone
-
+import uuid
 from products.models import Product
 from cart.models import CartItem
 
@@ -92,6 +92,7 @@ class Order(Model):
     date_shipped = DateTimeField(null=True)
     supplier = ForeignKey(User, on_delete=CASCADE, related_name='supplier')
     objects = OrderManager()
+    uuid = UUIDField(default=uuid.uuid4())
 
     class Meta:
         ordering = ['-date_created']
@@ -184,6 +185,7 @@ class OrderItem(Model):
     total_price = FloatField()
     order = ForeignKey(Order, on_delete=CASCADE, related_name='order_items')
     product = ForeignKey(Product, on_delete=PROTECT)
+    uuid = UUIDField(default=uuid.uuid4())
 
     objects = OrderItemManager()
 
