@@ -2,15 +2,18 @@ from typing import List
 
 from django.db import transaction
 from django.db.models import Q, Max, Sum, Manager, QuerySet, Model, DateTimeField, CharField, FloatField, TextField, \
-    ForeignKey, BooleanField, CASCADE, UniqueConstraint, Index, IntegerField, PROTECT, Case, When, TextChoices, Count,\
+    ForeignKey, BooleanField, CASCADE, UniqueConstraint, Index, IntegerField, PROTECT, Case, When, TextChoices, Count, \
     Value, UUIDField
 from django.conf import settings
 from django.utils import timezone
+from django.contrib.postgres import indexes, search as fts,
 import uuid
 from products.models import Product
 from cart.models import CartItem
 
 User = settings.AUTH_USER_MODEL
+
+s = fts.SearchVector("product_name","manufacturer", config="english")
 
 
 class OrderQuerySet(QuerySet):
@@ -150,12 +153,19 @@ class Order(Model):
 
 class OrderItemQuerySet(QuerySet):
 
-    def search_order_items(self, query, user=None):
+    def search(self, query, user=None):
         lookup = Q(sku__icontains=query) | Q(product_name__icontains=query) | Q(manufacturer__icontains=query)
         qs = self.filter(lookup)
         if user is not None:
             qs2 = self.filter(order__user=user).filter(lookup)
             qs = (qs | qs2).distinct()
+        return qs
+
+    def fts_search(self, query, user=None):
+        doc = fts.SearchQuery(query, search_type='websearch')
+        qs = self.annotate(doc=s).filter(doc=doc)
+        if user is not None:
+            qs.filter(order__user=user)
         return qs
 
     def is_popular(self):
@@ -186,8 +196,21 @@ class OrderItem(Model):
     order = ForeignKey(Order, on_delete=CASCADE, related_name='order_items')
     product = ForeignKey(Product, on_delete=PROTECT)
     uuid = UUIDField(default=uuid.uuid4())
+    #  django 5!!!!
+    # search = GeneratedField(
+    #     db_persist=True,
+    #     expression=SearchVector(
+    #         "product_name","manufacturer", config="english"
+    #     ),
+    #     output_field=SearchVectorField(),
+    # )
 
     objects = OrderItemManager()
+
+    class Meta:
+        indexes = [
+            indexes.GinIndex(s, name="s_order_item_product_name_idx")
+        ]
 
     def __repr__(self):
         return f"<OrderItem {self.id}>"
