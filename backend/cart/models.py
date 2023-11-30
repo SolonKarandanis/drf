@@ -4,8 +4,9 @@ from django.core.exceptions import ObjectDoesNotExist
 from django.db.models.signals import post_delete, post_save
 from django.dispatch import receiver
 from django.db.models import QuerySet, DateTimeField, Manager, Model, OneToOneField, FloatField, BooleanField, CASCADE, \
-    UniqueConstraint, Index, IntegerField, ForeignKey, PROTECT
+    UniqueConstraint, Index, IntegerField, ForeignKey, PROTECT, UUIDField
 from django.conf import settings
+import uuid
 
 from products.models import Product
 
@@ -53,6 +54,7 @@ class Cart(Model):
     modification_alert = BooleanField(default=False)
     date_created = DateTimeField(auto_now_add=True, null=False)
     date_modified = DateTimeField(auto_now=True, null=False)
+    uuid = UUIDField(default=uuid.uuid4())
     objects = CartManager()
 
     class Meta:
@@ -92,6 +94,7 @@ class CartItem(Model):
     total_price = FloatField()
     cart = ForeignKey(Cart, on_delete=CASCADE, related_name='cart_items', null=True)
     product = ForeignKey(Product, on_delete=PROTECT)
+    uuid = UUIDField(default=uuid.uuid4())
 
     objects = CartItemManager()
 

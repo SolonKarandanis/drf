@@ -1,6 +1,7 @@
 from django.db.models import Q, QuerySet, Manager, Model, SET_NULL, ForeignKey, CharField, TextField, \
-    FloatField, BooleanField, IntegerField
+    FloatField, BooleanField, IntegerField, UUIDField
 from django.conf import settings
+import uuid
 
 # Create your models here.
 User = settings.AUTH_USER_MODEL
@@ -47,6 +48,7 @@ class Product(Model):
     price = FloatField()
     public = BooleanField(default=True)
     inventory = IntegerField(blank=True, null=True)
+    uuid = UUIDField(default=uuid.uuid4())
 
     class Meta:
         ordering = ['sku']

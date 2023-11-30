@@ -1,8 +1,9 @@
-from django.db.models import QuerySet, DateTimeField, EmailField
+from django.db.models import QuerySet, DateTimeField, EmailField, UUIDField
 from django.contrib.auth.models import AbstractUser
 from django.contrib.auth.base_user import BaseUserManager
 from django.utils.translation import gettext_lazy as _
 from django.db.models.functions import Lower
+import uuid
 
 
 class UserQuerySet(QuerySet):
@@ -64,6 +65,7 @@ class User(AbstractUser):
     created_date = DateTimeField(auto_now_add=True, null=False)
     updated_date = DateTimeField(auto_now=True, null=False)
     email = EmailField(_("email address"), unique=True)
+    uuid = UUIDField(default=uuid.uuid4())
 
     date_joined = None
 
