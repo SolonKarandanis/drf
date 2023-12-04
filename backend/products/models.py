@@ -1,6 +1,7 @@
 from django.db.models import Q, QuerySet, Manager, Model, SET_NULL, ForeignKey, CharField, TextField, \
     FloatField, BooleanField, IntegerField, UUIDField
 from django.conf import settings
+from django.contrib.contenttypes.fields import GenericRelation
 import uuid
 
 # Create your models here.
@@ -57,6 +58,7 @@ class Product(Model):
     public = BooleanField(default=True)
     inventory = IntegerField(blank=True, null=True)
     uuid = UUIDField(default=uuid.uuid4())
+    comments = GenericRelation("Comment")
 
     class Meta:
         ordering = ['sku']
