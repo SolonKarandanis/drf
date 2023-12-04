@@ -1,5 +1,5 @@
 from typing import List
-
+from django.core.exceptions import ObjectDoesNotExist
 from django.db import transaction
 from django.db.models import Q, Max, Sum, Manager, QuerySet, Model, DateTimeField, CharField, FloatField, TextField, \
     ForeignKey, BooleanField, CASCADE, UniqueConstraint, Index, IntegerField, PROTECT, Case, When, TextChoices, Count, \
@@ -14,15 +14,28 @@ from cart.models import CartItem
 
 User = settings.AUTH_USER_MODEL
 
-s = fts.SearchVector("product_name","manufacturer", config="english")
+s = fts.SearchVector("product_name", "manufacturer", config="english")
 
 
 class OrderQuerySet(QuerySet):
+
+    def by_uuid(self, uuid: str):
+        try:
+            return self.get(uuid=uuid)
+        except ObjectDoesNotExist:
+            return None
+
+    def with_comments(self):
+        return self.prefetch_related('comments')
+
     def with_order_items(self):
         return self.prefetch_related('order_items')
 
     def owned_by(self, user):
         return self.filter(user=user)
+
+    def supplied_by(self, user):
+        return self.filter(supplier=user)
 
     def order_ids_with_is_shipped(self):
         return self.values('id', 'is_shipped')
@@ -65,12 +78,13 @@ class OrderQuerySet(QuerySet):
 
 
 class OrderManager(Manager):
-    def create_order(self, user):
-        order = self.create(user=user, total_price=0)
+    def create_order(self, buyer, supplier):
+        draft_status = Order.OrderStatus.DRAFT
+        order = self.create(buyer=buyer, supplier=supplier, total_price=0, status=draft_status)
         return order
 
-    def update_order(self):
-        order = self.save()
+    def update_order(self, order):
+        order = order.save()
         return order
 
     def get_queryset(self, *args, **kwargs):
@@ -94,9 +108,10 @@ class Order(Model):
     is_shipped = BooleanField(default=False)
     date_shipped = DateTimeField(null=True)
     supplier = ForeignKey(User, on_delete=CASCADE, related_name='supplier')
-    objects = OrderManager()
     uuid = UUIDField(default=uuid.uuid4())
     comments = GenericRelation("comments.Comment", related_query_name='order')
+
+    objects = OrderManager()
 
     class Meta:
         ordering = ['-date_created']
@@ -149,7 +164,6 @@ class Order(Model):
 
     def update_order_total_price(self) -> None:
         self.total_price = sum(oi.total_price for oi in self.order_items.all())
-        self.save()
 
 
 class OrderItemQuerySet(QuerySet):
@@ -184,6 +198,13 @@ class OrderItemQuerySet(QuerySet):
 class OrderItemManager(Manager):
     def get_queryset(self, *args, **kwargs):
         return OrderItemQuerySet(self.model, using=self._db)
+
+    def update_item(self, order_item):
+        order_item = order_item.save()
+        return order_item
+
+    def create_item(self):
+        pass
 
 
 class OrderItem(Model):

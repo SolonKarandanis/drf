@@ -10,8 +10,14 @@ repo = ProductRepository()
 
 class ProductService:
 
+    def find_by_uuid(self, uuid: str) -> Product:
+        return repo.find_by_uuid(uuid)
+
     def find_by_id(self, product_id: int) -> Product:
         return repo.find_by_id(product_id)
+
+    def find_users_product_by_uuid(self, uuid: str, logged_in_user: User) -> Product:
+        return repo.find_users_product_by_uuid(uuid, logged_in_user)
 
     def find_users_product_by_id(self, product_id: int, logged_in_user: User) -> Product:
         return repo.find_users_product_by_id(product_id, logged_in_user)

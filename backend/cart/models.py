@@ -16,6 +16,12 @@ logger = logging.getLogger('django')
 
 
 class CartQuerySet(QuerySet):
+    def by_uuid(self, uuid: str):
+        try:
+            return self.get(uuid=uuid)
+        except ObjectDoesNotExist:
+            return None
+
     def owned_by(self, user):
         try:
             cart = self.get(user=user)

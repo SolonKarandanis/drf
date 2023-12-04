@@ -1,3 +1,4 @@
+from django.core.exceptions import ObjectDoesNotExist
 from django.db.models import Q, QuerySet, Manager, Model, SET_NULL, ForeignKey, CharField, TextField, \
     FloatField, BooleanField, IntegerField, UUIDField
 from django.conf import settings
@@ -9,6 +10,12 @@ User = settings.AUTH_USER_MODEL
 
 
 class ProductQuerySet(QuerySet):
+    def by_uuid(self, uuid: str):
+        try:
+            return self.get(uuid=uuid)
+        except ObjectDoesNotExist:
+            return None
+
     def is_public(self):
         return self.filter(public=True)
 

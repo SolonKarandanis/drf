@@ -147,6 +147,11 @@ LOGGING = {
             'level': 'DEBUG',
             'filters': ['require_debug_true'],
             'class': 'logging.StreamHandler',
+        },
+        'file': {
+            'class': 'logging.FileHandler',
+            'filename': 'logs/drf.log',
+            'level': 'DEBUG',
         }
     },
     'loggers': {
