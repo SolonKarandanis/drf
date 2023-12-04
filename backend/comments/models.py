@@ -1,5 +1,5 @@
 from django.db.models import Model, DateTimeField, TextField, ForeignKey, CASCADE, \
-    PositiveSmallIntegerField, QuerySet, Manager
+    PositiveSmallIntegerField, QuerySet, Manager, CharField, EmailField
 from django.contrib.contenttypes.fields import GenericForeignKey
 from django.contrib.contenttypes.models import ContentType
 from django.conf import settings
@@ -26,5 +26,7 @@ class Comment(Model):
     content_object = GenericForeignKey('content_type', 'object_id')
     date_created = DateTimeField(auto_now_add=True, null=False)
     user = ForeignKey(User,  on_delete=CASCADE)
+    user_username = CharField(max_length=50, null=True)
+    user_email = EmailField(null=True)
 
     objects = CommentManager()
