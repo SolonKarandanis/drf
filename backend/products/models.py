@@ -15,6 +15,9 @@ class ProductQuerySet(QuerySet):
     def with_owner(self):
         return self.select_related('user')
 
+    def with_comments(self):
+        return self.prefetch_related('comments')
+
     def owned_by(self, user):
         return self.filter(user=user)
 
@@ -58,7 +61,7 @@ class Product(Model):
     public = BooleanField(default=True)
     inventory = IntegerField(blank=True, null=True)
     uuid = UUIDField(default=uuid.uuid4())
-    comments = GenericRelation("Comment")
+    comments = GenericRelation("comments.Comment")
 
     class Meta:
         ordering = ['sku']
