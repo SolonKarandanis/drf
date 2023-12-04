@@ -51,7 +51,7 @@ class CartService:
             existing_cart_item = next(filter(lambda ci: ci.product_id == product_id, cart.cart_items.all()), None)
             logger.info(f'existing_cart_item: {existing_cart_item}')
             if existing_cart_item is None:
-                cart_item = cart_repo.initialize_cart_item(quantity, price, quantity * price, product_id)
+                cart_item = cart_repo.initialize_cart_item(quantity, price, quantity * price, product_id, cart)
                 items.append(cart_item)
             else:
                 new_quantity = existing_cart_item.quantity + quantity
@@ -60,7 +60,8 @@ class CartService:
                 items.append(existing_cart_item)
         cart.cart_items.add(*items, bulk=False)
         cart.recalculate_cart_total_price()
-        return self.update_cart(cart)
+        self.update_cart(cart)
+        return self.fetch_user_cart(logged_in_user)
 
     @transaction.atomic
     def update_item_quantities(self, request: UpdateQuantity, logged_in_user: User) -> Cart:
@@ -70,9 +71,15 @@ class CartService:
         for data in data_list:
             quantity = data['quantity']
             cart_item_id = data['cart_item_id']
-            cart.update_item_quantity(cart_item_id, quantity)
+            existing_cart_item = next(filter(lambda ci: ci.id == cart_item_id, cart.cart_items.all()), None)
+            if existing_cart_item is not None:
+                existing_cart_item.quantity = quantity
+                existing_cart_item.total_price = quantity * existing_cart_item.unit_price
+                cart_repo.update_cart_item(existing_cart_item)
+        cart = self.fetch_user_cart(logged_in_user)
         cart.recalculate_cart_total_price()
-        return self.update_cart(cart)
+        self.update_cart(cart)
+        return cart
 
     @transaction.atomic
     def delete_cart_items(self, request: DeleteCartItems, logged_in_user: User) -> Cart:
@@ -85,7 +92,8 @@ class CartService:
         if existing_cart_items is not None:
             cart.cart_items.remove(*existing_cart_items)
             cart.recalculate_cart_total_price()
-            return self.update_cart(cart)
+            self.update_cart(cart)
+            return self.fetch_user_cart(logged_in_user)
         return cart
 
     @transaction.atomic
@@ -93,7 +101,8 @@ class CartService:
         cart: Cart = self.fetch_user_cart(logged_in_user)
         cart.cart_items.clear()
         cart.recalculate_cart_total_price()
-        return self.update_cart(cart)
+        self.update_cart(cart)
+        return self.fetch_user_cart(logged_in_user)
 
     def update_cart(self, cart: Cart) -> Cart:
         return cart_repo.update_cart(cart)

@@ -81,9 +81,13 @@ class Cart(Model):
 
 class CartItemManager(Manager):
 
-    def create_cart_item(self, quantity: int, unit_price: float, total_price: float, product_id: int):
+    def create_cart_item(self, quantity: int, unit_price: float, total_price: float, product_id: int, cart: Cart):
         cart_item = self.create(quantity=quantity, unit_price=unit_price, total_price=total_price,
-                                product_id=product_id)
+                                product_id=product_id, cart=cart)
+        return cart_item
+
+    def update_cart_item(self, cart_item):
+        cart_item = cart_item.save()
         return cart_item
 
 

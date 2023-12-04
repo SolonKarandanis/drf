@@ -50,8 +50,12 @@ class AddToCart(serializers.Serializer):
 
 
 class UpdateQuantity(serializers.Serializer):
+    cart_item_id = serializers.IntegerField()
     quantity = serializers.IntegerField(validators=[is_quantity_valid])
-    cart_item_id: serializers.IntegerField()
+
+
+    def __repr__(self):
+        return f"<UpdateQuantity CartItemId:{self.cart_item_id},  Quantity:{self.quantity}>"
 
 
 class DeleteCartItems(serializers.Serializer):

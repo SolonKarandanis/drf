@@ -22,6 +22,10 @@ class CartRepository:
         cart = Cart.objects.update_cart(cart)
         return cart
 
+    def update_cart_item(self, cart_item: CartItem) -> CartItem:
+        item = CartItem.objects.update_cart_item(cart_item)
+        return item
 
-    def initialize_cart_item(self, quantity: int, unit_price: float, total_price: float, product_id: int) -> CartItem:
-        return CartItem.objects.create_cart_item(quantity, unit_price, total_price, product_id)
+    def initialize_cart_item(self, quantity: int, unit_price: float, total_price: float,
+                             product_id: int, cart: Cart) -> CartItem:
+        return CartItem.objects.create_cart_item(quantity, unit_price, total_price, product_id, cart)
