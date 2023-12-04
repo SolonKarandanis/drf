@@ -61,7 +61,7 @@ class Product(Model):
     public = BooleanField(default=True)
     inventory = IntegerField(blank=True, null=True)
     uuid = UUIDField(default=uuid.uuid4())
-    comments = GenericRelation("comments.Comment")
+    comments = GenericRelation("comments.Comment", related_query_name='product')
 
     class Meta:
         ordering = ['sku']

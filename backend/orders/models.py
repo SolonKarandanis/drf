@@ -6,6 +6,7 @@ from django.db.models import Q, Max, Sum, Manager, QuerySet, Model, DateTimeFiel
     Value, UUIDField
 from django.conf import settings
 from django.utils import timezone
+from django.contrib.contenttypes.fields import GenericRelation
 from django.contrib.postgres import indexes, search as fts
 import uuid
 from products.models import Product
@@ -89,13 +90,13 @@ class Order(Model):
     date_created = DateTimeField(auto_now_add=True, null=False)
     status = CharField(max_length=40, choices=OrderStatus.choices)
     total_price = FloatField()
-    comments = TextField(blank=True, null=True)
     buyer = ForeignKey(User, on_delete=CASCADE, related_name='buyer')
     is_shipped = BooleanField(default=False)
     date_shipped = DateTimeField(null=True)
     supplier = ForeignKey(User, on_delete=CASCADE, related_name='supplier')
     objects = OrderManager()
     uuid = UUIDField(default=uuid.uuid4())
+    comments = GenericRelation("comments.Comment", related_query_name='order')
 
     class Meta:
         ordering = ['-date_created']

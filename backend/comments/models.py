@@ -8,7 +8,9 @@ User = settings.AUTH_USER_MODEL
 
 
 class CommentQuerySet(QuerySet):
-    pass
+
+    def get_order_not_shipped_comments(self):
+        return self.filter(order__order_is_shipped=False)
 
 
 class CommentManager(Manager):
