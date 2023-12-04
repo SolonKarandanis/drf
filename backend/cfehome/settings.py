@@ -51,6 +51,7 @@ INSTALLED_APPS = [
     'mail',
     'notifications',
     'chat',
+    'comments',
 ]
 
 MIDDLEWARE = [
