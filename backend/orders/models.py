@@ -1,6 +1,4 @@
-from typing import List
 from django.core.exceptions import ObjectDoesNotExist
-from django.db import transaction
 from django.db.models import Q, Max, Sum, Manager, QuerySet, Model, DateTimeField, CharField, FloatField, TextField, \
     ForeignKey, BooleanField, CASCADE, UniqueConstraint, Index, IntegerField, PROTECT, Case, When, TextChoices, Count, \
     Value, UUIDField
@@ -10,7 +8,6 @@ from django.contrib.contenttypes.fields import GenericRelation
 from django.contrib.postgres import indexes, search as fts
 import uuid
 from products.models import Product
-from cart.models import CartItem
 
 User = settings.AUTH_USER_MODEL
 
@@ -81,6 +78,7 @@ class OrderManager(Manager):
     def create_order(self, buyer, supplier):
         draft_status = Order.OrderStatus.DRAFT
         order = self.create(buyer=buyer, supplier=supplier, total_price=0, status=draft_status)
+        order.save()
         return order
 
     def update_order(self, order):
@@ -145,24 +143,7 @@ class Order(Model):
     def __repr__(self):
         return f"<Order {self.id}>"
 
-    @transaction.atomic
-    def add_order_items(self, cart_items: List[CartItem]) -> None:
-        items = []
-        for cart_item in cart_items:
-            order_item = OrderItem(product_id=cart_item.products_id,
-                                   product_name=cart_item.product.name,
-                                   sku=cart_item.product.sku,
-                                   manufacturer=cart_item.product.supplier,
-                                   start_date=timezone.now(),
-                                   status=self.status,
-                                   price=cart_item.unit_price,
-                                   quantity=cart_item.quantity,
-                                   total_price=cart_item.total_price)
-            items.append(order_item)
-        self.order_items.append(*items, bulk=False)
-        self.update_order_total_price()
-
-    def update_order_total_price(self) -> None:
+    def recalculate_order_total_price(self) -> None:
         self.total_price = sum(oi.total_price for oi in self.order_items.all())
 
 
@@ -203,8 +184,11 @@ class OrderItemManager(Manager):
         order_item = order_item.save()
         return order_item
 
-    def create_item(self):
-        pass
+    def create_order_item(self, product_id: int, product_name: str, sku: str,
+                          manufacturer: str, price: float, quantity: float, total_price: float):
+        order_item = self.create(product_id=product_id, product_name=product_name, sku=sku,
+                                 manufacturer=manufacturer,price=price, quantity=quantity, total_price=total_price)
+        return order_item
 
 
 class OrderItem(Model):

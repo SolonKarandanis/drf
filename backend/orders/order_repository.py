@@ -2,7 +2,9 @@ from typing import List
 
 from django.conf import settings
 from .models import Order, OrderItem
+
 User = settings.AUTH_USER_MODEL
+
 
 class OrderRepository:
 
@@ -48,3 +50,8 @@ class OrderRepository:
 
     def search_order_items(self, query: str, user: User = None) -> List[OrderItem]:
         return OrderItem.objects.get_queryset().fts_search(query, user)
+
+    def initialize_order_item(self, product_id: int, product_name: str, sku: str,
+                              manufacturer: str, price: float, quantity: float, total_price: float):
+        return OrderItem.objects.create_order_item(product_id, product_name, sku, manufacturer, price, quantity,
+                                                   total_price)
