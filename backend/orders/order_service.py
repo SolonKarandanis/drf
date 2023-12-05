@@ -16,7 +16,7 @@ cart_repo = CartRepository()
 class OrderService:
 
     @transaction.atomic
-    def add_order_items(self, logged_in_user: User) -> List[Order]:
+    def place_draft_orders(self, logged_in_user: User) -> List[Order]:
         cart: Cart = cart_repo.fetch_user_cart(logged_in_user)
         distinct_suppliers = [dict(cart_item.product.user) for cart_item in cart.cart_items.all()]
         order_ids = []
