@@ -85,6 +85,11 @@ class Cart(Model):
         return f"<Cart id:{self.id} >"
 
 
+class CartItemQuerySet(QuerySet):
+    def with_product(self):
+        return self.select_related('product')
+
+
 class CartItemManager(Manager):
 
     def create_cart_item(self, quantity: int, unit_price: float, total_price: float, product_id: int, cart: Cart):
@@ -95,6 +100,9 @@ class CartItemManager(Manager):
     def update_cart_item(self, cart_item):
         cart_item = cart_item.save()
         return cart_item
+
+    def get_queryset(self, *args, **kwargs):
+        return CartItemQuerySet(self.model, using=self._db)
 
 
 class CartItem(Model):

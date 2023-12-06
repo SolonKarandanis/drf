@@ -36,13 +36,19 @@ class OrderRepository:
         return Order.objects.update_order(order)
 
     def find_order_by_uuid(self, uuid: str) -> Order:
-        return Order.objects.get_queryset().by_uuid(uuid)
+        return Order.objects.get_queryset().with_order_items().by_uuid(uuid)
 
     def find_order_by_id(self, order_id: int) -> Order:
-        return Order.objects.get_queryset().get(pk=order_id)
+        return Order.objects.get_queryset().with_order_items().get(pk=order_id)
 
     def find_orders_by_requested_status(self, requested_status: str) -> List[Order]:
         return Order.objects.get_queryset().by_status(requested_status)
+
+    def find_order_item_by_uuid(self, uuid: str) -> OrderItem:
+        return OrderItem.objects.get_queryset().with_product().by_uuid(uuid)
+
+    def find_order_item_by_id(self, order_item_id: int) -> OrderItem:
+        return OrderItem.objects.get_queryset().with_product().get(pk=order_item_id)
 
     def update_order_item(self, order_item: OrderItem) -> OrderItem:
         item = OrderItem.objects.update_item(order_item)

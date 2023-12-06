@@ -7,6 +7,7 @@ from .models import Cart
 from products.models import Product
 from .cart_repository import CartRepository
 from products.product_repository import ProductRepository
+from orders.order_repository import OrderRepository
 
 import logging
 
@@ -14,6 +15,7 @@ from .serializers import AddToCart, UpdateQuantity, DeleteCartItems
 
 cart_repo = CartRepository()
 product_repo = ProductRepository()
+order_repo = OrderRepository()
 
 User = settings.AUTH_USER_MODEL
 key_prefix = settings.CACHES.get('default').get('KEY_PREFIX')
@@ -61,7 +63,7 @@ class CartService:
         cart.cart_items.add(*items, bulk=False)
         cart.recalculate_cart_total_price()
         self.update_cart(cart)
-        return self.fetch_user_cart(logged_in_user)
+        return cart
 
     @transaction.atomic
     def update_item_quantities(self, request: UpdateQuantity, logged_in_user: User) -> Cart:
@@ -102,7 +104,30 @@ class CartService:
         cart.cart_items.clear()
         cart.recalculate_cart_total_price()
         self.update_cart(cart)
-        return self.fetch_user_cart(logged_in_user)
+        return cart
+
+    @transaction.atomic
+    def add_order_to_cart(self, logged_in_user: User, order_uuid: str) -> None:
+        order = order_repo.find_order_by_uuid(order_uuid)
+
+    @transaction.atomic
+    def add_order_item_to_cart(self, logged_in_user: User, order_item_uuid: str) -> None:
+        order_item = order_repo.find_order_item_by_uuid(order_item_uuid)
+        cart: Cart = self.fetch_user_cart(logged_in_user)
+        product_id = order_item.product.id
+        quantity = order_item.quantity
+        price = order_item.price
+        existing_cart_item = next(filter(lambda ci: ci.product_id == product_id, cart.cart_items.all()), None)
+        if existing_cart_item is None:
+            cart_item = cart_repo.initialize_cart_item(quantity, price, quantity * price, product_id, cart)
+            cart.cart_items.add(cart_item)
+        else:
+            new_quantity = existing_cart_item.quantity + quantity
+            existing_cart_item.quantity = new_quantity
+            existing_cart_item.total_price = new_quantity * price
+            cart.cart_items.add(existing_cart_item)
+        cart.recalculate_cart_total_price()
+        self.update_cart(cart)
 
     def update_cart(self, cart: Cart) -> Cart:
         return cart_repo.update_cart(cart)

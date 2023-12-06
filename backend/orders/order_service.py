@@ -4,20 +4,20 @@ from django.db import transaction
 import logging
 from .models import Order, OrderItem
 from .order_repository import OrderRepository
-from cart.cart_repository import CartRepository
+from cart.cart_service import CartService
 from cart.models import Cart
 
 logger = logging.getLogger('django')
 User = settings.AUTH_USER_MODEL
 order_repo = OrderRepository()
-cart_repo = CartRepository()
+cart_service = CartService()
 
 
 class OrderService:
 
     @transaction.atomic
     def place_draft_orders(self, logged_in_user: User) -> List[Order]:
-        cart: Cart = cart_repo.fetch_user_cart(logged_in_user)
+        cart: Cart = cart_service.fetch_user_cart(logged_in_user)
         distinct_suppliers = [dict(cart_item.product.user) for cart_item in cart.cart_items.all()]
         order_ids = []
         for supplier in distinct_suppliers:
@@ -26,7 +26,7 @@ class OrderService:
             order_ids.append(new_order.id)
             filtered_by_supplier = filter(lambda ci: ci.product.user.id == supplier.id, cart.cart_items.all())
             for cart_item in filtered_by_supplier:
-                order_item = order_repo.initialize_order_item(product_id=cart_item.products_id,
+                order_item = order_repo.initialize_order_item(product_id=cart_item.product_id,
                                                               product_name=cart_item.product.name,
                                                               sku=cart_item.product.sku,
                                                               manufacturer=cart_item.product.supplier,
@@ -37,6 +37,7 @@ class OrderService:
             new_order.order_items.add(*items, bulk=False)
             new_order.recalculate_order_total_price()
             self.update_order(new_order)
+        cart_service.clear_cart(logged_in_user)
         return self.find_orders_by_ids(order_ids)
 
     def find_orders_by_ids(self, order_ids: List[int]) -> List[Order]:
@@ -76,6 +77,12 @@ class OrderService:
 
     def find_order_by_id(self, order_id: int) -> Order:
         return order_repo.find_order_by_id(order_id)
+
+    def find_order_item_by_uuid(self, uuid: str) -> OrderItem:
+        return order_repo.find_order_item_by_uuid(uuid)
+
+    def find_order_item_by_id(self, order_item_id: int) -> OrderItem:
+        return order_repo.find_order_item_by_id(order_item_id)
 
     def find_orders_by_requested_status(self, requested_status: str) -> List[Order]:
         return order_repo.find_orders_by_requested_status(requested_status)

@@ -175,6 +175,9 @@ class OrderItemQuerySet(QuerySet):
             )
         ).filter(is_popular=True)
 
+    def with_product(self):
+        return self.select_related('product')
+
 
 class OrderItemManager(Manager):
     def get_queryset(self, *args, **kwargs):
