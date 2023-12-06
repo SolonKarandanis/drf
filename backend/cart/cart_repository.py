@@ -3,6 +3,7 @@ from typing import List
 from django.conf import settings
 from django.db.models import Prefetch
 from .models import Cart, CartItem
+from products.models import Product
 import logging
 
 User = settings.AUTH_USER_MODEL
@@ -19,8 +20,9 @@ class CartRepository:
         return cart
 
     def fetch_user_cart_with_products_and_users(self, logged_in_user: User) -> Cart:
-        cart_items_prefect = Prefetch('cart_items', queryset=CartItem.objects.select_related('product'))
-        cart = Cart.objects.prefetch_related(cart_items_prefect)\
+        cart_items_products_prefetch = Prefetch('cart_items',
+                                                queryset=CartItem.objects.select_related('product', 'product__user'))
+        cart = Cart.objects.prefetch_related(cart_items_products_prefetch)\
             .get(user=logged_in_user)
         return cart
 

@@ -17,7 +17,7 @@ class OrderService:
 
     @transaction.atomic
     def place_draft_orders(self, logged_in_user: User) -> List[Order]:
-        cart: Cart = cart_service.fetch_user_cart(logged_in_user)
+        cart: Cart = cart_service.fetch_user_cart_with_products_and_users(logged_in_user)
         distinct_suppliers = [dict(cart_item.product.user) for cart_item in cart.cart_items.all()]
         order_ids = []
         for supplier in distinct_suppliers:
