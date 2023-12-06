@@ -3,7 +3,6 @@ from typing import List
 from django.conf import settings
 from django.db.models import Prefetch
 from .models import Cart, CartItem
-from products.models import Product
 import logging
 
 User = settings.AUTH_USER_MODEL
