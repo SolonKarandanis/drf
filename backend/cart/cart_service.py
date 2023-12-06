@@ -30,12 +30,13 @@ class CartService:
         cache_key = f'cart-{user_id}'
         cart = cache.get(f'{key_prefix}:1:{cache_key}')
         if cart is None:
-            cart = Cart.objects.get_queryset() \
-                .with_cart_items() \
-                .owned_by(logged_in_user)
+            cart =cart_repo.fetch_user_cart(logged_in_user)
             cache.set(cache_key, cart, timeout=120)
         logger.info(f'cart: {cart}')
         return cart
+
+    def fetch_user_cart_with_products_and_users(self, logged_in_user: User) -> Cart:
+        return cart_repo.fetch_user_cart_with_products_and_users(logged_in_user)
 
     @transaction.atomic
     def add_to_cart(self, request: AddToCart, logged_in_user: User) -> Cart:
@@ -108,7 +109,8 @@ class CartService:
 
     @transaction.atomic
     def add_order_to_cart(self, logged_in_user: User, order_uuid: str) -> None:
-        order = order_repo.find_order_by_uuid(order_uuid)
+        order = order_repo.find_order_by_uuid_with_products(order_uuid)
+        cart: Cart = self.fetch_user_cart(logged_in_user)
 
     @transaction.atomic
     def add_order_item_to_cart(self, logged_in_user: User, order_item_uuid: str) -> None:

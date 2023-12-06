@@ -29,7 +29,6 @@ class OrderService:
                 order_item = order_repo.initialize_order_item(product_id=cart_item.product_id,
                                                               product_name=cart_item.product.name,
                                                               sku=cart_item.product.sku,
-                                                              manufacturer=cart_item.product.supplier,
                                                               price=cart_item.unit_price,
                                                               quantity=cart_item.quantity,
                                                               total_price=cart_item.total_price)

@@ -1,6 +1,7 @@
 from typing import List
 
 from django.conf import settings
+from django.db.models import Prefetch
 from .models import Order, OrderItem
 
 User = settings.AUTH_USER_MODEL
@@ -38,6 +39,10 @@ class OrderRepository:
     def find_order_by_uuid(self, uuid: str) -> Order:
         return Order.objects.get_queryset().with_order_items().by_uuid(uuid)
 
+    def find_order_by_uuid_with_products(self, uuid: str) -> Order:
+        order_items_prefect = Prefetch('order_items', queryset=OrderItem.objects.select_related('product'))
+        return Order.objects.prefetch_related(order_items_prefect).get(uuid=uuid)
+
     def find_order_by_id(self, order_id: int) -> Order:
         return Order.objects.get_queryset().with_order_items().get(pk=order_id)
 
@@ -57,7 +62,6 @@ class OrderRepository:
     def search_order_items(self, query: str, user: User = None) -> List[OrderItem]:
         return OrderItem.objects.get_queryset().fts_search(query, user)
 
-    def initialize_order_item(self, product_id: int, product_name: str, sku: str,
-                              manufacturer: str, price: float, quantity: float, total_price: float):
-        return OrderItem.objects.create_order_item(product_id, product_name, sku, manufacturer, price, quantity,
+    def initialize_order_item(self, product_id: int, product_name: str, sku: str, price: float, quantity: float, total_price: float):
+        return OrderItem.objects.create_order_item(product_id, product_name, sku, price, quantity,
                                                    total_price)
