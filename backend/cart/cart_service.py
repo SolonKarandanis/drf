@@ -102,6 +102,7 @@ class CartService:
     @transaction.atomic
     def clear_cart(self, logged_in_user: User) -> Cart:
         cart: Cart = self.fetch_user_cart(logged_in_user)
+        cart_repo.delete_cart_items(cart)
         cart.cart_items.clear()
         cart.recalculate_cart_total_price()
         self.update_cart(cart)

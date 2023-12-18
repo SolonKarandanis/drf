@@ -33,6 +33,9 @@ class CartRepository:
         item = CartItem.objects.update_cart_item(cart_item)
         return item
 
+    def delete_cart_items(self, cart: Cart) -> None:
+        CartItem.objects.filter(cart=cart).delete()
+
     def initialize_cart_item(self, quantity: int, unit_price: float, total_price: float,
                              product_id: int, cart: Cart) -> CartItem:
         return CartItem.objects.create_cart_item(quantity, unit_price, total_price, product_id, cart)
