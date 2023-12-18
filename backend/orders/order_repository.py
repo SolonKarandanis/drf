@@ -62,6 +62,6 @@ class OrderRepository:
     def search_order_items(self, query: str, user: User = None) -> List[OrderItem]:
         return OrderItem.objects.get_queryset().fts_search(query, user)
 
-    def initialize_order_item(self, product_id: int, product_name: str, sku: str, price: float, quantity: float, total_price: float):
-        return OrderItem.objects.create_order_item(product_id, product_name, sku, price, quantity,
+    def initialize_order_item(self, product_id: int, order_id: int, product_name: str, sku: str, price: float, quantity: float, total_price: float):
+        return OrderItem.objects.create_order_item(product_id, order_id, product_name, sku, price, quantity,
                                                    total_price)

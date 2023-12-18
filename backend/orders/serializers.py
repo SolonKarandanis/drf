@@ -7,19 +7,38 @@ from cfehome.serializers import ModelPaginationSerializer
 logger = logging.getLogger('django')
 
 
-class OrderSerializer(serializers.ModelSerializer):
-    class Meta:
-        model = Order
-        fields = [
-            'id',
-        ]
-
-
 class OrderItemSerializer(serializers.ModelSerializer):
     class Meta:
         model = OrderItem
         fields = [
             'id',
+            'product_name',
+            'sku',
+            'manufacturer',
+            'start_date',
+            'end_date',
+            'status',
+            'price',
+            'quantity',
+            'total_price',
+            'uuid',
+        ]
+
+
+class OrderSerializer(serializers.ModelSerializer):
+    order_items = OrderItemSerializer(many=True, read_only=True)
+
+    class Meta:
+        model = Order
+        fields = [
+            'id',
+            'date_created',
+            'status',
+            'total_price',
+            'is_shipped',
+            'date_shipped',
+            'uuid',
+            'order_items'
         ]
 
 

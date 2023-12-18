@@ -18,7 +18,9 @@ class OrderService:
     @transaction.atomic
     def place_draft_orders(self, logged_in_user: User) -> List[Order]:
         cart: Cart = cart_service.fetch_user_cart_with_products_and_users(logged_in_user)
-        distinct_suppliers = [dict(cart_item.product.user) for cart_item in cart.cart_items.all()]
+        distinct_suppliers = set()
+        for cart_item in cart.cart_items.all():
+            distinct_suppliers.add(cart_item.product.user)
         order_ids = []
         for supplier in distinct_suppliers:
             items = []
@@ -27,7 +29,8 @@ class OrderService:
             filtered_by_supplier = filter(lambda ci: ci.product.user.id == supplier.id, cart.cart_items.all())
             for cart_item in filtered_by_supplier:
                 order_item = order_repo.initialize_order_item(product_id=cart_item.product_id,
-                                                              product_name=cart_item.product.name,
+                                                              order_id=new_order.id,
+                                                              product_name=cart_item.product.title,
                                                               sku=cart_item.product.sku,
                                                               price=cart_item.unit_price,
                                                               quantity=cart_item.quantity,

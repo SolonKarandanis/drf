@@ -187,10 +187,10 @@ class OrderItemManager(Manager):
         order_item = order_item.save()
         return order_item
 
-    def create_order_item(self, product_id: int, product_name: str, sku: str,
+    def create_order_item(self, product_id: int, order_id: int, product_name: str, sku: str,
                           price: float, quantity: float, total_price: float):
-        order_item = self.create(product_id=product_id, product_name=product_name, sku=sku,
-                                 price=price, quantity=quantity, total_price=total_price)
+        order_item = self.create(product_id=product_id, order_id=order_id, product_name=product_name, sku=sku,
+                                 price=price, quantity=quantity, total_price=total_price, manufacturer="")
         return order_item
 
 
@@ -199,7 +199,7 @@ class OrderItem(Model):
     sku = CharField(max_length=120, default=None)
     manufacturer = CharField(max_length=255, default=None)
     start_date = DateTimeField(auto_now_add=True, null=False)
-    end_date = DateTimeField(null=False)
+    end_date = DateTimeField(null=True)
     status = CharField(max_length=40)
     price = FloatField()
     quantity = IntegerField(blank=True, null=True)
