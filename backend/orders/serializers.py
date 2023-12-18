@@ -12,6 +12,7 @@ class OrderItemSerializer(serializers.ModelSerializer):
         model = OrderItem
         fields = [
             'id',
+            'product_id',
             'product_name',
             'sku',
             'manufacturer',
@@ -33,6 +34,8 @@ class OrderSerializer(serializers.ModelSerializer):
         fields = [
             'id',
             'date_created',
+            'buyer_id',
+            'supplier_id',
             'status',
             'total_price',
             'is_shipped',

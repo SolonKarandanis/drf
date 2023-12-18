@@ -75,7 +75,7 @@ class OrderService:
         return order_repo.update_order(order)
 
     def find_order_by_uuid(self, uuid: str) -> Order:
-        return order_repo.find_order_by_uuid(uuid)
+        return order_repo.find_order_by_uuid_with_products(uuid)
 
     def find_order_by_id(self, order_id: int) -> Order:
         return order_repo.find_order_by_id(order_id)

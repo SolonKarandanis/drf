@@ -190,7 +190,8 @@ class OrderItemManager(Manager):
     def create_order_item(self, product_id: int, order_id: int, product_name: str, sku: str,
                           price: float, quantity: float, total_price: float):
         order_item = self.create(product_id=product_id, order_id=order_id, product_name=product_name, sku=sku,
-                                 price=price, quantity=quantity, total_price=total_price, manufacturer="")
+                                 price=price, quantity=quantity, total_price=total_price, manufacturer="",
+                                 uuid=uuid.uuid4())
         return order_item
 
 

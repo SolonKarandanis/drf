@@ -109,7 +109,7 @@ class CartService:
 
     @transaction.atomic
     def add_order_to_cart(self, logged_in_user: User, order_uuid: str) -> None:
-        self.clear_cart()
+        self.clear_cart(logged_in_user)
         order = order_repo.find_order_by_uuid_with_products(order_uuid)
         cart: Cart = self.fetch_user_cart(logged_in_user)
         items = []
