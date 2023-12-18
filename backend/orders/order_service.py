@@ -18,6 +18,8 @@ class OrderService:
     @transaction.atomic
     def place_draft_orders(self, logged_in_user: User) -> List[Order]:
         cart: Cart = cart_service.fetch_user_cart_with_products_and_users(logged_in_user)
+        if len(cart.cart_items.all()) == 0:
+            raise Exception("error.empty.cart")
         distinct_suppliers = set()
         for cart_item in cart.cart_items.all():
             distinct_suppliers.add(cart_item.product.user)

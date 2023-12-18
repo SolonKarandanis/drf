@@ -41,7 +41,8 @@ class OrderRepository:
 
     def find_order_by_uuid_with_products(self, uuid: str) -> Order:
         order_items_prefect = Prefetch('order_items', queryset=OrderItem.objects.select_related('product'))
-        return Order.objects.prefetch_related(order_items_prefect).get(uuid=uuid)
+        comments_prefetch = Prefetch('comments')
+        return Order.objects.prefetch_related(order_items_prefect, comments_prefetch).get(uuid=uuid)
 
     def find_order_by_id(self, order_id: int) -> Order:
         return Order.objects.get_queryset().with_order_items().get(pk=order_id)

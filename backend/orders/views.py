@@ -37,7 +37,12 @@ def get_order(request, uuid):
 def place_draft_orders(request):
     logged_in_user = request.user
     logger.info(f'logged_in_user: {logged_in_user}')
-    orders = order_service.place_draft_orders(logged_in_user)
-    data = OrderSerializer(orders, many=True).data
-    return Response(data)
+    try:
+        orders = order_service.place_draft_orders(logged_in_user)
+        data = OrderSerializer(orders, many=True).data
+        return Response(data)
+    except Exception as error:
+        logger.error(f'error: {error}')
+        return Response(str(error), status=status.HTTP_400_BAD_REQUEST)
+
 
