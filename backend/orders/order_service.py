@@ -44,6 +44,9 @@ class OrderService:
         cart_service.clear_cart(logged_in_user)
         return self.find_orders_by_ids(order_ids)
 
+    def find_users_orders(self, user: User) -> List[Order]:
+        return order_repo.find_users_orders(user)
+
     def find_orders_by_ids(self, order_ids: List[int]) -> List[Order]:
         order = Order.objects.filter(pk__in=order_ids)
         return order

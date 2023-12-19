@@ -6,7 +6,7 @@ from rest_framework import status
 import logging
 from .models import Order
 from .order_service import OrderService
-from .serializers import OrderSerializer
+from .serializers import OrderSerializer, OrderListSerializer
 
 order_service = OrderService()
 
@@ -19,6 +19,9 @@ logger = logging.getLogger('django')
 def get_user_orders(request):
     logged_in_user = request.user
     logger.info(f'logged_in_user: {logged_in_user}')
+    orders = order_service.find_users_orders(logged_in_user)
+    data = OrderListSerializer(orders, many=True).data
+    return Response(data)
 
 
 @api_view(['GET'])
@@ -26,7 +29,7 @@ def get_user_orders(request):
 def get_order(request, uuid):
     logged_in_user = request.user
     logger.info(f'logged_in_user: {logged_in_user}')
-    order = order_service.find_order_by_uuid(uuid)
+    order: Order = order_service.find_order_by_uuid(uuid)
     data = OrderSerializer(order, many=False).data
     return Response(data)
 

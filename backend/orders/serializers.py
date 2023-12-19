@@ -45,6 +45,22 @@ class OrderSerializer(serializers.ModelSerializer):
         ]
 
 
+class OrderListSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = Order
+        fields = [
+            'id',
+            'date_created',
+            'buyer_id',
+            'supplier_id',
+            'status',
+            'total_price',
+            'is_shipped',
+            'date_shipped',
+            'uuid'
+        ]
+
+
 class PaginatedOrderSerializer(ModelPaginationSerializer):
     """
     Serializes page objects of order querysets.
@@ -52,6 +68,6 @@ class PaginatedOrderSerializer(ModelPaginationSerializer):
 
     def __init__(self, data, request):
         super().__init__(data, request)
-        serializer = OrderSerializer(data, many=True)
+        serializer = OrderListSerializer(data, many=True)
         self.data = {'count': self.page_data.get('count'), 'previous': self.page_data.get('previous'),
                      'next': self.page_data.get('next'), 'data': serializer.data}

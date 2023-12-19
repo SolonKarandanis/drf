@@ -31,7 +31,7 @@ class CartQuerySet(QuerySet):
 
     def with_cart_items(self):
         cart_items_prefect = Prefetch('cart_items', queryset=CartItem.objects.select_related('product'))
-        return self.prefetch_related(cart_items_prefect)
+        return self.prefetch_related('cart_items')
 
     def update(self, **kwargs):
         user = kwargs.get("user")

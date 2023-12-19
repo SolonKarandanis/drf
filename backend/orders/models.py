@@ -29,7 +29,7 @@ class OrderQuerySet(QuerySet):
         return self.prefetch_related('order_items')
 
     def owned_by(self, user):
-        return self.filter(user=user)
+        return self.filter(buyer=user)
 
     def supplied_by(self, user):
         return self.filter(supplier=user)
