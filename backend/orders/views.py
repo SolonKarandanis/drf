@@ -35,7 +35,6 @@ def get_order(request, uuid):
 
 
 @api_view(['POST'])
-# @authentication_classes((CustomAuthentication,))
 @permission_classes([IsAuthenticated])
 def place_draft_orders(request):
     logged_in_user = request.user

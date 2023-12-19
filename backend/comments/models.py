@@ -21,8 +21,8 @@ class CommentManager(Manager):
 # Create your models here.
 class Comment(Model):
     content = TextField()
-    content_type = ForeignKey(ContentType, on_delete=CASCADE)
-    object_id = PositiveSmallIntegerField()
+    content_type = ForeignKey(ContentType, on_delete=CASCADE)  #products.product
+    object_id = PositiveSmallIntegerField()                    #product.id
     content_object = GenericForeignKey('content_type', 'object_id')
     date_created = DateTimeField(auto_now_add=True, null=False)
     user = ForeignKey(User,  on_delete=CASCADE)
