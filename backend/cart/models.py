@@ -4,7 +4,7 @@ from django.core.exceptions import ObjectDoesNotExist
 from django.db.models.signals import post_delete, post_save
 from django.dispatch import receiver
 from django.db.models import QuerySet, DateTimeField, Manager, Model, OneToOneField, FloatField, BooleanField, CASCADE, \
-    UniqueConstraint, Index, IntegerField, ForeignKey, PROTECT, UUIDField
+    UniqueConstraint, Index, IntegerField, ForeignKey, PROTECT, UUIDField, Prefetch
 from django.conf import settings
 import uuid
 
@@ -30,7 +30,8 @@ class CartQuerySet(QuerySet):
         return cart
 
     def with_cart_items(self):
-        return self.prefetch_related('cart_items')
+        cart_items_prefect = Prefetch('cart_items', queryset=CartItem.objects.select_related('product'))
+        return self.prefetch_related(cart_items_prefect)
 
     def update(self, **kwargs):
         user = kwargs.get("user")

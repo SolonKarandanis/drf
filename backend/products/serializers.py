@@ -23,7 +23,8 @@ class ProductSerializer(serializers.ModelSerializer):
             'owner',
             'price',
             'inventory',
-            'sale_price'
+            'sale_price',
+            'uuid',
         ]
 
 
@@ -37,7 +38,8 @@ class ProductListSerializer(serializers.ModelSerializer):
             'content',
             'price',
             'inventory',
-            'sale_price'
+            'sale_price',
+            'uuid'
         ]
 
 

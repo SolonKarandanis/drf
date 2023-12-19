@@ -18,17 +18,17 @@ logger = logging.getLogger('django')
 
 @api_view(['GET'])
 @permission_classes([IsAuthenticated])
-def get_product(request, pk, *args, **kwargs):
-    product = product_service.find_by_id(pk)
+def get_product(request, uuid: str, *args, **kwargs):
+    product = product_service.find_by_uuid(uuid)
     data = ProductSerializer(product, many=False).data
     return Response(data)
 
 
 @api_view(['GET'])
 @permission_classes([IsAuthenticated])
-def get_supplier_product(request, pk):
+def get_supplier_product(request, uuid: str):
     logged_in_user = request.user
-    product = product_service.find_users_product_by_id(pk, logged_in_user)
+    product = product_service.find_users_product_by_uuid(uuid, logged_in_user)
     data = ProductSerializer(product, many=False).data
     return Response(data)
 

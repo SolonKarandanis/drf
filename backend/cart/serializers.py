@@ -14,7 +14,8 @@ class CartItemSerializer(serializers.ModelSerializer):
             'quantity',
             'unit_price',
             'total_price',
-            'product_id'
+            'uuid',
+            'product_id',
         ]
 
 
@@ -37,6 +38,7 @@ class CartSerializer(serializers.ModelSerializer):
             'total_price',
             'date_created',
             'date_modified',
+            'uuid',
             'cart_items',
         ]
 
@@ -52,7 +54,6 @@ class AddToCart(serializers.Serializer):
 class UpdateQuantity(serializers.Serializer):
     cart_item_id = serializers.IntegerField()
     quantity = serializers.IntegerField(validators=[is_quantity_valid])
-
 
     def __repr__(self):
         return f"<UpdateQuantity CartItemId:{self.cart_item_id},  Quantity:{self.quantity}>"
