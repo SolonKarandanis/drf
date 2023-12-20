@@ -3,6 +3,7 @@ import logging
 from rest_framework import serializers
 from .models import Order, OrderItem
 from cfehome.serializers import ModelPaginationSerializer
+from comments.serializers import CommentSerializer
 
 logger = logging.getLogger('django')
 
@@ -28,6 +29,7 @@ class OrderItemSerializer(serializers.ModelSerializer):
 
 class OrderSerializer(serializers.ModelSerializer):
     order_items = OrderItemSerializer(many=True, read_only=True)
+    comments = CommentSerializer(many=True, read_only=True)
 
     class Meta:
         model = Order
@@ -41,7 +43,8 @@ class OrderSerializer(serializers.ModelSerializer):
             'is_shipped',
             'date_shipped',
             'uuid',
-            'order_items'
+            'order_items',
+            'comments'
         ]
 
 
