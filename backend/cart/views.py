@@ -16,8 +16,7 @@ logger = logging.getLogger('django')
 @api_view(['GET'])
 @permission_classes([IsAuthenticated])
 def get_user_cart(request):
-    logged_in_user = request.user
-    logger.info(f'logged_in_user: {logged_in_user}')
+    logged_in_user = get_user_from_request(request)
     cart = cart_service.fetch_user_cart(logged_in_user)
     data = CartSerializer(cart).data
     return Response(data)
@@ -26,8 +25,7 @@ def get_user_cart(request):
 @api_view(['PUT'])
 @permission_classes([IsAuthenticated])
 def add_cart_items(request):
-    logged_in_user = request.user
-    logger.info(f'logged_in_user: {logged_in_user}')
+    logged_in_user = get_user_from_request(request)
     serializer = AddToCart(data=request.data, many=True)
     if serializer.is_valid(raise_exception=True):
         cart = cart_service.add_to_cart(serializer, logged_in_user)
@@ -39,8 +37,7 @@ def add_cart_items(request):
 @api_view(['PUT'])
 @permission_classes([IsAuthenticated])
 def update_quantities(request):
-    logged_in_user = request.user
-    logger.info(f'logged_in_user: {logged_in_user}')
+    logged_in_user = get_user_from_request(request)
     serializer = UpdateQuantity(data=request.data, many=True)
     if serializer.is_valid(raise_exception=True):
         cart = cart_service.update_item_quantities(serializer, logged_in_user)
@@ -52,8 +49,7 @@ def update_quantities(request):
 @api_view(['DELETE'])
 @permission_classes([IsAuthenticated])
 def delete_cart_items(request):
-    logged_in_user = request.user
-    logger.info(f'logged_in_user: {logged_in_user}')
+    logged_in_user = get_user_from_request(request)
     serializer = DeleteCartItems(data=request.data, many=True)
     if serializer.is_valid(raise_exception=True):
         cart = cart_service.delete_cart_items(serializer, logged_in_user)
@@ -65,8 +61,7 @@ def delete_cart_items(request):
 @api_view(['PUT'])
 @permission_classes([IsAuthenticated])
 def clear_cart(request):
-    logged_in_user = request.user
-    logger.info(f'logged_in_user: {logged_in_user}')
+    logged_in_user = get_user_from_request(request)
     cart = cart_service.clear_cart(logged_in_user)
     data = CartSerializer(cart).data
     return Response(data, status=status.HTTP_200_OK)
@@ -75,8 +70,7 @@ def clear_cart(request):
 @api_view(['PUT'])
 @permission_classes([IsAuthenticated])
 def add_order_to_cart(request, order_uuid: str):
-    logged_in_user = request.user
-    logger.info(f'logged_in_user: {logged_in_user}')
+    logged_in_user = get_user_from_request(request)
     cart_service.add_order_to_cart(logged_in_user, order_uuid)
     cart = cart_service.fetch_user_cart(logged_in_user)
     response = CartSerializer(cart).data
@@ -86,9 +80,14 @@ def add_order_to_cart(request, order_uuid: str):
 @api_view(['PUT'])
 @permission_classes([IsAuthenticated])
 def add_order_item_to_cart(request, order_item_uuid: str):
-    logged_in_user = request.user
-    logger.info(f'logged_in_user: {logged_in_user}')
+    logged_in_user = get_user_from_request(request)
     cart_service.add_order_item_to_cart(logged_in_user, order_item_uuid)
     cart = cart_service.fetch_user_cart(logged_in_user)
     response = CartSerializer(cart).data
     return Response(response, status=status.HTTP_201_CREATED)
+
+
+def get_user_from_request(request):
+    logged_in_user = request.user
+    logger.info(f'logged_in_user: {logged_in_user}')
+    return logged_in_user

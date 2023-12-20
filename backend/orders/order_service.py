@@ -6,10 +6,12 @@ from .models import Order, OrderItem
 from .order_repository import OrderRepository
 from cart.cart_service import CartService
 from cart.models import Cart
+from comments.comment_repository import CommentRepository
 
 logger = logging.getLogger('django')
 User = settings.AUTH_USER_MODEL
 order_repo = OrderRepository()
+comment_repo = CommentRepository()
 cart_service = CartService()
 
 

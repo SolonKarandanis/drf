@@ -17,8 +17,7 @@ logger = logging.getLogger('django')
 @api_view(['GET'])
 @permission_classes([IsAuthenticated])
 def get_user_orders(request):
-    logged_in_user = request.user
-    logger.info(f'logged_in_user: {logged_in_user}')
+    logged_in_user = get_user_from_request(request)
     orders = order_service.find_users_orders(logged_in_user)
     data = OrderListSerializer(orders, many=True).data
     return Response(data)
@@ -27,8 +26,7 @@ def get_user_orders(request):
 @api_view(['GET'])
 @permission_classes([IsAuthenticated])
 def get_order(request, uuid):
-    logged_in_user = request.user
-    logger.info(f'logged_in_user: {logged_in_user}')
+    logged_in_user = get_user_from_request(request)
     order: Order = order_service.find_order_by_uuid(uuid)
     data = OrderSerializer(order, many=False).data
     return Response(data)
@@ -37,8 +35,7 @@ def get_order(request, uuid):
 @api_view(['POST'])
 @permission_classes([IsAuthenticated])
 def place_draft_orders(request):
-    logged_in_user = request.user
-    logger.info(f'logged_in_user: {logged_in_user}')
+    logged_in_user = get_user_from_request(request)
     try:
         orders = order_service.place_draft_orders(logged_in_user)
         data = OrderSerializer(orders, many=True).data
@@ -48,3 +45,13 @@ def place_draft_orders(request):
         return Response(str(error), status=status.HTTP_400_BAD_REQUEST)
 
 
+@api_view(['POST'])
+@permission_classes([IsAuthenticated])
+def post_order_comment(request):
+    logged_in_user = get_user_from_request(request)
+
+
+def get_user_from_request(request):
+    logged_in_user = request.user
+    logger.info(f'logged_in_user: {logged_in_user}')
+    return logged_in_user
