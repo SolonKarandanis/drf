@@ -5,6 +5,8 @@ from .models import Order, OrderItem
 from cfehome.serializers import ModelPaginationSerializer
 from comments.serializers import CommentSerializer
 
+from .validators import order_exists
+
 logger = logging.getLogger('django')
 
 
@@ -74,3 +76,11 @@ class PaginatedOrderSerializer(ModelPaginationSerializer):
         serializer = OrderListSerializer(data, many=True)
         self.data = {'count': self.page_data.get('count'), 'previous': self.page_data.get('previous'),
                      'next': self.page_data.get('next'), 'data': serializer.data}
+
+
+class PostOrderComment(serializers.Serializer):
+    order_id = serializers.IntegerField(validators=[order_exists])
+    comment = serializers.CharField()
+
+    def __repr__(self):
+        return f"<PostOrderComment OrderId:{self.order_id},  Comment:{self.comment}>"

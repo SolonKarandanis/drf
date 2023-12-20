@@ -8,6 +8,8 @@ from cart.cart_service import CartService
 from cart.models import Cart
 from comments.comment_repository import CommentRepository
 
+from .serializers import PostOrderComment
+
 logger = logging.getLogger('django')
 User = settings.AUTH_USER_MODEL
 order_repo = OrderRepository()
@@ -46,6 +48,19 @@ class OrderService:
         cart_service.clear_cart(logged_in_user)
         return self.find_orders_by_ids(order_ids)
 
+    @transaction.atomic
+    def post_order_comment(self, request: PostOrderComment, logged_in_user: User) -> Order:
+        serialized_data = request.data
+        data_dict = dict(serialized_data)
+        logger.info(f'data_dict: {data_dict}')
+        order_id = data_dict['order_id']
+        comment = data_dict['comment']
+        order: Order = self.find_order_by_id(order_id, False)
+        comment_repo.create_order_comment(comment, order, logged_in_user)
+        return order_repo.find_order_by_id_with_products(order_id, True)
+
+
+
     def find_users_orders(self, user: User) -> List[Order]:
         return order_repo.find_users_orders(user)
 
@@ -82,10 +97,10 @@ class OrderService:
         return order_repo.update_order(order)
 
     def find_order_by_uuid(self, uuid: str) -> Order:
-        return order_repo.find_order_by_uuid_with_products(uuid)
+        return order_repo.find_order_by_uuid_with_products(uuid, True)
 
-    def find_order_by_id(self, order_id: int) -> Order:
-        return order_repo.find_order_by_id(order_id)
+    def find_order_by_id(self, order_id: int, fetch_items: bool) -> Order:
+        return order_repo.find_order_by_id(order_id, fetch_items)
 
     def find_order_item_by_uuid(self, uuid: str) -> OrderItem:
         return order_repo.find_order_item_by_uuid(uuid)

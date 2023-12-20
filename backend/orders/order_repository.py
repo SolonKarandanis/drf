@@ -42,13 +42,27 @@ class OrderRepository:
     def find_order_by_uuid(self, uuid: str) -> Order:
         return Order.objects.get_queryset().with_order_items().by_uuid(uuid)
 
-    def find_order_by_uuid_with_products(self, uuid: str) -> Order:
-        order_items_prefect = Prefetch('order_items', queryset=OrderItem.objects.select_related('product'))
-        comments_prefetch = Prefetch('comments')
-        return Order.objects.prefetch_related(order_items_prefect, comments_prefetch).get(uuid=uuid)
+    def find_order_by_uuid_with_products(self, uuid: str, fetch_items: bool) -> Order:
+        query = Order.objects
+        if fetch_items:
+            order_items_prefect = Prefetch('order_items', queryset=OrderItem.objects.select_related('product'))
+            comments_prefetch = Prefetch('comments')
+            query.prefetch_related(order_items_prefect, comments_prefetch)
+        return query.get(uuid=uuid)
 
-    def find_order_by_id(self, order_id: int) -> Order:
-        return Order.objects.get_queryset().with_order_items().get(pk=order_id)
+    def find_order_by_id(self, order_id: int, fetch_items: bool) -> Order:
+        query = Order.objects
+        if fetch_items:
+            query.get_queryset().with_order_items()
+        return query.get(pk=order_id)
+
+    def find_order_by_id_with_products(self, order_id: int, fetch_items: bool) -> Order:
+        query = Order.objects
+        if fetch_items:
+            order_items_prefect = Prefetch('order_items', queryset=OrderItem.objects.select_related('product'))
+            comments_prefetch = Prefetch('comments')
+            query.prefetch_related(order_items_prefect, comments_prefetch)
+        return query.get(pk=order_id)
 
     def find_orders_by_requested_status(self, requested_status: str) -> List[Order]:
         return Order.objects.get_queryset().by_status(requested_status)

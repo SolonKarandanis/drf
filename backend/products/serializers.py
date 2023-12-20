@@ -103,3 +103,11 @@ class CreateProductSerializer(serializers.ModelSerializer):
         new_product = Product(sku=sku, user=user, title=title, content=content, price=price, inventory=inventory)
         new_product.save()
         return new_product
+
+
+class PostProductComment(serializers.Serializer):
+    product_id = serializers.IntegerField()
+    comment = serializers.CharField()
+
+    def __repr__(self):
+        return f"<PostProductComment ProductId:{self.product_id},  Comment:{self.comment}>"

@@ -6,7 +6,7 @@ from rest_framework import status
 import logging
 from .models import Order
 from .order_service import OrderService
-from .serializers import OrderSerializer, OrderListSerializer
+from .serializers import OrderSerializer, OrderListSerializer, PostOrderComment
 
 order_service = OrderService()
 
@@ -45,10 +45,16 @@ def place_draft_orders(request):
         return Response(str(error), status=status.HTTP_400_BAD_REQUEST)
 
 
-@api_view(['POST'])
+@api_view(['PUT'])
 @permission_classes([IsAuthenticated])
 def post_order_comment(request):
     logged_in_user = get_user_from_request(request)
+    serializer = PostOrderComment(data=request.data, many=False)
+    if serializer.is_valid(raise_exception=True):
+        order = order_service.post_order_comment(serializer, logged_in_user)
+        response = OrderSerializer(order, many=False).data
+        return Response(response, status=status.HTTP_200_OK)
+    return Response({"invalid": "not good data"}, status=status.HTTP_400_BAD_REQUEST)
 
 
 def get_user_from_request(request):
