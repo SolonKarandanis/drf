@@ -1,4 +1,5 @@
 from django.urls import re_path
+from channels.auth import AuthMiddlewareStack
 
 from . import consumers
 

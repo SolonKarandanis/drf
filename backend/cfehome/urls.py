@@ -21,8 +21,8 @@ urlpatterns = [
     path('admin/', admin.site.urls),
     path('api/auth/', include('auth.urls')),
     path('api/products/', include('products.urls')),
-    path('api/search/', include('search.urls')),
+    path('api/chat/', include('chat.urls')),
     path('api/cart/', include('cart.urls')),
     path('api/orders/', include('orders.urls')),
-    path('api/v2/', include('cfehome.routers'))
+    # path('api/v2/', include('cfehome.routers'))
 ]
