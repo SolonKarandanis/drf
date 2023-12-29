@@ -1,3 +1,5 @@
+import logging
+
 from django.core.exceptions import ObjectDoesNotExist
 from django.db.models import Q, Max, Sum, Manager, QuerySet, Model, DateTimeField, CharField, FloatField, TextField, \
     ForeignKey, BooleanField, CASCADE, UniqueConstraint, Index, IntegerField, PROTECT, Case, When, TextChoices, Count, \
@@ -10,7 +12,7 @@ import uuid
 from products.models import Product
 
 User = settings.AUTH_USER_MODEL
-
+logger = logging.getLogger('django')
 
 
 
@@ -163,8 +165,8 @@ class OrderItemQuerySet(QuerySet):
     def fts_search(self, query, user=None):
         # Django 5
         # OrderItem.objects.filter(search="meanings")
-        doc = fts.SearchQuery(query)
-        qs = self.annotate(doc=vector).filter(doc=doc)
+        s_query = fts.SearchQuery(query)
+        qs = self.annotate(search=vector).filter(search=s_query)
         if user is not None:
             qs.filter(order__buyer=user)
         return qs
