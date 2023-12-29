@@ -40,7 +40,7 @@ class OrderRepository:
         return Order.objects.update_order(order)
 
     def find_order_by_uuid(self, uuid: str) -> Order:
-        return Order.objects.get_queryset().with_order_items().by_uuid(uuid)
+        return Order.objects.get_queryset().by_uuid(uuid)
 
     def find_order_by_uuid_with_products(self, uuid: str, fetch_items: bool) -> Order:
         query = Order.objects

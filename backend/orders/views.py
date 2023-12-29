@@ -57,6 +57,56 @@ def post_order_comment(request):
     return Response({"invalid": "not good data"}, status=status.HTTP_400_BAD_REQUEST)
 
 
+@api_view(['PUT'])
+@permission_classes([IsAuthenticated])
+def order_buyer_rejected(request, uuid):
+    logged_in_user = get_user_from_request(request)
+    order_service.change_order_status_to_buyer_rejected(uuid)
+    order: Order = order_service.find_order_by_uuid(uuid)
+    data = OrderSerializer(order, many=False).data
+    return Response(data)
+
+
+@api_view(['PUT'])
+@permission_classes([IsAuthenticated])
+def order_supplier_rejected(request, uuid):
+    logged_in_user = get_user_from_request(request)
+    order_service.change_order_status_to_supplier_rejected(uuid)
+    order: Order = order_service.find_order_by_uuid(uuid)
+    data = OrderSerializer(order, many=False).data
+    return Response(data)
+
+
+@api_view(['PUT'])
+@permission_classes([IsAuthenticated])
+def order_approved(request, uuid):
+    logged_in_user = get_user_from_request(request)
+    order_service.change_order_status_to_approved(uuid)
+    order: Order = order_service.find_order_by_uuid(uuid)
+    data = OrderSerializer(order, many=False).data
+    return Response(data)
+
+
+@api_view(['PUT'])
+@permission_classes([IsAuthenticated])
+def order_shipped(request, uuid):
+    logged_in_user = get_user_from_request(request)
+    order_service.change_order_status_to_shipped(uuid)
+    order: Order = order_service.find_order_by_uuid(uuid)
+    data = OrderSerializer(order, many=False).data
+    return Response(data)
+
+
+@api_view(['PUT'])
+@permission_classes([IsAuthenticated])
+def order_received(request, uuid):
+    logged_in_user = get_user_from_request(request)
+    order_service.change_order_status_to_received(uuid)
+    order: Order = order_service.find_order_by_uuid(uuid)
+    data = OrderSerializer(order, many=False).data
+    return Response(data)
+
+
 def get_user_from_request(request):
     logged_in_user = request.user
     logger.info(f'logged_in_user: {logged_in_user}')

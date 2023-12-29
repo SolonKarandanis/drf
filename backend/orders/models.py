@@ -11,7 +11,7 @@ from products.models import Product
 
 User = settings.AUTH_USER_MODEL
 
-s = fts.SearchVector("product_name", "manufacturer", config="english")
+
 
 
 class OrderQuerySet(QuerySet):
@@ -145,6 +145,9 @@ class Order(Model):
 
     def recalculate_order_total_price(self) -> None:
         self.total_price = sum(oi.total_price for oi in self.order_items.all())
+
+
+s = fts.SearchVector("product_name", "manufacturer", config="english")
 
 
 class OrderItemQuerySet(QuerySet):

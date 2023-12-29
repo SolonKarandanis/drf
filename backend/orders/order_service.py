@@ -1,6 +1,7 @@
 from typing import List
 from django.conf import settings
 from django.db import transaction
+from django.utils import timezone
 import logging
 from .models import Order, OrderItem
 from .order_repository import OrderRepository
@@ -59,7 +60,34 @@ class OrderService:
         comment_repo.create_order_comment(comment, order, logged_in_user)
         return order_repo.find_order_by_id_with_products(order_id, True)
 
+    @transaction.atomic
+    def change_order_status(self, uuid: str, status: str) -> None:
+        order: Order = order_repo.find_order_by_uuid(uuid)
+        order.status = status
+        if Order.OrderStatus.SHIPPED.__eq__(status):
+            order.is_shipped = True
+            order.date_shipped = timezone.now()
+        self.update_order(order)
 
+    def change_order_status_to_buyer_rejected(self, uuid: str) -> None:
+        status = Order.OrderStatus.BUYER_REJECTED
+        self.change_order_status(uuid, status)
+
+    def change_order_status_to_supplier_rejected(self, uuid: str) -> None:
+        status = Order.OrderStatus.SUPPLIER_REJECTED
+        self.change_order_status(uuid, status)
+
+    def change_order_status_to_approved(self, uuid: str) -> None:
+        status = Order.OrderStatus.APPROVED
+        self.change_order_status(uuid, status)
+
+    def change_order_status_to_shipped(self, uuid: str) -> None:
+        status = Order.OrderStatus.SHIPPED
+        self.change_order_status(uuid, status)
+
+    def change_order_status_to_received(self, uuid: str) -> None:
+        status = Order.OrderStatus.RECEIVED
+        self.change_order_status(uuid, status)
 
     def find_users_orders(self, user: User) -> List[Order]:
         return order_repo.find_users_orders(user)
@@ -67,7 +95,6 @@ class OrderService:
     def find_orders_by_ids(self, order_ids: List[int]) -> List[Order]:
         order = Order.objects.filter(pk__in=order_ids)
         return order
-
 
     def find_order_ids_with_is_shipped(self):
         return order_repo.find_order_ids_with_is_shipped()
@@ -116,4 +143,3 @@ class OrderService:
 
     def search_order_items(self, query: str, user: User = None) -> List[OrderItem]:
         return order_repo.search_order_items(query, user)
-
