@@ -147,7 +147,7 @@ class Order(Model):
         self.total_price = sum(oi.total_price for oi in self.order_items.all())
 
 
-s = fts.SearchVector("product_name", "manufacturer", config="english")
+vector = fts.SearchVector("product_name", "sku", "manufacturer", config="english")
 
 
 class OrderItemQuerySet(QuerySet):
@@ -163,10 +163,10 @@ class OrderItemQuerySet(QuerySet):
     def fts_search(self, query, user=None):
         # Django 5
         # OrderItem.objects.filter(search="meanings")
-        doc = fts.SearchQuery(query, search_type='websearch')
-        qs = self.annotate(doc=s).filter(doc=doc)
+        doc = fts.SearchQuery(query)
+        qs = self.annotate(doc=vector).filter(doc=doc)
         if user is not None:
-            qs.filter(order__user=user)
+            qs.filter(order__buyer=user)
         return qs
 
     def is_popular(self):
@@ -224,7 +224,7 @@ class OrderItem(Model):
 
     class Meta:
         indexes = [
-            indexes.GinIndex(s, name="s_order_item_product_name_idx")
+            indexes.GinIndex(vector, name="s_order_item_product_name_idx")
         ]
 
     def __repr__(self):

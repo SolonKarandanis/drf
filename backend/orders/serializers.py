@@ -84,3 +84,10 @@ class PostOrderComment(serializers.Serializer):
 
     def __repr__(self):
         return f"<PostOrderComment OrderId:{self.order_id},  Comment:{self.comment}>"
+
+
+class SearchOrderItems(serializers.Serializer):
+    query = serializers.CharField()
+
+    def __repr__(self):
+        return f"<SearchOrderItems query:{self.query}>"

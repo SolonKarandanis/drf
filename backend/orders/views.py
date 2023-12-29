@@ -6,7 +6,7 @@ from rest_framework import status
 import logging
 from .models import Order
 from .order_service import OrderService
-from .serializers import OrderSerializer, OrderListSerializer, PostOrderComment
+from .serializers import OrderSerializer, OrderListSerializer, PostOrderComment, SearchOrderItems, OrderItemSerializer
 
 order_service = OrderService()
 
@@ -105,6 +105,20 @@ def order_received(request, uuid):
     order: Order = order_service.find_order_by_uuid(uuid)
     data = OrderSerializer(order, many=False).data
     return Response(data)
+
+
+@api_view(['POST'])
+@permission_classes([IsAuthenticated])
+def search_order_items(request):
+    logged_in_user = get_user_from_request(request)
+    serializer = SearchOrderItems(data=request.data, many=False)
+    if serializer.is_valid(raise_exception=True):
+        query = serializer.data
+        search_results = order_service.search_order_items(query, logged_in_user)
+        logger.info(f'search_results: {search_results}')
+        response = OrderItemSerializer(search_results, many=True).data
+        return Response(response, status=status.HTTP_200_OK)
+    return Response({"invalid": "not good data"}, status=status.HTTP_400_BAD_REQUEST)
 
 
 def get_user_from_request(request):

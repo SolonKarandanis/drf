@@ -5,6 +5,7 @@ urlpatterns = [
     path('', views.get_user_orders, name='users-orders'),
     path('place-draft/', views.place_draft_orders, name='draft-orders'),
     path('comment/', views.post_order_comment, name='comment-order'),
+    path('items/search/', views.search_order_items, name='search-order-items'),
     path('<str:uuid>/', views.get_order, name='fetch-order'),
     path('<str:uuid>/buyer-reject', views.order_buyer_rejected, name='order-buyer-reject'),
     path('<str:uuid>/supplier-reject', views.order_supplier_rejected, name='order-supplier-reject'),
