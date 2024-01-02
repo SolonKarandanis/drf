@@ -30,3 +30,6 @@ class Comment(Model):
     user_email = EmailField(null=True)
 
     objects = CommentManager()
+
+    def __repr__(self):
+        return f"<Comment id:{self.id} , content: {self.content}>"
