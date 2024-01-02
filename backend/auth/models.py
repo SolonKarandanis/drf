@@ -3,6 +3,7 @@ from django.contrib.auth.models import AbstractUser
 from django.contrib.auth.base_user import BaseUserManager
 from django.utils.translation import gettext_lazy as _
 from django.db.models.functions import Lower
+from django.contrib.contenttypes.fields import GenericRelation
 import uuid
 
 
@@ -66,6 +67,7 @@ class User(AbstractUser):
     updated_date = DateTimeField(auto_now=True, null=False)
     email = EmailField(_("email address"), unique=True)
     uuid = UUIDField(default=uuid.uuid4())
+    images = GenericRelation("images.Images", related_query_name='user')
 
     date_joined = None
 

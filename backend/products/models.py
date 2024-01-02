@@ -25,6 +25,9 @@ class ProductQuerySet(QuerySet):
     def with_comments(self):
         return self.prefetch_related('comments')
 
+    def with_images(self):
+        return self.prefetch_related('images')
+
     def owned_by(self, user):
         return self.filter(user=user)
 
@@ -69,6 +72,7 @@ class Product(Model):
     inventory = IntegerField(blank=True, null=True)
     uuid = UUIDField(default=uuid.uuid4())
     comments = GenericRelation("comments.Comment", related_query_name='product')
+    images = GenericRelation("images.Images", related_query_name='product')
 
     class Meta:
         ordering = ['sku']
