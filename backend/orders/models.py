@@ -15,7 +15,6 @@ User = settings.AUTH_USER_MODEL
 logger = logging.getLogger('django')
 
 
-
 class OrderQuerySet(QuerySet):
 
     def by_uuid(self, uuid: str):
