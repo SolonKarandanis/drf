@@ -33,7 +33,7 @@ services:
             - redis
 
     pgdb:
-        image: postgres
+        image: postgres:14.10
         container_name: pgdb
         environment:
             - POSTGRES_DB=postgres

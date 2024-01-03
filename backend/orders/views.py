@@ -7,6 +7,7 @@ import logging
 from .models import Order
 from .order_service import OrderService
 from .serializers import OrderSerializer, OrderListSerializer, PostOrderComment, SearchOrderItems, OrderItemSerializer
+from .publisher import publish
 
 order_service = OrderService()
 
@@ -39,6 +40,7 @@ def place_draft_orders(request):
     try:
         orders = order_service.place_draft_orders(logged_in_user)
         data = OrderSerializer(orders, many=True).data
+        publish('orders_created', data)
         return Response(data)
     except Exception as error:
         logger.error(f'error: {error}')
