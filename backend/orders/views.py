@@ -30,6 +30,7 @@ def get_order(request, uuid):
     logged_in_user = get_user_from_request(request)
     order: Order = order_service.find_order_by_uuid(uuid)
     data = OrderSerializer(order, many=False).data
+    publish('orders_created', data)
     return Response(data)
 
 
@@ -40,7 +41,7 @@ def place_draft_orders(request):
     try:
         orders = order_service.place_draft_orders(logged_in_user)
         data = OrderSerializer(orders, many=True).data
-        publish('orders_created', data)
+        # publish('orders_created', data)
         return Response(data)
     except Exception as error:
         logger.error(f'error: {error}')
