@@ -10,4 +10,12 @@ def validate_sku(self):
     return self
 
 
+def product_exists(self):
+    qs = Product.objects.filter(pk=self)
+    exists = qs.exists()
+    if not exists:
+        raise serializers.ValidationError(f"Product does not exist")
+    return self
+
+
 unique_product_title = UniqueValidator(queryset=Product.objects.all(), lookup='iexact')

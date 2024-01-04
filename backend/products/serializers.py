@@ -3,8 +3,9 @@ import logging
 from rest_framework import serializers
 from django.core.paginator import Paginator
 from .models import Product
-from .validators import unique_product_title, validate_sku
+from .validators import unique_product_title, validate_sku, product_exists
 from auth.serializers import UserPublicSerializer
+from comments.serializers import CommentSerializer
 
 logger = logging.getLogger('django')
 
@@ -12,6 +13,7 @@ logger = logging.getLogger('django')
 class ProductSerializer(serializers.ModelSerializer):
     title = serializers.CharField(validators=[unique_product_title])
     owner = UserPublicSerializer(source='user', read_only=True)
+    comments = CommentSerializer(many=True, read_only=True)
 
     class Meta:
         model = Product
@@ -25,6 +27,7 @@ class ProductSerializer(serializers.ModelSerializer):
             'inventory',
             'sale_price',
             'uuid',
+            'comments'
         ]
 
 
@@ -106,7 +109,7 @@ class CreateProductSerializer(serializers.ModelSerializer):
 
 
 class PostProductComment(serializers.Serializer):
-    product_id = serializers.IntegerField()
+    product_id = serializers.IntegerField(validators=[product_exists])
     comment = serializers.CharField()
 
     def __repr__(self):

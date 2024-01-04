@@ -1,6 +1,7 @@
 import logging
 
-from .serializers import ProductSerializer, CreateProductSerializer, PaginatedProductListSerializer
+from .serializers import ProductSerializer, CreateProductSerializer, PaginatedProductListSerializer, \
+    PostProductComment
 from .models import Product
 from rest_framework import status
 from rest_framework import generics, mixins, permissions, authentication
@@ -67,6 +68,18 @@ def create_product(request):
     if serializer.is_valid(raise_exception=True):
         serializer.save()
         return Response(serializer.data, status=status.HTTP_201_CREATED)
+    return Response({"invalid": "not good data"}, status=status.HTTP_400_BAD_REQUEST)
+
+
+@api_view(['PUT'])
+@permission_classes([IsAuthenticated])
+def post_product_comment(request):
+    logged_in_user = request.user
+    serializer = PostProductComment(data=request.data, many=False)
+    if serializer.is_valid(raise_exception=True):
+        product = product_service.post_product_comment(serializer, logged_in_user)
+        response = ProductSerializer(product, many=False).data
+        return Response(response, status=status.HTTP_200_OK)
     return Response({"invalid": "not good data"}, status=status.HTTP_400_BAD_REQUEST)
 
 

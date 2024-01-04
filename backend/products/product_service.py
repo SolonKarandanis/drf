@@ -1,11 +1,14 @@
 from typing import List
-
+from django.db import transaction
 from django.conf import settings
 from .models import Product
 from .product_repository import ProductRepository
+from .serializers import PostProductComment
+from comments.comment_repository import CommentRepository
 
 User = settings.AUTH_USER_MODEL
 repo = ProductRepository()
+comment_repo = CommentRepository()
 
 
 class ProductService:
@@ -41,3 +44,13 @@ class ProductService:
 
     def find_product_skus(self) -> List[str]:
         return repo.find_product_skus()
+
+    @transaction.atomic
+    def post_product_comment(self, request: PostProductComment, logged_in_user: User) -> Product:
+        serialized_data = request.data
+        data_dict = dict(serialized_data)
+        product_id = data_dict['product_id']
+        comment = data_dict['comment']
+        product: Product = self.find_by_id(product_id)
+        comment_repo.create_product_comment(comment, product, logged_in_user)
+        return repo.find_by_id(product_id)
