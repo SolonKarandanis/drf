@@ -1,0 +1,59 @@
+# SOME DESCRIPTIVE TITLE.
+# Copyright (C) YEAR THE PACKAGE'S COPYRIGHT HOLDER
+# This file is distributed under the same license as the PACKAGE package.
+# FIRST AUTHOR <EMAIL@ADDRESS>, YEAR.
+#
+#, fuzzy
+msgid ""
+msgstr ""
+"Project-Id-Version: PACKAGE VERSION\n"
+"Report-Msgid-Bugs-To: \n"
+"POT-Creation-Date: 2024-01-05 08:18+0200\n"
+"PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
+"Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
+"Language-Team: LANGUAGE <LL@li.org>\n"
+"Language: \n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"Plural-Forms: nplurals=2; plural=(n != 1);\n"
+
+#: auth/models.py:38
+msgid "user.email.required"
+msgstr "The Email must be set"
+
+#: auth/models.py:40
+msgid "user.is_staff.false"
+msgstr "User cannot have is_staff=True."
+
+#: auth/models.py:42
+msgid "user.is_superuser.false"
+msgstr "User cannot have is_superuser=True."
+
+#: auth/models.py:58
+msgid "superuser.is_staff.true"
+msgstr "Superuser must have is_staff=True."
+
+#: auth/models.py:60
+msgid "superuser.is_superuser.true"
+msgstr "Superuser must have is_superuser=True."
+
+#: auth/models.py:68
+msgid "email.address"
+msgstr "Email address"
+
+#: cfehome/settings.py:174
+msgid "en"
+msgstr "English"
+
+#: cfehome/settings.py:175
+msgid "fr"
+msgstr "French"
+
+#: orders/views.py:61
+msgid "invalid"
+msgstr "Invalid"
+
+#: orders/views.py:61
+msgid "not.good.data"
+msgstr "Not good data"

@@ -35,11 +35,11 @@ class UserManager(BaseUserManager):
         extra_fields.setdefault("is_superuser", False)
         extra_fields.setdefault("is_active", True)
         if not email:
-            raise ValueError(_("The Email must be set"))
+            raise ValueError(_("user.email.required"))
         if extra_fields.get("is_staff") is not False:
-            raise ValueError(_("User cannot have is_staff=True."))
+            raise ValueError(_("user.is_staff.false"))
         if extra_fields.get("is_superuser") is not False:
-            raise ValueError(_("User cannot have is_superuser=True."))
+            raise ValueError(_("user.is_superuser.false"))
         email = self.normalize_email(email)
         user = self.model(email=email, **extra_fields)
         user.set_password(password)
@@ -55,9 +55,9 @@ class UserManager(BaseUserManager):
         extra_fields.setdefault("is_active", True)
 
         if extra_fields.get("is_staff") is not True:
-            raise ValueError(_("Superuser must have is_staff=True."))
+            raise ValueError(_("superuser.is_staff.true"))
         if extra_fields.get("is_superuser") is not True:
-            raise ValueError(_("Superuser must have is_superuser=True."))
+            raise ValueError(_("superuser.is_superuser.true"))
         return self.create_user(email, password, **extra_fields)
 
 
@@ -65,7 +65,7 @@ class UserManager(BaseUserManager):
 class User(AbstractUser):
     created_date = DateTimeField(auto_now_add=True, null=False)
     updated_date = DateTimeField(auto_now=True, null=False)
-    email = EmailField(_("email address"), unique=True)
+    email = EmailField(_("email.address"), unique=True)
     uuid = UUIDField(default=uuid.uuid4())
     images = GenericRelation("images.Images", related_query_name='user')
 

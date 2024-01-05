@@ -130,8 +130,8 @@ DATABASES = {
     }
 }
 
-#CONN_MAX_AGE = 60
-#CONN_HEALTH_CHECKS = True
+# CONN_MAX_AGE = 60
+# CONN_HEALTH_CHECKS = True
 
 LOGGING = {
     'version': 1,
@@ -166,8 +166,18 @@ LOGGING = {
 
 # Internationalization
 # https://docs.djangoproject.com/en/4.1/topics/i18n/
+from django.utils.translation import gettext_lazy as _
 
-LANGUAGE_CODE = 'en-us'
+LANGUAGE_CODE = 'en'
+
+LANGUAGES = (
+    ('en', _('en')),
+    ('fr', _('fr')),
+)
+
+LOCALE_PATHS = (
+    os.path.join(BASE_DIR, 'locale/'),
+)
 
 TIME_ZONE = 'Europe/Athens'
 

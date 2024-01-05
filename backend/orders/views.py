@@ -2,6 +2,7 @@ from rest_framework.response import Response
 from rest_framework.permissions import IsAuthenticated
 from rest_framework.decorators import api_view, permission_classes
 from rest_framework import status
+from django.utils.translation import gettext_lazy as _
 
 import logging
 from .models import Order
@@ -30,7 +31,7 @@ def get_order(request, uuid):
     logged_in_user = get_user_from_request(request)
     order: Order = order_service.find_order_by_uuid(uuid)
     data = OrderSerializer(order, many=False).data
-    publish('orders_created', data)
+    # publish('orders_created', data)
     return Response(data)
 
 
@@ -57,7 +58,7 @@ def post_order_comment(request):
         order = order_service.post_order_comment(serializer, logged_in_user)
         response = OrderSerializer(order, many=False).data
         return Response(response, status=status.HTTP_200_OK)
-    return Response({"invalid": "not good data"}, status=status.HTTP_400_BAD_REQUEST)
+    return Response({_("invalid"): _("not.good.data")}, status=status.HTTP_400_BAD_REQUEST)
 
 
 @api_view(['PUT'])
