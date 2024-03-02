@@ -264,3 +264,5 @@ MEDIA_ROOT = os.path.join(BASE_DIR, 'media')
 MEDIA_URL = '/media/'
 
 AMQP_URL = 'amqp://guest:guest@localhost/%2f'
+
+BANNED_IPS = []
