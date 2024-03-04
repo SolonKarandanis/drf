@@ -79,6 +79,7 @@ class ChatConsumer(WebsocketConsumer):
     def receive(self, text_data=None, bytes_data=None):
         text_data_json = json.loads(text_data)
         message = text_data_json['message']
+        type = text_data_json.get("type", None)
 
         if not self.user.is_authenticated:
             return
