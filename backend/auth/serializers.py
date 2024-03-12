@@ -32,8 +32,10 @@ class UserSerializer(serializers.ModelSerializer):
             'last_name',
             'email',
             'is_active',
+            'is_staff',
             'created_date',
-            'updated_date'
+            'updated_date',
+            'uuid'
         ]
 
 
@@ -80,8 +82,10 @@ class UserDetailSerializer(serializers.ModelSerializer):
             'last_name',
             'email',
             'is_active',
+            'is_staff',
             'created_date',
             'updated_date',
+            'uuid',
             'groups',
             'permissions'
         ]
