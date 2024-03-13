@@ -70,13 +70,15 @@ MIDDLEWARE = [
 
 ROOT_URLCONF = 'cfehome.urls'
 CORS_URLS_REGEX = r"^/api/.*"
-CORS_ALLOWED_ORIGINS = []
+CORS_ALLOW_CREDENTIALS = True
+CORS_ALLOWED_ORIGINS = [
+    'http://localhost:3000'
+]
 
-if DEBUG:
-    CORS_ALLOWED_ORIGINS += [
-        'http://localhost:8111',
-        'https://localhost:8111',
-    ]
+# if DEBUG:
+#     CORS_ALLOWED_ORIGINS += [
+#         'http://localhost:3000',
+#     ]
 
 TEMPLATES = [
     {
