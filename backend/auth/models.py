@@ -4,6 +4,8 @@ from django.contrib.auth.base_user import BaseUserManager
 from django.utils.translation import gettext_lazy as _
 from django.db.models.functions import Lower
 from django.contrib.contenttypes.fields import GenericRelation
+from django.utils import timezone
+from datetime import date
 import uuid
 
 
@@ -78,3 +80,11 @@ class User(AbstractUser):
 
     def __str__(self):
         return f"{self.username}"
+
+    @property
+    def was_created_this_year(self) -> bool:
+        current_year = timezone.now().year
+        return self.created_date.date().year == current_year
+
+    def was_created_after(self, given_date: date) -> bool:
+        return self.created_date.date() > given_date
