@@ -1,7 +1,6 @@
 from typing import List
 
 from django.conf import settings
-from django.core.cache import cache
 from django.db import transaction
 from .models import Cart
 from products.models import Product
@@ -27,11 +26,7 @@ class CartService:
 
     def fetch_user_cart(self, logged_in_user: User) -> Cart:
         user_id = logged_in_user.id
-        cache_key = f'cart-{user_id}'
-        cart = cache.get(f'{key_prefix}:1:{cache_key}')
-        if cart is None:
-            cart =cart_repo.fetch_user_cart(logged_in_user)
-            cache.set(cache_key, cart, timeout=120)
+        cart =cart_repo.fetch_user_cart(logged_in_user)
         logger.info(f'cart: {cart}')
         return cart
 

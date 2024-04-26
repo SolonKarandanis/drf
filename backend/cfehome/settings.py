@@ -217,10 +217,10 @@ INTERNAL_IPS = [
     "127.0.0.1",
 ]
 
-REDIS_URL = 'redis://192.168.1.5:6379/0'
+# REDIS_URL = 'redis://192.168.1.5:6379/0'
 
 # Celery Settings
-CELERY_BROKER_URL = REDIS_URL
+CELERY_BROKER_URL = ''
 accept_content = ['application/json']
 result_serializer = 'json'
 task_serializer = 'json'
@@ -238,29 +238,29 @@ EMAIL_HOST_USER = "skarandanis@gmail.com"
 EMAIL_HOST_PASSWORD = ""
 DEFAULT_FROM_EMAIL = "Testing <>"
 
-CHANNEL_LAYERS = {
-    'default': {
-        'BACKEND': 'channels_redis.core.RedisChannelLayer',
-        'CONFIG': {
-            "hosts": [('192.168.1.5', 6379)],
-        },
-    },
-}
+# CHANNEL_LAYERS = {
+#     'default': {
+#         'BACKEND': 'channels_redis.core.RedisChannelLayer',
+#         'CONFIG': {
+#             "hosts": [('192.168.1.5', 6379)],
+#         },
+#     },
+# }
 
-CACHES = {
-    'default': {
-        'BACKEND': 'django_redis.cache.RedisCache',
-        'LOCATION': REDIS_URL,
-        'OPTIONS': {
-            'CLIENT_CLASS': 'django_redis.client.DefaultClient',
-            "SOCKET_CONNECT_TIMEOUT": 5,  # seconds
-            "SOCKET_TIMEOUT": 5,  # seconds
-            "COMPRESSOR": "django_redis.compressors.zlib.ZlibCompressor",
-            "IGNORE_EXCEPTIONS": True,
-        },
-        "KEY_PREFIX": "drf"
-    }
-}
+# CACHES = {
+#     'default': {
+#         'BACKEND': 'django_redis.cache.RedisCache',
+#         'LOCATION': REDIS_URL,
+#         'OPTIONS': {
+#             'CLIENT_CLASS': 'django_redis.client.DefaultClient',
+#             "SOCKET_CONNECT_TIMEOUT": 5,  # seconds
+#             "SOCKET_TIMEOUT": 5,  # seconds
+#             "COMPRESSOR": "django_redis.compressors.zlib.ZlibCompressor",
+#             "IGNORE_EXCEPTIONS": True,
+#         },
+#         "KEY_PREFIX": "drf"
+#     }
+# }
 
 MEDIA_ROOT = os.path.join(BASE_DIR, 'media')
 MEDIA_URL = '/media/'

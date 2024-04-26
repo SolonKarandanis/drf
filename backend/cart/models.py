@@ -1,5 +1,4 @@
 import logging
-from django.core.cache import cache
 from django.core.exceptions import ObjectDoesNotExist
 from django.db.models.signals import post_delete, post_save
 from django.dispatch import receiver
@@ -36,8 +35,6 @@ class CartQuerySet(QuerySet):
     def update(self, **kwargs):
         user = kwargs.get("user")
         user_id = user.id
-        cache_key = f'{key_prefix}:1:cart-{user_id}'
-        cache.delete(cache_key)
         super(CartQuerySet, self).update(**kwargs)
 
 
@@ -121,29 +118,25 @@ class CartItem(Model):
         return f"<CartItem {self.id}>"
 
 
-@receiver(post_delete, sender=CartItem, dispatch_uid='cart_item_deleted')
-def cart_item_post_delete_handler(sender, instance, **kwargs):
-    user_id = instance.cart.user.id
-    cache_key = f'{key_prefix}:1:cart-{user_id}'
-    cache.delete(cache_key)
+# @receiver(post_delete, sender=CartItem, dispatch_uid='cart_item_deleted')
+# def cart_item_post_delete_handler(sender, instance, **kwargs):
+#     user_id = instance.cart.user.id
+#
+#
+#
+# @receiver(post_save, sender=CartItem, dispatch_uid='cart_item_updated')
+# def cart_item_post_save_handler(sender, instance, **kwargs):
+#     user_id = instance.cart.user.id
+#
+#
+#
+# @receiver(post_delete, sender=Cart, dispatch_uid='cart_deleted')
+# def cart__post_delete_handler(sender, instance, **kwargs):
+#     user_id = instance.user.id
+#
+#
+#
+# @receiver(post_save, sender=Cart, dispatch_uid='cart_updated')
+# def cart_post_save_handler(sender, instance, **kwargs):
+#     user_id = instance.user.id
 
-
-@receiver(post_save, sender=CartItem, dispatch_uid='cart_item_updated')
-def cart_item_post_save_handler(sender, instance, **kwargs):
-    user_id = instance.cart.user.id
-    cache_key = f'{key_prefix}:1:cart-{user_id}'
-    cache.delete(cache_key)
-
-
-@receiver(post_delete, sender=Cart, dispatch_uid='cart_deleted')
-def cart__post_delete_handler(sender, instance, **kwargs):
-    user_id = instance.user.id
-    cache_key = f'{key_prefix}:1:cart-{user_id}'
-    cache.delete(cache_key)
-
-
-@receiver(post_save, sender=Cart, dispatch_uid='cart_updated')
-def cart_post_save_handler(sender, instance, **kwargs):
-    user_id = instance.user.id
-    cache_key = f'{key_prefix}:1:cart-{user_id}'
-    cache.delete(cache_key)
