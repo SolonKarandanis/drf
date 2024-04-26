@@ -8,7 +8,7 @@ import logging
 from .models import Order
 from .order_service import OrderService
 from .serializers import OrderSerializer, OrderListSerializer, PostOrderComment, SearchOrderItems, OrderItemSerializer
-from .publisher import publish
+# from .publisher import publish
 
 order_service = OrderService()
 

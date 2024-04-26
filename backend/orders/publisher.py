@@ -6,15 +6,15 @@ from django.conf import settings
 logger = logging.getLogger('django')
 
 url = settings.AMQP_URL
-params = pika.URLParameters(url)
-params.socket_timeout = 5
-
-connection = pika.BlockingConnection(params)  # Connect to Broker
-channel = connection.channel()  # start a channel
-channel.queue_declare(queue='drf')  # Declare a queue
-
-
-def publish(method, body):
-    properties = pika.BasicProperties(method)
-    channel.basic_publish(exchange='', routing_key='drf',
-                          body=json.dumps(body), properties=properties)
+# params = pika.URLParameters(url)
+# params.socket_timeout = 5
+#
+# connection = pika.BlockingConnection(params)  # Connect to Broker
+# channel = connection.channel()  # start a channel
+# channel.queue_declare(queue='drf')  # Declare a queue
+#
+#
+# def publish(method, body):
+#     properties = pika.BasicProperties(method)
+#     channel.basic_publish(exchange='', routing_key='drf',
+#                           body=json.dumps(body), properties=properties)
