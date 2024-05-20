@@ -127,7 +127,7 @@ DATABASES = {
         'NAME': 'drf',
         'USER': 'drf',
         'PASSWORD': 'drf',
-        'HOST': 'localhost',
+        'HOST': '192.168.1.5',
         'PORT': '5432'
     }
 }
