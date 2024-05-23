@@ -151,6 +151,8 @@ class UserDetailSerializer(serializers.ModelSerializer):
 
 
 class CreateUserSerializer(serializers.ModelSerializer):
+    firstName = serializers.CharField(source="first_name")
+    lastName = serializers.CharField(source="last_name")
     username = serializers.CharField(validators=[validate_username])
     email = serializers.CharField(validators=[validate_email])
     password2 = serializers.CharField(write_only=True)
@@ -162,8 +164,8 @@ class CreateUserSerializer(serializers.ModelSerializer):
             'username',
             'password',
             'password2',
-            'first_name',
-            'last_name',
+            'firstName',
+            'lastName',
             'email',
             'role',
         ]
