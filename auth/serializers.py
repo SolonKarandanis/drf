@@ -75,6 +75,31 @@ class GroupSerializer(serializers.ModelSerializer):
         fields = ('id', 'name')
 
 
+class UserAccountSerializer(serializers.ModelSerializer):
+    groups = GroupSerializer(many=True)
+    permissions = serializers.SerializerMethodField()
+
+    class Meta:
+        model = User
+        fields = [
+            'id',
+            'username',
+            'first_name',
+            'last_name',
+            'email',
+            'is_active',
+            'is_staff',
+            'created_date',
+            'updated_date',
+            'uuid',
+            'groups',
+            'permissions'
+        ]
+
+    def get_permissions(self, obj):
+        return obj.get_group_permissions()
+
+
 class UserDetailSerializer(serializers.ModelSerializer):
     groups = GroupSerializer(many=True)
     permissions = serializers.SerializerMethodField()
@@ -91,6 +116,7 @@ class UserDetailSerializer(serializers.ModelSerializer):
             'is_staff',
             'created_date',
             'updated_date',
+            'bio'
             'uuid',
             'groups',
             'permissions'

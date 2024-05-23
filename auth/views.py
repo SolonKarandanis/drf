@@ -7,7 +7,8 @@ from celery.result import AsyncResult
 
 from .group_service import GroupService
 from .models import User
-from .serializers import PaginatedUserSerializer, CreateUserSerializer, UserDetailSerializer, GroupSerializer
+from .serializers import PaginatedUserSerializer, CreateUserSerializer, UserDetailSerializer, GroupSerializer, \
+    UserAccountSerializer
 from .tasks import create_task
 from .user_service import UserService
 
@@ -47,7 +48,7 @@ def get_user(request, pk):
 @api_view(['GET'])
 @permission_classes([IsAuthenticated])
 def get_account(request):
-    data = UserDetailSerializer(request.user).data
+    data = UserAccountSerializer(request.user).data
     return Response(data)
 
 
