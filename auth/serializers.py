@@ -3,8 +3,12 @@ import logging
 from rest_framework import serializers
 from django.contrib.auth.models import Group
 from django.core.paginator import Paginator, PageNotAnInteger, EmptyPage
-from .validators import validate_username, validate_email
+
+from .group_repository import GroupRepository
+from .validators import validate_username, validate_email, validate_role
 from .models import User
+
+groupRepo = GroupRepository()
 
 logger = logging.getLogger('django')
 
@@ -98,6 +102,7 @@ class CreateUserSerializer(serializers.ModelSerializer):
     username = serializers.CharField(validators=[validate_username])
     email = serializers.CharField(validators=[validate_email])
     password2 = serializers.CharField(write_only=True)
+    role = serializers.CharField(validators=[validate_role])
 
     class Meta:
         model = User
@@ -108,6 +113,7 @@ class CreateUserSerializer(serializers.ModelSerializer):
             'first_name',
             'last_name',
             'email',
+            'role',
         ]
 
     def save(self):
@@ -117,11 +123,15 @@ class CreateUserSerializer(serializers.ModelSerializer):
         last_name = self.validated_data['last_name']
         password = self.validated_data['password']
         password2 = self.validated_data['password2']
+        role = self.validated_data['role']
         user = User(username=username, email=email, first_name=first_name, last_name=last_name)
+
         if password != password2:
             raise serializers.ValidationError({'password': 'Passwords must match.'})
         user.set_password(password)
+        group = groupRepo.find_by_name(role)
         user.save()
+        user.groups.add(group)
         return user
 
 
