@@ -4,14 +4,17 @@ from rest_framework.response import Response
 from rest_framework.decorators import api_view, permission_classes
 from rest_framework.permissions import IsAuthenticated
 from celery.result import AsyncResult
+
+from .group_service import GroupService
 from .models import User
-from .serializers import PaginatedUserSerializer, CreateUserSerializer, UserDetailSerializer
+from .serializers import PaginatedUserSerializer, CreateUserSerializer, UserDetailSerializer, GroupSerializer
 from .tasks import create_task
 from .user_service import UserService
 
 logger = logging.getLogger('django')
 
 user_service = UserService()
+group_service = GroupService()
 
 
 # Create your views here.
@@ -45,6 +48,14 @@ def get_user(request, pk):
 @permission_classes([IsAuthenticated])
 def get_account(request):
     data = UserDetailSerializer(request.user).data
+    return Response(data)
+
+
+@api_view(['GET'])
+def get_all_groups(request):
+    groups = group_service.find_all_groups()
+    logger.info(f'groups: {groups}')
+    data = GroupSerializer(groups, many=True).data
     return Response(data)
 
 
