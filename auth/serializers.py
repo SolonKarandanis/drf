@@ -28,18 +28,26 @@ class UserPublicSerializer(serializers.Serializer):
 
 
 class UserSerializer(serializers.ModelSerializer):
+    firstName = serializers.CharField(source="first_name")
+    lastName = serializers.CharField(source="last_name")
+    isActive = serializers.CharField(source="is_active")
+    isStaff = serializers.CharField(source="is_staff")
+    isVerified = serializers.CharField(source="is_verified")
+    createdDate = serializers.CharField(source="created_date")
+    updatedDate = serializers.CharField(source="updated_date")
     class Meta:
         model = User
         fields = [
             'id',
             'username',
-            'first_name',
-            'last_name',
+            'firstName',
+            'lastName',
             'email',
-            'is_active',
-            'is_staff',
-            'created_date',
-            'updated_date',
+            'isActive',
+            'isStaff',
+            'isVerified',
+            'createdDate',
+            'updatedDate',
             'uuid'
         ]
 
@@ -78,19 +86,27 @@ class GroupSerializer(serializers.ModelSerializer):
 class UserAccountSerializer(serializers.ModelSerializer):
     groups = GroupSerializer(many=True)
     permissions = serializers.SerializerMethodField()
+    firstName = serializers.CharField(source="first_name")
+    lastName = serializers.CharField(source="last_name")
+    isActive = serializers.CharField(source="is_active")
+    isStaff = serializers.CharField(source="is_staff")
+    isVerified = serializers.CharField(source="is_verified")
+    createdDate = serializers.CharField(source="created_date")
+    updatedDate = serializers.CharField(source="updated_date")
 
     class Meta:
         model = User
         fields = [
             'id',
             'username',
-            'first_name',
-            'last_name',
+            'firstName',
+            'lastName',
             'email',
-            'is_active',
-            'is_staff',
-            'created_date',
-            'updated_date',
+            'isActive',
+            'isStaff',
+            'isVerified',
+            'createdDate',
+            'updatedDate',
             'uuid',
             'groups',
             'permissions'
@@ -103,6 +119,13 @@ class UserAccountSerializer(serializers.ModelSerializer):
 class UserDetailSerializer(serializers.ModelSerializer):
     groups = GroupSerializer(many=True)
     permissions = serializers.SerializerMethodField()
+    firstName = serializers.CharField(source="first_name")
+    lastName = serializers.CharField(source="last_name")
+    isActive = serializers.CharField(source="is_active")
+    isStaff = serializers.CharField(source="is_staff")
+    isVerified = serializers.CharField(source="is_verified")
+    createdDate = serializers.CharField(source="created_date")
+    updatedDate = serializers.CharField(source="updated_date")
 
     class Meta:
         model = User
@@ -114,6 +137,7 @@ class UserDetailSerializer(serializers.ModelSerializer):
             'email',
             'is_active',
             'is_staff',
+            'isVerified',
             'created_date',
             'updated_date',
             'bio'
