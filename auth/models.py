@@ -1,4 +1,5 @@
-from django.db.models import QuerySet, DateTimeField, EmailField, UUIDField,TextField,BooleanField
+from django.db.models import QuerySet, DateTimeField, EmailField, UUIDField, \
+    TextField, BooleanField, Model, OneToOneField, CASCADE, CharField
 from django.contrib.auth.models import AbstractUser
 from django.contrib.auth.base_user import BaseUserManager
 from django.utils.translation import gettext_lazy as _
@@ -90,3 +91,15 @@ class User(AbstractUser):
 
     def was_created_after(self, given_date: date) -> bool:
         return self.created_date.date() > given_date
+
+
+class UserDetails(Model):
+    user = OneToOneField(User, on_delete=CASCADE)
+    state = CharField(max_length=120, default=None)
+    city = CharField(max_length=120, default=None)
+    address = CharField(max_length=120, default=None)
+    zip = CharField(max_length=20, default=None)
+    phone = CharField(max_length=50, default=None)
+
+    def __str__(self):
+        return f"{self.state}-{self.city}-{self.address}"
