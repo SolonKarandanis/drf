@@ -1,8 +1,6 @@
-from django.contrib.auth.models import Group
 from rest_framework import serializers
 from .group_repository import GroupRepository
 from .user_repository import UserRepository
-from .models import User
 groupRepo = GroupRepository()
 userRepo = UserRepository()
 

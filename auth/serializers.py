@@ -12,6 +12,7 @@ groupRepo = GroupRepository()
 
 logger = logging.getLogger('django')
 
+
 class UserProductInlineSerializer(serializers.Serializer):
     url = serializers.HyperlinkedIdentityField(
         view_name='product-detail',
@@ -47,6 +48,7 @@ class PaginatedUserSerializer:
     """
     Serializes page objects of product querysets.
     """
+
     def __init__(self, data, request):
         page = request.GET.get('page', 1)
         size = request.GET.get('size', 10)
@@ -70,7 +72,7 @@ class PaginatedUserSerializer:
 class GroupSerializer(serializers.ModelSerializer):
     class Meta:
         model = Group
-        fields = ('name',)
+        fields = ('id', 'name')
 
 
 class UserDetailSerializer(serializers.ModelSerializer):
