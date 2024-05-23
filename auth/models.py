@@ -1,4 +1,4 @@
-from django.db.models import QuerySet, DateTimeField, EmailField, UUIDField
+from django.db.models import QuerySet, DateTimeField, EmailField, UUIDField,TextField
 from django.contrib.auth.models import AbstractUser
 from django.contrib.auth.base_user import BaseUserManager
 from django.utils.translation import gettext_lazy as _
@@ -70,6 +70,7 @@ class User(AbstractUser):
     email = EmailField(_("email.address"), unique=True)
     uuid = UUIDField(default=uuid.uuid4())
     images = GenericRelation("images.Images", related_query_name='user')
+    bio = TextField(default=None, null=True)
 
     date_joined = None
 
