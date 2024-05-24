@@ -1,5 +1,5 @@
 from django.db.models import QuerySet, DateTimeField, EmailField, UUIDField, \
-    TextField, BooleanField, Model, OneToOneField, CASCADE, CharField
+    TextField, BooleanField, Model, OneToOneField, CASCADE, CharField, TextChoices
 from django.contrib.auth.models import AbstractUser
 from django.contrib.auth.base_user import BaseUserManager
 from django.utils.translation import gettext_lazy as _
@@ -69,6 +69,12 @@ class UserManager(BaseUserManager):
 
 # Create your models here.
 class User(AbstractUser):
+    class UserStatus(TextChoices):
+        UNVERIFIED = 'user.unverified',
+        ACTIVE = 'user.active',
+        DEACTIVATED = 'user.deactivated',
+        DELETED = 'user.deleted',
+
     created_date = DateTimeField(auto_now_add=True, null=False)
     updated_date = DateTimeField(auto_now=True, null=False)
     email = EmailField(_("email.address"), unique=True)
@@ -76,6 +82,7 @@ class User(AbstractUser):
     images = GenericRelation("images.Images", related_query_name='user')
     bio = TextField(default=None, null=True)
     is_verified = BooleanField(default=False)
+    status = CharField(max_length=40, choices=UserStatus.choices, default=UserStatus.UNVERIFIED)
 
     date_joined = None
 
