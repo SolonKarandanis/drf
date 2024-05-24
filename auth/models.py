@@ -94,12 +94,12 @@ class User(AbstractUser):
 
 
 class UserDetails(Model):
-    user = OneToOneField(User, on_delete=CASCADE,primary_key=True)
-    state = CharField(max_length=120, default=None)
-    city = CharField(max_length=120, default=None)
-    address = CharField(max_length=120, default=None)
-    zip = CharField(max_length=20, default=None)
-    phone = CharField(max_length=50, default=None)
+    user = OneToOneField(User, on_delete=CASCADE, primary_key=True)
+    state = CharField(max_length=120, default=None, null=True)
+    city = CharField(max_length=120, default=None, null=True)
+    address = CharField(max_length=120, default=None, null=True)
+    zip = CharField(max_length=20, default=None, null=True)
+    phone = CharField(max_length=50, default=None, null=True)
 
     def __str__(self):
         return f"{self.state}-{self.city}-{self.address}"
