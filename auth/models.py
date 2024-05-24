@@ -10,6 +10,13 @@ from datetime import date
 import uuid
 
 
+class UserStatus(TextChoices):
+    UNVERIFIED = 'user.unverified',
+    ACTIVE = 'user.active',
+    DEACTIVATED = 'user.deactivated',
+    DELETED = 'user.deleted'
+
+
 class UserQuerySet(QuerySet):
     def is_active(self):
         return self.filter(is_active=True)
@@ -59,6 +66,7 @@ class UserManager(BaseUserManager):
         extra_fields.setdefault("is_staff", True)
         extra_fields.setdefault("is_superuser", True)
         extra_fields.setdefault("is_active", True)
+        extra_fields.setdefault("status", UserStatus.ACTIVE)
 
         if extra_fields.get("is_staff") is not True:
             raise ValueError(_("superuser.is_staff.true"))
@@ -69,12 +77,6 @@ class UserManager(BaseUserManager):
 
 # Create your models here.
 class User(AbstractUser):
-    class UserStatus(TextChoices):
-        UNVERIFIED = 'user.unverified',
-        ACTIVE = 'user.active',
-        DEACTIVATED = 'user.deactivated',
-        DELETED = 'user.deleted',
-
     created_date = DateTimeField(auto_now_add=True, null=False)
     updated_date = DateTimeField(auto_now=True, null=False)
     email = EmailField(_("email.address"), unique=True)
