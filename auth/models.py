@@ -94,7 +94,7 @@ class User(AbstractUser):
 
 
 class UserDetails(Model):
-    user = OneToOneField(User, on_delete=CASCADE)
+    user = OneToOneField(User, on_delete=CASCADE,primary_key=True)
     state = CharField(max_length=120, default=None)
     city = CharField(max_length=120, default=None)
     address = CharField(max_length=120, default=None)
