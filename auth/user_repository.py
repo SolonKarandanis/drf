@@ -18,7 +18,10 @@ class UserRepository:
         return exists
 
     def find_user_by_id(self, user_id: int) -> User:
-        return User.objects.get_queryset().with_groups().get(pk=user_id)
+        return User.objects.get_queryset().with_details().with_groups().get(pk=user_id)
+
+    def find_user_by_uuid(self, uuid: str) -> User:
+        return User.objects.get_queryset().with_details().with_groups().get(uuid=uuid)
 
     def search(self, params) -> List[User]:
         user_filter = Q(is_active=True)

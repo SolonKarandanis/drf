@@ -17,3 +17,6 @@ class UserService:
 
     def find_user_by_id(self, user_id: int) -> User:
         return repo.find_user_by_id(user_id)
+
+    def find_user_by_uuid(self, uuid: str) -> User:
+        return repo.find_user_by_uuid(uuid)

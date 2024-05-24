@@ -40,8 +40,8 @@ def create_user(request):
 @api_view(['GET'])
 @permission_classes([IsAuthenticated])
 # @has_permission('retrive_job')
-def get_user(request, pk):
-    obj = user_service.find_user_by_id(pk)
+def get_user(request, uuid):
+    obj = user_service.find_user_by_uuid(uuid)
     data = UseInfoSerializer(obj).data
     return Response(data)
 

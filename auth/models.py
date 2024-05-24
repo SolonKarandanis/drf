@@ -20,6 +20,9 @@ class UserQuerySet(QuerySet):
     def with_groups(self):
         return self.prefetch_related('groups')
 
+    def with_details(self):
+        return self.select_related('user_details')
+
 
 class UserManager(BaseUserManager):
     """
