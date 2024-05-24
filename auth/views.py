@@ -7,7 +7,7 @@ from celery.result import AsyncResult
 
 from .group_service import GroupService
 from .models import User
-from .serializers import PaginatedUserSerializer, CreateUserSerializer, UserDetailSerializer, GroupSerializer, \
+from .serializers import PaginatedUserSerializer, CreateUserSerializer, UseInfoSerializer, GroupSerializer, \
     UserAccountSerializer
 from .tasks import create_task
 from .user_service import UserService
@@ -42,7 +42,7 @@ def create_user(request):
 # @has_permission('retrive_job')
 def get_user(request, pk):
     obj = user_service.find_user_by_id(pk)
-    data = UserDetailSerializer(obj).data
+    data = UseInfoSerializer(obj).data
     return Response(data)
 
 

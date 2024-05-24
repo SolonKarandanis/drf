@@ -6,7 +6,7 @@ from django.core.paginator import Paginator, PageNotAnInteger, EmptyPage
 
 from .group_repository import GroupRepository
 from .validators import validate_username, validate_email, validate_role
-from .models import User
+from .models import User, UserDetails
 
 groupRepo = GroupRepository()
 
@@ -27,6 +27,10 @@ class UserPublicSerializer(serializers.Serializer):
     id = serializers.IntegerField(read_only=True)
 
 
+class UserIdSerializer(serializers.Serializer):
+    id = serializers.IntegerField(read_only=True)
+
+
 class UserSerializer(serializers.ModelSerializer):
     firstName = serializers.CharField(source="first_name")
     lastName = serializers.CharField(source="last_name")
@@ -35,6 +39,7 @@ class UserSerializer(serializers.ModelSerializer):
     isVerified = serializers.CharField(source="is_verified")
     createdDate = serializers.CharField(source="created_date")
     updatedDate = serializers.CharField(source="updated_date")
+
     class Meta:
         model = User
         fields = [
@@ -83,9 +88,25 @@ class GroupSerializer(serializers.ModelSerializer):
         fields = ('id', 'name')
 
 
+class UserDetailSerializer(serializers.ModelSerializer):
+    userId = serializers.IntegerField(source='user_id', read_only=True)
+
+    class Meta:
+        model = UserDetails
+        fields = [
+            'userId',
+            'state',
+            'city',
+            'address',
+            'zip',
+            'phone'
+        ]
+
+
 class UserAccountSerializer(serializers.ModelSerializer):
     groups = GroupSerializer(many=True)
     permissions = serializers.SerializerMethodField()
+    details = UserDetailSerializer(source="user_details")
     firstName = serializers.CharField(source="first_name")
     lastName = serializers.CharField(source="last_name")
     isActive = serializers.CharField(source="is_active")
@@ -109,16 +130,18 @@ class UserAccountSerializer(serializers.ModelSerializer):
             'updatedDate',
             'uuid',
             'groups',
-            'permissions'
+            'permissions',
+            'details'
         ]
 
     def get_permissions(self, obj):
         return obj.get_group_permissions()
 
 
-class UserDetailSerializer(serializers.ModelSerializer):
+class UseInfoSerializer(serializers.ModelSerializer):
     groups = GroupSerializer(many=True)
     permissions = serializers.SerializerMethodField()
+    details = UserDetailSerializer(source="user_details")
     firstName = serializers.CharField(source="first_name")
     lastName = serializers.CharField(source="last_name")
     isActive = serializers.CharField(source="is_active")
@@ -132,18 +155,19 @@ class UserDetailSerializer(serializers.ModelSerializer):
         fields = [
             'id',
             'username',
-            'first_name',
-            'last_name',
+            'firstName',
+            'lastName',
             'email',
-            'is_active',
-            'is_staff',
+            'isActive',
+            'isStaff',
             'isVerified',
-            'created_date',
-            'updated_date',
-            'bio'
+            'createdDate',
+            'updatedDate',
+            'bio',
             'uuid',
             'groups',
-            'permissions'
+            'permissions',
+            'details'
         ]
 
     def get_permissions(self, obj):
