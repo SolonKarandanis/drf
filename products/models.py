@@ -1,6 +1,6 @@
 from django.core.exceptions import ObjectDoesNotExist
 from django.db.models import Q, QuerySet, Manager, Model, SET_NULL, ForeignKey, CharField, TextField, \
-    FloatField, BooleanField, IntegerField, UUIDField
+    FloatField, BooleanField, IntegerField, UUIDField, Index
 from django.conf import settings
 from django.contrib.contenttypes.fields import GenericRelation
 import uuid
@@ -76,6 +76,21 @@ class Product(Model):
 
     class Meta:
         ordering = ['sku']
+
+        indexes = [
+            Index(
+                name='product_sku',
+                fields=['sku'],
+            ),
+            Index(
+                name='product_uuid',
+                fields=['uuid'],
+            ),
+            Index(
+                name='product_user_id',
+                fields=['user_id'],
+            )
+        ]
 
     objects = ProductManager()
 
