@@ -20,7 +20,7 @@ def validate_email(self):
 
 
 def validate_role(self):
-    qs = groupRepo.exists_by_name(name=self)
+    qs = groupRepo.exists_by_id(group_id=self)
     if not qs:
         raise serializers.ValidationError(f"Role: {self} does not exist")
     return self

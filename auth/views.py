@@ -33,7 +33,7 @@ def create_user(request):
     serializer = CreateUserSerializer(data=request.data)
     if serializer.is_valid(raise_exception=True):
         serializer.save()
-        return Response(serializer.data, status=status.HTTP_201_CREATED)
+        return Response(status=status.HTTP_201_CREATED)
     return Response({"invalid": "not good data"}, status=status.HTTP_400_BAD_REQUEST)
 
 

@@ -8,8 +8,16 @@ class GroupRepository:
         exists = Group.objects.filter(name=name).exists()
         return exists
 
+    def exists_by_id(self, group_id: int) -> bool:
+        exists = Group.objects.filter(pk=group_id).exists()
+        return exists
+
     def find_by_name(self, name: str) -> Group:
         qs = Group.objects.get(name=name)
+        return qs
+
+    def find_by_id(self, group_id: int) -> Group:
+        qs = Group.objects.get(pk=group_id)
         return qs
 
     def create(self, name: str) -> None:

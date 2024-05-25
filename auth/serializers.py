@@ -209,7 +209,7 @@ class CreateUserSerializer(serializers.ModelSerializer):
         if password != password2:
             raise serializers.ValidationError({'password': 'Passwords must match.'})
         user.set_password(password)
-        group = groupRepo.find_by_name(role)
+        group = groupRepo.find_by_id(role)
         user.save()
         user.groups.add(group)
         return user
