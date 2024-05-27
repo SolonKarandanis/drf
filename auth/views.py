@@ -6,7 +6,6 @@ from rest_framework.permissions import IsAuthenticated
 from celery.result import AsyncResult
 
 from .group_service import GroupService
-from .models import User
 from .serializers import PaginatedUserSerializer, CreateUserSerializer, UseInfoSerializer, GroupSerializer, \
     UserAccountSerializer
 from .tasks import create_task
