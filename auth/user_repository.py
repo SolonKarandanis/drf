@@ -45,6 +45,6 @@ class UserRepository:
 
         if "role" in request:
             role = request["role"]
-        #     user_filter.add(Q(groups=role), Q.OR)
+            user_filter.add(Q(groups=role), Q.AND)
 
         return User.objects.filter(user_filter)
