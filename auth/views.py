@@ -7,7 +7,7 @@ from celery.result import AsyncResult
 
 from .group_service import GroupService
 from .serializers import PaginatedUserSerializer, CreateUserSerializer, UseInfoSerializer, GroupSerializer, \
-    UserAccountSerializer
+    UserAccountSerializer, SearchUsersRequestSerializer
 from .tasks import create_task
 from .user_service import UserService
 
@@ -23,6 +23,16 @@ group_service = GroupService()
 @permission_classes([IsAuthenticated])
 def get_all_users(request):
     queryset = user_service.find_all_users()
+    serializer = PaginatedUserSerializer(queryset, request)
+    return Response(serializer.page_data)
+
+
+@api_view(['POST'])
+@permission_classes([IsAuthenticated])
+def search_users(request):
+    search_request = SearchUsersRequestSerializer(data=request.data)
+    serialized_data = search_request.initial_data
+    queryset = user_service.search(serialized_data)
     serializer = PaginatedUserSerializer(queryset, request)
     return Response(serializer.page_data)
 

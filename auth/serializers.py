@@ -225,9 +225,8 @@ class PasswordChangeSerializer(serializers.Serializer):
         return value
 
 
-class SearchUsersSerializer(serializers.Serializer):
+class SearchUsersRequestSerializer(serializers.Serializer):
     username = serializers.CharField()
     name = serializers.CharField()
     email = serializers.CharField()
     role = serializers.IntegerField()
-    

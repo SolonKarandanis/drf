@@ -4,6 +4,7 @@ from django.db.models import Q
 from .models import User
 
 
+
 class UserRepository:
 
     def find_all_users(self) -> List[User]:
@@ -23,18 +24,27 @@ class UserRepository:
     def find_user_by_uuid(self, uuid: str) -> User:
         return User.objects.get_queryset().with_details().with_groups().get(uuid=uuid)
 
-    def search(self, params) -> List[User]:
-        user_filter = Q(is_active=True)
-        value = params["value"]
+    def search(self, request) -> List[User]:
+        user_filter = Q(is_active=True) & Q(is_verified=True)
 
-        if "name" in params:
+        if "name" in request:
+            name = request["name"]
             user_filter.add(
                 Q(
-                    Q(first_name_icontains=value) | Q(last_name_icontains=value)
+                    Q(first_name__icontains=name) | Q(last_name__icontains=name)
                 ),
                 Q.OR
             )
-        if "email" in params:
-            user_filter.add(Q(email_icontains=value), Q.OR)
+        if "email" in request:
+            email = request["email"]
+            user_filter.add(Q(email__icontains=email), Q.OR)
+
+        if "username" in request:
+            username = request["username"]
+            user_filter.add(Q(username__icontains=username), Q.OR)
+
+        if "role" in request:
+            role = request["role"]
+        #     user_filter.add(Q(groups=role), Q.OR)
 
         return User.objects.filter(user_filter)
