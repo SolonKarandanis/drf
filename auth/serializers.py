@@ -182,7 +182,7 @@ class CreateUserSerializer(serializers.ModelSerializer):
     username = serializers.CharField(validators=[validate_username])
     email = serializers.CharField(validators=[validate_email])
     password2 = serializers.CharField(write_only=True)
-    role = serializers.CharField(validators=[validate_role])
+    role = serializers.IntegerField(validators=[validate_role])
 
     class Meta:
         model = User
@@ -223,3 +223,11 @@ class PasswordChangeSerializer(serializers.Serializer):
         if not self.context['request'].user.check_password(value):
             raise serializers.ValidationError({'current_password': 'Does not match'})
         return value
+
+
+class SearchUsersSerializer(serializers.Serializer):
+    username = serializers.CharField()
+    name = serializers.CharField()
+    email = serializers.CharField()
+    role = serializers.IntegerField()
+    
