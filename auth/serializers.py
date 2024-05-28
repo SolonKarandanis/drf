@@ -7,6 +7,7 @@ from django.core.paginator import Paginator, PageNotAnInteger, EmptyPage
 from .group_repository import GroupRepository
 from .validators import validate_username, validate_email, validate_role
 from .models import User, UserDetails
+from cfehome.serializers import PagingSerializer
 
 groupRepo = GroupRepository()
 
@@ -226,7 +227,8 @@ class PasswordChangeSerializer(serializers.Serializer):
 
 
 class SearchUsersRequestSerializer(serializers.Serializer):
-    username = serializers.CharField()
-    name = serializers.CharField()
-    email = serializers.CharField()
-    role = serializers.IntegerField()
+    username = serializers.CharField(required=False)
+    name = serializers.CharField(required=False)
+    email = serializers.CharField(required=False)
+    role = serializers.IntegerField(required=False)
+    paging = PagingSerializer(required=True)

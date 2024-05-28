@@ -31,10 +31,12 @@ def get_all_users(request):
 @permission_classes([IsAuthenticated])
 def search_users(request):
     search_request = SearchUsersRequestSerializer(data=request.data)
-    serialized_data = search_request.initial_data
-    queryset = user_service.search(serialized_data)
-    serializer = PaginatedUserSerializer(queryset, request)
-    return Response(serializer.page_data)
+    if search_request.is_valid(raise_exception=True):
+        serialized_data = search_request.data
+        logger.info(f'serialized_data: {serialized_data}')
+        queryset = user_service.search(serialized_data)
+        serializer = PaginatedUserSerializer(queryset, request)
+        return Response(serializer.page_data)
 
 
 @api_view(['POST'])

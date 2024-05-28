@@ -47,4 +47,8 @@ class UserRepository:
             role = request["role"]
             user_filter.add(Q(groups=role), Q.AND)
 
-        return User.objects.filter(user_filter)
+        query = User.objects.filter(user_filter)
+        if "paging" in request:
+            pass
+
+        return query
