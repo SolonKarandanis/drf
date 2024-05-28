@@ -35,8 +35,8 @@ def search_users(request):
         serialized_data = search_request.data
         logger.info(f'serialized_data: {serialized_data}')
         queryset = user_service.search(serialized_data)
-        serializer = PaginatedUserSerializer(queryset, request)
-        return Response(serializer.page_data)
+        # serializer = PaginatedUserSerializer(queryset, request)
+        return Response(queryset)
 
 
 @api_view(['POST'])

@@ -82,6 +82,30 @@ class PaginatedUserSerializer:
         serializer = UserSerializer(data, many=True)
         self.page_data = {'count': count, 'previous': previous, 'next': next, 'data': serializer.data}
 
+class PaginatedPOSTUserSerializer:
+    """
+    Serializes page objects of product querysets.
+    """
+
+    def __init__(self, data, paging):
+        limit = paging["limit"]
+        page = paging["page"]
+        logger.info(f'page: {page}')
+        logger.info(f'size: {limit}')
+        paginator = Paginator(data, limit)
+        try:
+            data = paginator.page(page)
+        except PageNotAnInteger:
+            data = paginator.page(1)
+        except EmptyPage:
+            data = paginator.page(paginator.num_pages)
+        count = paginator.count
+
+        previous = None if not data.has_previous() else data.previous_page_number()
+        next = None if not data.has_next() else data.next_page_number()
+        serializer = UserSerializer(data, many=True)
+        self.page_data = {'count': count, 'previous': previous, 'next': next, 'data': serializer.data}
+
 
 class GroupSerializer(serializers.ModelSerializer):
     class Meta:
