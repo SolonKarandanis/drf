@@ -6,10 +6,15 @@ logger = logging.getLogger('django')
 
 
 class PagingSerializer(serializers.Serializer):
+    SORT_ORDER_CHOICES = (
+        ("ASC", "ASC"),
+        ("DESC", "DESC")
+    )
+
     page = serializers.IntegerField(required=True, min_value=1)
     limit = serializers.IntegerField(required=True, min_value=1)
     sortField = serializers.CharField(required=False)
-    sortOrder = serializers.CharField(required=False)
+    sortOrder = serializers.ChoiceField(choices=SORT_ORDER_CHOICES, required=False)
 
 
 
