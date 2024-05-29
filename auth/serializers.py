@@ -101,11 +101,12 @@ class PaginatedPOSTUserSerializer:
         except EmptyPage:
             data = paginator.page(paginator.num_pages)
         count = paginator.count
+        pages = paginator.num_pages
 
         previous = None if not data.has_previous() else data.previous_page_number()
         next = None if not data.has_next() else data.next_page_number()
         serializer = UserSerializer(data, many=True)
-        self.page_data = {'count': count, 'previous': previous, 'next': next, 'data': serializer.data}
+        self.page_data = {'count': count, 'pages': pages, 'previous': previous, 'next': next, 'data': serializer.data}
 
 
 class GroupSerializer(serializers.ModelSerializer):

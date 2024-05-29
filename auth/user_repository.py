@@ -1,7 +1,9 @@
 from typing import List
 from django.db.models import Q
 from .models import User
+import logging
 
+logger = logging.getLogger('django')
 
 class UserRepository:
 
@@ -23,7 +25,10 @@ class UserRepository:
         return User.objects.get_queryset().with_details().with_groups().get(uuid=uuid)
 
     def search(self, request):
+        user_manager = User.objects
         user_filter = Q(is_active=True) & Q(is_verified=True)
+        user_order = None
+        paging = request["paging"]
 
         if "name" in request:
             name = request["name"]
@@ -45,6 +50,13 @@ class UserRepository:
             role = request["role"]
             user_filter.add(Q(groups=role), Q.AND)
 
-        query = User.objects.filter(user_filter)
+        search_filter = user_manager.filter(user_filter)
 
-        return query
+        if "sortField" in paging:
+            sortField = paging["sortField"]
+            logger.info(f'sortField: {sortField}')
+            if hasattr(User, sortField):
+                logger.info(f'true')
+                return search_filter.order_by(sortField)
+
+        return search_filter

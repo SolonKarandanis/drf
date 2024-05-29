@@ -6,8 +6,8 @@ logger = logging.getLogger('django')
 
 
 class PagingSerializer(serializers.Serializer):
-    page = serializers.IntegerField(required=True)
-    limit = serializers.IntegerField(required=True)
+    page = serializers.IntegerField(required=True, min_value=1)
+    limit = serializers.IntegerField(required=True, min_value=1)
     sortField = serializers.CharField(required=False)
     sortOrder = serializers.CharField(required=False)
 

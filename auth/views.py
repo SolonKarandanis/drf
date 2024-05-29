@@ -33,7 +33,6 @@ def search_users(request):
     search_request = SearchUsersRequestSerializer(data=request.data)
     if search_request.is_valid(raise_exception=True):
         serialized_data = search_request.data
-        logger.info(f'serialized_data: {serialized_data}')
         queryset = user_service.search(serialized_data)
         paging = serialized_data["paging"]
         serializer = PaginatedPOSTUserSerializer(queryset, paging)
