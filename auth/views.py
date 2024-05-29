@@ -5,6 +5,7 @@ from rest_framework.decorators import api_view, permission_classes
 from rest_framework.permissions import IsAuthenticated
 from celery.result import AsyncResult
 
+from cfehome.decorators.has_role import has_role
 from .group_service import GroupService
 from .serializers import PaginatedUserSerializer, CreateUserSerializer, UseInfoSerializer, GroupSerializer, \
     UserAccountSerializer, SearchUsersRequestSerializer, PaginatedPOSTUserSerializer
@@ -46,6 +47,12 @@ def create_user(request):
         serializer.save()
         return Response(status=status.HTTP_201_CREATED)
     return Response({"invalid": "not good data"}, status=status.HTTP_400_BAD_REQUEST)
+
+
+@api_view(['PUT'])
+@has_role('ADMIN')
+def deactivate_user(request):
+    pass
 
 
 @api_view(['GET'])
