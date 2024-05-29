@@ -7,7 +7,7 @@ from celery.result import AsyncResult
 
 from .group_service import GroupService
 from .serializers import PaginatedUserSerializer, CreateUserSerializer, UseInfoSerializer, GroupSerializer, \
-    UserAccountSerializer, SearchUsersRequestSerializer
+    UserAccountSerializer, SearchUsersRequestSerializer, PaginatedPOSTUserSerializer
 from .tasks import create_task
 from .user_service import UserService
 
@@ -35,8 +35,9 @@ def search_users(request):
         serialized_data = search_request.data
         logger.info(f'serialized_data: {serialized_data}')
         queryset = user_service.search(serialized_data)
-        # serializer = PaginatedUserSerializer(queryset, request)
-        return Response(queryset)
+        paging = serialized_data["paging"]
+        serializer = PaginatedPOSTUserSerializer(queryset, paging)
+        return Response(serializer.page_data)
 
 
 @api_view(['POST'])

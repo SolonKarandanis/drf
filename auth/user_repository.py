@@ -1,8 +1,5 @@
 from typing import List
-
-from django.core.paginator import Paginator, PageNotAnInteger, EmptyPage
 from django.db.models import Q
-
 from .models import User
 
 
@@ -27,9 +24,6 @@ class UserRepository:
 
     def search(self, request):
         user_filter = Q(is_active=True) & Q(is_verified=True)
-        paging = request["paging"]
-        limit = paging["limit"]
-        page = paging["page"]
 
         if "name" in request:
             name = request["name"]
@@ -52,13 +46,5 @@ class UserRepository:
             user_filter.add(Q(groups=role), Q.AND)
 
         query = User.objects.filter(user_filter)
-        paginator = Paginator(query, limit)
-        try:
-            data = paginator.page(page)
-        except PageNotAnInteger:
-            data = paginator.page(1)
-        except EmptyPage:
-            data = paginator.page(paginator.num_pages)
-        count = paginator.count
 
-        return {'count': count,  'data': data}
+        return query

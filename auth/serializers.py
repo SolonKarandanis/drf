@@ -82,6 +82,7 @@ class PaginatedUserSerializer:
         serializer = UserSerializer(data, many=True)
         self.page_data = {'count': count, 'previous': previous, 'next': next, 'data': serializer.data}
 
+
 class PaginatedPOSTUserSerializer:
     """
     Serializes page objects of product querysets.
