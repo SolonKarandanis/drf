@@ -54,12 +54,10 @@ class UserRepository:
 
         if "sortField" in paging:
             sortField = paging["sortField"]
-            logger.info(f'sortField: {sortField}')
             if hasattr(User, sortField):
                 if "sortOrder" in paging:
                     sortOrder = paging["sortOrder"]
                     if sortOrder == "DESC":
                         sortField = f'-{sortField}'
             return search_filter.order_by(sortField)
-
         return search_filter
