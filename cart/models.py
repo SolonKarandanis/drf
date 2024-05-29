@@ -1,7 +1,5 @@
 import logging
 from django.core.exceptions import ObjectDoesNotExist
-from django.db.models.signals import post_delete, post_save
-from django.dispatch import receiver
 from django.db.models import QuerySet, DateTimeField, Manager, Model, OneToOneField, FloatField, BooleanField, CASCADE, \
     UniqueConstraint, Index, IntegerField, ForeignKey, PROTECT, UUIDField, Prefetch
 from django.conf import settings

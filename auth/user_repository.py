@@ -14,6 +14,9 @@ class UserRepository:
         exists = User.objects.filter(email=email).exists()
         return exists
 
+    def find_user_by_username(self, username: str) -> User:
+        return User.objects.get_queryset().with_groups().get(username=username)
+
     def user_username_exists(self, username: str) -> bool:
         exists = User.objects.filter(username=username).exists()
         return exists

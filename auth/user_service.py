@@ -12,6 +12,9 @@ class UserService:
     def user_username_exists(self, username: str) -> bool:
         return repo.user_username_exists(username)
 
+    def find_user_by_username(self, username: str) -> User:
+        return repo.find_user_by_username(username)
+
     def user_email_exists(self, email: str) -> bool:
         return repo.user_email_exists(email)
 

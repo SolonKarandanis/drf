@@ -51,8 +51,8 @@ def create_user(request):
 
 @api_view(['PUT'])
 @has_role('ADMIN')
-def deactivate_user(request):
-    pass
+def change_user_account_status(request):
+    return Response({"invalid": "not good data"}, status=status.HTTP_400_BAD_REQUEST)
 
 
 @api_view(['GET'])
