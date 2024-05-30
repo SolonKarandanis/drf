@@ -1,4 +1,5 @@
 import logging
+import uuid
 
 from rest_framework import serializers
 from django.contrib.auth.models import Group
@@ -236,6 +237,7 @@ class CreateUserSerializer(serializers.ModelSerializer):
         if password != password2:
             raise serializers.ValidationError({'password': 'Passwords must match.'})
         user.set_password(password)
+        user.uuid = uuid.uuid4()
         group = groupRepo.find_by_id(role)
         user.save()
         user.groups.add(group)

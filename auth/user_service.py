@@ -26,7 +26,7 @@ class UserService:
         return repo.find_user_by_id(user_id)
 
     def find_user_by_uuid(self, uuid: str) -> User:
-        return repo.find_user_by_uuid(uuid)
+        return repo.find_user_by_uuid_with_relations(uuid)
 
     def search(self, request, logged_user: User):
         return repo.search(request, logged_user)

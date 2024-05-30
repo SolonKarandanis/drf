@@ -24,8 +24,11 @@ class UserRepository:
     def find_user_by_id(self, user_id: int) -> User:
         return User.objects.get_queryset().with_details().with_groups().get(pk=user_id)
 
-    def find_user_by_uuid(self, uuid: str) -> User:
+    def find_user_by_uuid_with_relations(self, uuid: str) -> User:
         return User.objects.get_queryset().with_details().with_groups().get(uuid=uuid)
+
+    def find_user_by_uuid(self, uuid: str) -> User:
+        return User.objects.get(uuid=uuid)
 
     def search(self, request, logged_user: User):
         user_manager = User.objects

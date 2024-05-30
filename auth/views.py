@@ -57,7 +57,9 @@ def create_user(request):
 def activate_user_account(request):
     serializer = ChangeUserStatusSerializer(data=request.data)
     if serializer.is_valid(raise_exception=True):
-        user_service.user_account_status_activated(serializer.data)
+        serialized_data = serializer.data
+        user_uuid = serialized_data["userId"]
+        user_service.user_account_status_activated(user_uuid)
         return Response(status=status.HTTP_204_NO_CONTENT)
     return Response({"invalid": "not good data"}, status=status.HTTP_400_BAD_REQUEST)
 
@@ -67,7 +69,9 @@ def activate_user_account(request):
 def deactivate_user_account(request):
     serializer = ChangeUserStatusSerializer(data=request.data)
     if serializer.is_valid(raise_exception=True):
-        user_service.user_account_status_deactivated(serializer.data)
+        serialized_data = serializer.data
+        user_uuid = serialized_data["userId"]
+        user_service.user_account_status_deactivated(user_uuid)
         return Response(status=status.HTTP_204_NO_CONTENT)
     return Response({"invalid": "not good data"}, status=status.HTTP_400_BAD_REQUEST)
 
@@ -77,7 +81,9 @@ def deactivate_user_account(request):
 def delete_user_account(request):
     serializer = ChangeUserStatusSerializer(data=request.data)
     if serializer.is_valid(raise_exception=True):
-        user_service.user_account_status_deleted(serializer.data)
+        serialized_data = serializer.data
+        user_uuid = serialized_data["userId"]
+        user_service.user_account_status_deleted(user_uuid)
         return Response(status=status.HTTP_204_NO_CONTENT)
     return Response({"invalid": "not good data"}, status=status.HTTP_400_BAD_REQUEST)
 
