@@ -5,6 +5,7 @@ from rest_framework.decorators import api_view, permission_classes
 from rest_framework.permissions import IsAuthenticated
 from celery.result import AsyncResult
 
+from cfehome.constants.security_constants import ADMIN
 from cfehome.decorators.has_role import has_role
 from .group_service import GroupService
 from .serializers import PaginatedUserSerializer, CreateUserSerializer, UseInfoSerializer, GroupSerializer, \
@@ -50,7 +51,7 @@ def create_user(request):
 
 
 @api_view(['PUT'])
-@has_role('ADMIN')
+@has_role(ADMIN)
 def change_user_account_status(request):
     return Response({"invalid": "not good data"}, status=status.HTTP_400_BAD_REQUEST)
 
