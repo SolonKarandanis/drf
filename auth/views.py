@@ -33,10 +33,11 @@ def get_all_users(request):
 @api_view(['POST'])
 @permission_classes([IsAuthenticated])
 def search_users(request):
+    logged_in_user = get_user_from_request(request)
     search_request = SearchUsersRequestSerializer(data=request.data)
     if search_request.is_valid(raise_exception=True):
         serialized_data = search_request.data
-        queryset = user_service.search(serialized_data)
+        queryset = user_service.search(serialized_data, logged_in_user)
         paging = serialized_data["paging"]
         serializer = PaginatedPOSTUserSerializer(queryset, paging)
         return Response(serializer.page_data)

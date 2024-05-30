@@ -27,10 +27,9 @@ class UserRepository:
     def find_user_by_uuid(self, uuid: str) -> User:
         return User.objects.get_queryset().with_details().with_groups().get(uuid=uuid)
 
-    def search(self, request):
+    def search(self, request, logged_user: User):
         user_manager = User.objects
         user_filter = Q(is_active=True) & Q(is_verified=True)
-        user_order = None
         paging = request["paging"]
 
         if "name" in request:

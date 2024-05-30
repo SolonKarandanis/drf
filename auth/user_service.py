@@ -28,8 +28,8 @@ class UserService:
     def find_user_by_uuid(self, uuid: str) -> User:
         return repo.find_user_by_uuid(uuid)
 
-    def search(self, request):
-        return repo.search(request)
+    def search(self, request, logged_user: User):
+        return repo.search(request, logged_user)
 
     @transaction.atomic
     def change_user_account_status(self, status: str, user_uuid: str) -> None:
