@@ -1,11 +1,10 @@
 from typing import List
-from django.db.models import Q, Prefetch
-
-from socials.models import Social, SocialUser
+from django.db.models import Q
 from .models import User
 import logging
 
 logger = logging.getLogger('django')
+
 
 class UserRepository:
 
@@ -28,13 +27,7 @@ class UserRepository:
         return User.objects.get_queryset().with_details().with_groups().get(pk=user_id)
 
     def find_user_by_uuid_with_relations(self, uuid: str) -> User:
-        user = User.objects.get_queryset().with_details().with_groups().get(uuid=uuid)
-
-        # socials = Social.objects.filter(socialuser__user=user)
-        su = SocialUser.objects.prefetch_related('social').filter(user=user)
-        # user.socialuser_set.add(su.values())
-        logger.info(f'social: {su}')
-        return user
+        return User.objects.get_queryset().with_details().with_groups().get(uuid=uuid)
 
     def find_user_by_uuid(self, uuid: str) -> User:
         return User.objects.get(uuid=uuid)
