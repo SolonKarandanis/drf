@@ -8,6 +8,7 @@ from celery.result import AsyncResult
 from cfehome.constants.security_constants import ADMIN
 from cfehome.decorators.HasRole import HasRole
 from cfehome.decorators.has_role import has_role
+from socials.social_service import SocialService
 from .group_service import GroupService
 from .serializers import PaginatedUserSerializer, CreateUserSerializer, UseInfoSerializer, GroupSerializer, \
     UserAccountSerializer, SearchUsersRequestSerializer, PaginatedPOSTUserSerializer, ChangeUserStatusSerializer
@@ -17,6 +18,7 @@ from .user_service import UserService
 logger = logging.getLogger('django')
 
 user_service = UserService()
+social_service = SocialService()
 group_service = GroupService()
 
 
@@ -92,15 +94,19 @@ def delete_user_account(request):
 @permission_classes([IsAuthenticated])
 # @has_permission('retrive_job')
 def get_user(request, uuid):
-    obj = user_service.find_user_by_uuid(uuid)
-    data = UseInfoSerializer(obj).data
+    user = user_service.find_user_by_uuid(uuid)
+    s = social_service.find_users_socials(user)
+    logger.info(f's: {s}')
+    data = UseInfoSerializer(user).data
     return Response(data)
 
 
 @api_view(['GET'])
 @permission_classes([IsAuthenticated])
 def get_account(request):
-    data = UserAccountSerializer(request.user).data
+    user = get_user_from_request(request)
+    s = social_service.find_users_socials(user)
+    data = UserAccountSerializer(user).data
     return Response(data)
 
 
