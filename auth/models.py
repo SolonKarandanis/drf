@@ -36,6 +36,9 @@ class UserManager(BaseUserManager):
     Custom user model manager where email is the unique identifiers
     for authentication instead of usernames.
     """
+    def update_user(self, user):
+        user = user.save()
+        return user
 
     def get_queryset(self, *args, **kwargs):
         return UserQuerySet(self.model, using=self._db)

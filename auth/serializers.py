@@ -268,3 +268,4 @@ class ChangeUserStatusSerializer(serializers.Serializer):
         ("deleted", "deleted")
     )
     status = serializers.ChoiceField(choices=STATUS_CHOICES, required=True)
+    userId = serializers.CharField(required=True)

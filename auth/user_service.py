@@ -1,6 +1,10 @@
 from typing import List
+
+from django.db import transaction
+
 from .user_repository import UserRepository
-from .models import User
+from .models import User, UserStatus
+
 repo = UserRepository()
 
 
@@ -27,3 +31,18 @@ class UserService:
     def search(self, request):
         return repo.search(request)
 
+    @transaction.atomic
+    def change_user_account_status(self, status: str, user_uuid: str) -> None:
+        user: User = self.find_user_by_uuid(user_uuid)
+        user.status = status
+        if UserStatus.ACTIVE.__eq__(status):
+            user.is_active = True
+        elif UserStatus.UNVERIFIED.__eq__(status):
+            user.is_verified = False
+        elif UserStatus.DEACTIVATED.__eq__(status) or UserStatus.DELETED.__eq__(status):
+            user.is_active = False
+
+        self.update_user(user)
+
+    def update_user(self, user: User):
+        return repo.update_user(user)

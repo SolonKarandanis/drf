@@ -64,3 +64,6 @@ class UserRepository:
                         sortField = f'-{sortField}'
             return search_filter.order_by(sortField)
         return search_filter
+
+    def update_user(self, user: User) -> User:
+        return User.objects.update_user(user)
