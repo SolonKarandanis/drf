@@ -1,14 +1,19 @@
+import logging
 from functools import wraps
 from typing import List
 from django.http import HttpResponseForbidden
 from django.contrib.auth.models import Group
 from django.conf import settings
 
-User = settings.AUTH_USER_MODEL
+from auth.user_service import UserService
+
+logger = logging.getLogger('django')
+user_service = UserService()
 
 
-def get_user_groups(user_id: int) -> List[Group]:
-    user = User.objects.get(id=user_id)
+def get_user_groups(username: str) -> List[Group]:
+    user = user_service.find_user_by_username(username)
+    logger.info(f'user: {user}')
     return user.groups
 
 
