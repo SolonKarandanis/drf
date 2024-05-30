@@ -95,8 +95,8 @@ def delete_user_account(request):
 # @has_permission('retrive_job')
 def get_user(request, uuid):
     user = user_service.find_user_by_uuid(uuid)
-    s = social_service.find_users_socials(user)
-    logger.info(f's: {s}')
+    # s = social_service.find_users_socials(user)
+    # logger.info(f's: {s}')
     data = UseInfoSerializer(user).data
     return Response(data)
 
@@ -105,7 +105,6 @@ def get_user(request, uuid):
 @permission_classes([IsAuthenticated])
 def get_account(request):
     user = get_user_from_request(request)
-    s = social_service.find_users_socials(user)
     data = UserAccountSerializer(user).data
     return Response(data)
 
