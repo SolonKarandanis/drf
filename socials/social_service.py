@@ -10,5 +10,5 @@ repo = SocialRepository()
 
 
 class SocialService:
-    def find_users_socials(self, user: User) -> List[SocialUser]:
-        return repo.find_users_socials(user)
+    def find_users_socials(self, user_id: int) -> List[SocialUser]:
+        return repo.find_users_socials(user_id)
