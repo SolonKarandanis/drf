@@ -34,6 +34,7 @@ class UserRepository:
         user_manager = User.objects
         user_filter = Q(is_active=True) & Q(is_verified=True)
         paging = request["paging"]
+        isAdmin = logged_user.is_staff
 
         if "name" in request:
             name = request["name"]
@@ -54,6 +55,9 @@ class UserRepository:
         if "role" in request:
             role = request["role"]
             user_filter.add(Q(groups=role), Q.AND)
+
+        if not isAdmin:
+            user_filter.add(Q(is_verified=True) & Q(is_active=True), Q.AND)
 
         search_filter = user_manager.filter(user_filter)
 
