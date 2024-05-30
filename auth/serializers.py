@@ -261,11 +261,4 @@ class SearchUsersRequestSerializer(serializers.Serializer):
 
 
 class ChangeUserStatusSerializer(serializers.Serializer):
-    STATUS_CHOICES = (
-        ("unverified", "unverified"),
-        ("active", "active"),
-        ("deactivated", "deactivated"),
-        ("deleted", "deleted")
-    )
-    status = serializers.ChoiceField(choices=STATUS_CHOICES, required=True)
     userId = serializers.CharField(required=True)

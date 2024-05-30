@@ -10,7 +10,7 @@ from cfehome.decorators.HasRole import HasRole
 from cfehome.decorators.has_role import has_role
 from .group_service import GroupService
 from .serializers import PaginatedUserSerializer, CreateUserSerializer, UseInfoSerializer, GroupSerializer, \
-    UserAccountSerializer, SearchUsersRequestSerializer, PaginatedPOSTUserSerializer,ChangeUserStatusSerializer
+    UserAccountSerializer, SearchUsersRequestSerializer, PaginatedPOSTUserSerializer, ChangeUserStatusSerializer
 from .tasks import create_task
 from .user_service import UserService
 
@@ -53,10 +53,31 @@ def create_user(request):
 
 @api_view(['PUT'])
 @permission_classes([IsAdminUser])
-def change_user_account_status(request):
+def activate_user_account(request):
     serializer = ChangeUserStatusSerializer(data=request.data)
     if serializer.is_valid(raise_exception=True):
-        return Response(status=status.HTTP_201_CREATED)
+        user_service.user_account_status_activated(serializer.data)
+        return Response(status=status.HTTP_204_NO_CONTENT)
+    return Response({"invalid": "not good data"}, status=status.HTTP_400_BAD_REQUEST)
+
+
+@api_view(['PUT'])
+@permission_classes([IsAdminUser])
+def deactivate_user_account(request):
+    serializer = ChangeUserStatusSerializer(data=request.data)
+    if serializer.is_valid(raise_exception=True):
+        user_service.user_account_status_deactivated(serializer.data)
+        return Response(status=status.HTTP_204_NO_CONTENT)
+    return Response({"invalid": "not good data"}, status=status.HTTP_400_BAD_REQUEST)
+
+
+@api_view(['DELETE'])
+@permission_classes([IsAdminUser])
+def delete_user_account(request):
+    serializer = ChangeUserStatusSerializer(data=request.data)
+    if serializer.is_valid(raise_exception=True):
+        user_service.user_account_status_deleted(serializer.data)
+        return Response(status=status.HTTP_204_NO_CONTENT)
     return Response({"invalid": "not good data"}, status=status.HTTP_400_BAD_REQUEST)
 
 
@@ -82,6 +103,12 @@ def get_all_groups(request):
     logger.info(f'groups: {groups}')
     data = GroupSerializer(groups, many=True).data
     return Response(data)
+
+
+def get_user_from_request(request):
+    logged_in_user = request.user
+    logger.info(f'logged_in_user: {logged_in_user}')
+    return logged_in_user
 
 
 @api_view(['POST'])

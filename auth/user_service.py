@@ -37,12 +37,24 @@ class UserService:
         user.status = status
         if UserStatus.ACTIVE.__eq__(status):
             user.is_active = True
+            user.is_verified = True
         elif UserStatus.UNVERIFIED.__eq__(status):
             user.is_verified = False
         elif UserStatus.DEACTIVATED.__eq__(status) or UserStatus.DELETED.__eq__(status):
             user.is_active = False
-
         self.update_user(user)
 
-    def update_user(self, user: User):
+    def user_account_status_activated(self, uuid: str) -> None:
+        status = UserStatus.ACTIVE
+        self.change_user_account_status(status, uuid)
+
+    def user_account_status_deactivated(self, uuid: str) -> None:
+        status = UserStatus.DEACTIVATED
+        self.change_user_account_status(status, uuid)
+
+    def user_account_status_deleted(self, uuid: str) -> None:
+        status = UserStatus.DELETED
+        self.change_user_account_status(status, uuid)
+
+    def update_user(self, user: User) -> User:
         return repo.update_user(user)
