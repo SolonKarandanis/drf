@@ -1,3 +1,4 @@
+import logging
 from typing import List
 
 from django.db import transaction
@@ -7,6 +8,7 @@ from .models import User, UserStatus
 
 repo = UserRepository()
 
+logger = logging.getLogger('django')
 
 class UserService:
 
