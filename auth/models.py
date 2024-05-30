@@ -49,7 +49,7 @@ class UserManager(BaseUserManager):
        """
         extra_fields.setdefault("is_staff", False)
         extra_fields.setdefault("is_superuser", False)
-        extra_fields.setdefault("is_active", False)
+        extra_fields.setdefault("is_active", True)
         extra_fields.setdefault("is_verified", False)
         extra_fields.setdefault("status", UserStatus.UNVERIFIED)
         if not email:

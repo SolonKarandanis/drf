@@ -50,6 +50,7 @@ class UserSerializer(serializers.ModelSerializer):
             'firstName',
             'lastName',
             'email',
+            'status',
             'isActive',
             'isStaff',
             'isVerified',
