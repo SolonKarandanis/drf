@@ -2,14 +2,15 @@ import logging
 from rest_framework import status
 from rest_framework.response import Response
 from rest_framework.decorators import api_view, permission_classes
-from rest_framework.permissions import IsAuthenticated
+from rest_framework.permissions import IsAuthenticated, IsAdminUser
 from celery.result import AsyncResult
 
 from cfehome.constants.security_constants import ADMIN
+from cfehome.decorators.HasRole import HasRole
 from cfehome.decorators.has_role import has_role
 from .group_service import GroupService
 from .serializers import PaginatedUserSerializer, CreateUserSerializer, UseInfoSerializer, GroupSerializer, \
-    UserAccountSerializer, SearchUsersRequestSerializer, PaginatedPOSTUserSerializer
+    UserAccountSerializer, SearchUsersRequestSerializer, PaginatedPOSTUserSerializer,ChangeUserStatusSerializer
 from .tasks import create_task
 from .user_service import UserService
 
@@ -51,8 +52,11 @@ def create_user(request):
 
 
 @api_view(['PUT'])
-@has_role(ADMIN)
+@permission_classes([IsAdminUser])
 def change_user_account_status(request):
+    serializer = ChangeUserStatusSerializer(data=request.data)
+    if serializer.is_valid(raise_exception=True):
+        return Response(status=status.HTTP_201_CREATED)
     return Response({"invalid": "not good data"}, status=status.HTTP_400_BAD_REQUEST)
 
 

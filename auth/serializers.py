@@ -258,3 +258,13 @@ class SearchUsersRequestSerializer(serializers.Serializer):
     email = serializers.CharField(required=False)
     role = serializers.IntegerField(required=False)
     paging = PagingSerializer(required=True)
+
+
+class ChangeUserStatusSerializer(serializers.Serializer):
+    STATUS_CHOICES = (
+        ("unverified", "unverified"),
+        ("active", "active"),
+        ("deactivated", "deactivated"),
+        ("deleted", "deleted")
+    )
+    status = serializers.ChoiceField(choices=STATUS_CHOICES, required=True)
