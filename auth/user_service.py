@@ -3,12 +3,15 @@ from typing import List
 
 from django.db import transaction
 
+from images.image_repository import ImageRepository
 from .user_repository import UserRepository
 from .models import User, UserStatus
 
 repo = UserRepository()
+image_repo = ImageRepository()
 
 logger = logging.getLogger('django')
+
 
 class UserService:
 

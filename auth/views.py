@@ -115,6 +115,12 @@ def get_all_groups(request):
     return Response(data)
 
 
+@api_view(['PUT'])
+@permission_classes([IsAuthenticated])
+def upload_profile_image(request):
+    pass
+
+
 def get_user_from_request(request):
     logged_in_user = request.user
     logger.info(f'logged_in_user: {logged_in_user}')
