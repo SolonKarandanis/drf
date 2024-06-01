@@ -1,6 +1,7 @@
 import logging
 from typing import List
 
+from django.core.files.uploadedfile import InMemoryUploadedFile
 from django.db import transaction
 from django.utils import timezone
 
@@ -67,12 +68,9 @@ class UserService:
         return repo.update_user(user)
 
     @transaction.atomic
-    def upload_cv(self, request: UploadCVSerializer, uuid: str) -> None:
+    def upload_cv(self, cv: InMemoryUploadedFile, uuid: str) -> None:
         user: User = repo.find_user_by_uuid(uuid)
-        logger.info(f'user: {user}')
-        serialized_data = request.data
-        logger.info(f'cv: {serialized_data}')
-        cv = serialized_data["cv"]
+        logger.info(f'cv: {cv}')
         user.cv = cv
         user.uploaded_at = timezone.now().date()
         repo.update_user_fields(user, ['cv', 'uploaded_at'])

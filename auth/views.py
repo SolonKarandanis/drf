@@ -1,6 +1,7 @@
 import logging
 
 from django.contrib.auth.decorators import permission_required
+from django.core.files.uploadedfile import InMemoryUploadedFile
 from rest_framework import status
 from rest_framework.response import Response
 from rest_framework.decorators import api_view, permission_classes
@@ -128,9 +129,9 @@ def upload_profile_image(request):
 @permission_classes([IsAuthenticated])
 def upload_cv(request, uuid):
     serializer = UploadCVSerializer(data=request.data)
-    logger.info(f'serializer: {serializer}')
     if serializer.is_valid(raise_exception=True):
-        user_service.upload_cv(serializer, uuid)
+        cv: InMemoryUploadedFile = request.FILES.get('cv')
+        user_service.upload_cv(cv, uuid)
         return Response(status=status.HTTP_204_NO_CONTENT)
     return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
