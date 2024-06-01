@@ -74,3 +74,7 @@ class UserService:
         user.cv = cv
         user.uploaded_at = timezone.now().date()
         repo.update_user_fields(user, ['cv', 'uploaded_at'])
+
+    @transaction.atomic
+    def upload_profile_image(self, uuid: str) -> None:
+        user: User = repo.find_user_by_uuid(uuid)
