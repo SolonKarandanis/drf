@@ -2,8 +2,10 @@ import logging
 from typing import List
 
 from django.db import transaction
+from django.utils import timezone
 
 from images.image_repository import ImageRepository
+from .serializers import UploadCVSerializer
 from .user_repository import UserRepository
 from .models import User, UserStatus
 
@@ -63,3 +65,14 @@ class UserService:
 
     def update_user(self, user: User) -> User:
         return repo.update_user(user)
+
+    @transaction.atomic
+    def upload_cv(self, request: UploadCVSerializer, uuid: str) -> None:
+        user: User = repo.find_user_by_uuid(uuid)
+        logger.info(f'user: {user}')
+        serialized_data = request.data
+        logger.info(f'cv: {serialized_data}')
+        cv = serialized_data["cv"]
+        user.cv = cv
+        user.uploaded_at = timezone.now().date()
+        repo.update_user_fields(user, ['cv', 'uploaded_at'])

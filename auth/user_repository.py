@@ -75,3 +75,6 @@ class UserRepository:
 
     def update_user(self, user: User) -> User:
         return User.objects.update_user(user)
+
+    def update_user_fields(self, user: User, fields: List[str]) -> User:
+        return user.save(update_fields=fields)

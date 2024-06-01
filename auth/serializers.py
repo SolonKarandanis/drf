@@ -267,9 +267,5 @@ class ChangeUserStatusSerializer(serializers.Serializer):
     userId = serializers.CharField(required=True)
 
 
-class UploadCVSerializer(serializers.ModelSerializer):
-    class Meta:
-        model = User,
-        fields = [
-            'cv'
-        ]
+class UploadCVSerializer(serializers.Serializer):
+    cv = serializers.FileField()

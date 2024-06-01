@@ -125,11 +125,14 @@ def upload_profile_image(request):
 
 
 @api_view(['POST'])
-def upload_cv(request,uuid):
-    serializer = UploadCVSerializer( data=request.data)
+@permission_classes([IsAuthenticated])
+def upload_cv(request, uuid):
+    serializer = UploadCVSerializer(data=request.data)
+    logger.info(f'serializer: {serializer}')
     if serializer.is_valid(raise_exception=True):
-        pass
-
+        user_service.upload_cv(serializer, uuid)
+        return Response(status=status.HTTP_204_NO_CONTENT)
+    return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
 
 def get_user_from_request(request):
