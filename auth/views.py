@@ -126,7 +126,7 @@ def upload_profile_image(request, uuid):
     serializer = UploadProfilePictureSerializer(data=request.data)
     if serializer.is_valid(raise_exception=True):
         image: InMemoryUploadedFile = request.FILES.get('image')
-        logger.info(f'image: {image}')
+        user_service.upload_profile_image(image, serializer, uuid)
         return Response(status=status.HTTP_204_NO_CONTENT)
     return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 

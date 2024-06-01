@@ -273,3 +273,5 @@ class UploadCVSerializer(serializers.Serializer):
 
 class UploadProfilePictureSerializer(serializers.Serializer):
     image = serializers.ImageField()
+    title = serializers.CharField(required=True)
+    alt = serializers.CharField(required=False)

@@ -6,7 +6,7 @@ from django.db import transaction
 from django.utils import timezone
 
 from images.image_repository import ImageRepository
-from .serializers import UploadCVSerializer
+from .serializers import UploadCVSerializer, UploadProfilePictureSerializer
 from .user_repository import UserRepository
 from .models import User, UserStatus
 
@@ -76,5 +76,9 @@ class UserService:
         repo.update_user_fields(user, ['cv', 'uploaded_at'])
 
     @transaction.atomic
-    def upload_profile_image(self, image: InMemoryUploadedFile, uuid: str) -> None:
+    def upload_profile_image(self, image: InMemoryUploadedFile, request: UploadProfilePictureSerializer, uuid: str) -> None:
         user: User = repo.find_user_by_uuid(uuid)
+        serialized_data = request.data
+        data_dict = dict(serialized_data)
+        title = data_dict['title']
+        alt = data_dict['alt']
