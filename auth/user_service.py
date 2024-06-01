@@ -76,9 +76,11 @@ class UserService:
         repo.update_user_fields(user, ['cv', 'uploaded_at'])
 
     @transaction.atomic
-    def upload_profile_image(self, image: InMemoryUploadedFile, request: UploadProfilePictureSerializer, uuid: str) -> None:
+    def upload_profile_image(self, image: InMemoryUploadedFile, request: UploadProfilePictureSerializer, uuid: str,
+                             logged_in_user: User) -> None:
         user: User = repo.find_user_by_uuid(uuid)
         serialized_data = request.data
         data_dict = dict(serialized_data)
         title = data_dict['title']
         alt = data_dict['alt']
+        image_repo.upload_profile_image(image, title, alt, user, logged_in_user)

@@ -123,10 +123,11 @@ def get_all_groups(request):
 # @permission_required("retrive_job", raise_exception=True)
 # @permission_required({"retrive_job","retrive_job"}, raise_exception=True)
 def upload_profile_image(request, uuid):
+    logged_in_user = get_user_from_request(request)
     serializer = UploadProfilePictureSerializer(data=request.data)
     if serializer.is_valid(raise_exception=True):
         image: InMemoryUploadedFile = request.FILES.get('image')
-        user_service.upload_profile_image(image, serializer, uuid)
+        user_service.upload_profile_image(image, serializer, uuid, logged_in_user)
         return Response(status=status.HTTP_204_NO_CONTENT)
     return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
