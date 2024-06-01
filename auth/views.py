@@ -15,7 +15,7 @@ from socials.social_service import SocialService
 from .group_service import GroupService
 from .serializers import PaginatedUserSerializer, CreateUserSerializer, UseInfoSerializer, GroupSerializer, \
     UserAccountSerializer, SearchUsersRequestSerializer, PaginatedPOSTUserSerializer, ChangeUserStatusSerializer, \
-    UploadCVSerializer
+    UploadCVSerializer, UploadProfilePictureSerializer
 from .tasks import create_task
 from .user_service import UserService
 
@@ -119,10 +119,16 @@ def get_all_groups(request):
 
 
 @api_view(['POST'])
-@permission_required("retrive_job", raise_exception=True)
+@permission_classes([IsAuthenticated])
+# @permission_required("retrive_job", raise_exception=True)
 # @permission_required({"retrive_job","retrive_job"}, raise_exception=True)
-def upload_profile_image(request):
-    pass
+def upload_profile_image(request, uuid):
+    serializer = UploadProfilePictureSerializer(data=request.data)
+    if serializer.is_valid(raise_exception=True):
+        image: InMemoryUploadedFile = request.FILES.get('image')
+        logger.info(f'image: {image}')
+        return Response(status=status.HTTP_204_NO_CONTENT)
+    return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
 
 @api_view(['POST'])

@@ -269,3 +269,7 @@ class ChangeUserStatusSerializer(serializers.Serializer):
 
 class UploadCVSerializer(serializers.Serializer):
     cv = serializers.FileField()
+
+
+class UploadProfilePictureSerializer(serializers.Serializer):
+    image = serializers.ImageField()
