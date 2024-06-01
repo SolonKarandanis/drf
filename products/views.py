@@ -68,7 +68,7 @@ def create_product(request):
     if serializer.is_valid(raise_exception=True):
         serializer.save()
         return Response(serializer.data, status=status.HTTP_201_CREATED)
-    return Response({"invalid": "not good data"}, status=status.HTTP_400_BAD_REQUEST)
+    return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
 
 @api_view(['PUT'])
@@ -80,7 +80,7 @@ def post_product_comment(request):
         product = product_service.post_product_comment(serializer, logged_in_user)
         response = ProductSerializer(product, many=False).data
         return Response(response, status=status.HTTP_200_OK)
-    return Response({"invalid": "not good data"}, status=status.HTTP_400_BAD_REQUEST)
+    return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
 
 class ProductMixinView(

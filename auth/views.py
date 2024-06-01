@@ -13,7 +13,8 @@ from cfehome.decorators.has_role import has_role
 from socials.social_service import SocialService
 from .group_service import GroupService
 from .serializers import PaginatedUserSerializer, CreateUserSerializer, UseInfoSerializer, GroupSerializer, \
-    UserAccountSerializer, SearchUsersRequestSerializer, PaginatedPOSTUserSerializer, ChangeUserStatusSerializer
+    UserAccountSerializer, SearchUsersRequestSerializer, PaginatedPOSTUserSerializer, ChangeUserStatusSerializer, \
+    UploadCVSerializer
 from .tasks import create_task
 from .user_service import UserService
 
@@ -53,7 +54,7 @@ def create_user(request):
     if serializer.is_valid(raise_exception=True):
         serializer.save()
         return Response(status=status.HTTP_201_CREATED)
-    return Response({"invalid": "not good data"}, status=status.HTTP_400_BAD_REQUEST)
+    return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
 
 @api_view(['PUT'])
@@ -65,7 +66,7 @@ def activate_user_account(request):
         user_uuid = serialized_data["userId"]
         user_service.user_account_status_activated(user_uuid)
         return Response(status=status.HTTP_204_NO_CONTENT)
-    return Response({"invalid": "not good data"}, status=status.HTTP_400_BAD_REQUEST)
+    return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
 
 @api_view(['PUT'])
@@ -77,7 +78,7 @@ def deactivate_user_account(request):
         user_uuid = serialized_data["userId"]
         user_service.user_account_status_deactivated(user_uuid)
         return Response(status=status.HTTP_204_NO_CONTENT)
-    return Response({"invalid": "not good data"}, status=status.HTTP_400_BAD_REQUEST)
+    return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
 
 @api_view(['DELETE'])
@@ -89,7 +90,7 @@ def delete_user_account(request):
         user_uuid = serialized_data["userId"]
         user_service.user_account_status_deleted(user_uuid)
         return Response(status=status.HTTP_204_NO_CONTENT)
-    return Response({"invalid": "not good data"}, status=status.HTTP_400_BAD_REQUEST)
+    return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
 
 @api_view(['GET'])
@@ -116,11 +117,19 @@ def get_all_groups(request):
     return Response(data)
 
 
-@api_view(['PUT'])
+@api_view(['POST'])
 @permission_required("retrive_job", raise_exception=True)
 # @permission_required({"retrive_job","retrive_job"}, raise_exception=True)
 def upload_profile_image(request):
     pass
+
+
+@api_view(['POST'])
+def upload_cv(request,uuid):
+    serializer = UploadCVSerializer( data=request.data)
+    if serializer.is_valid(raise_exception=True):
+        pass
+
 
 
 def get_user_from_request(request):

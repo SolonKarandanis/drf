@@ -31,7 +31,7 @@ def add_cart_items(request):
         cart = cart_service.add_to_cart(serializer, logged_in_user)
         response = CartSerializer(cart).data
         return Response(response, status=status.HTTP_201_CREATED)
-    return Response({"invalid": "not good data"}, status=status.HTTP_400_BAD_REQUEST)
+    return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
 
 @api_view(['PUT'])
@@ -43,7 +43,7 @@ def update_quantities(request):
         cart = cart_service.update_item_quantities(serializer, logged_in_user)
         response = CartSerializer(cart).data
         return Response(response, status=status.HTTP_200_OK)
-    return Response({"invalid": "not good data"}, status=status.HTTP_400_BAD_REQUEST)
+    return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
 
 @api_view(['DELETE'])
@@ -55,7 +55,7 @@ def delete_cart_items(request):
         cart = cart_service.delete_cart_items(serializer, logged_in_user)
         data = CartSerializer(cart).data
         return Response(data, status=status.HTTP_200_OK)
-    return Response({"invalid": "not good data"}, status=status.HTTP_400_BAD_REQUEST)
+    return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
 
 @api_view(['PUT'])

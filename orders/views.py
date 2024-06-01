@@ -122,7 +122,7 @@ def search_order_items(request):
         logger.info(f'search_results: {search_results}')
         response = OrderItemSerializer(search_results, many=True).data
         return Response(response, status=status.HTTP_200_OK)
-    return Response({"invalid": "not good data"}, status=status.HTTP_400_BAD_REQUEST)
+    return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
 
 def get_user_from_request(request):

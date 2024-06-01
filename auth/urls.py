@@ -2,7 +2,7 @@ from django.urls import path
 from rest_framework.authtoken.views import obtain_auth_token
 from rest_framework_simplejwt.views import TokenObtainPairView, TokenRefreshView, TokenVerifyView
 from .views import get_all_users, create_user, get_user, get_account, run_task, get_status, get_all_groups, \
-    search_users, activate_user_account, deactivate_user_account, delete_user_account
+    search_users, activate_user_account, deactivate_user_account, delete_user_account, upload_cv
 
 urlpatterns = [
     path('', obtain_auth_token),
@@ -16,6 +16,7 @@ urlpatterns = [
     path('users/search', search_users,  name='search-users'),
     path('users/create/', create_user,  name='create-user'),
     path('users/account/', get_account,  name='get-account'),
+    path('users/upload-cv/<str:uuid>/', upload_cv,  name='upload-cv'),
     path('users/<str:uuid>/', get_user, name='get-user'),
     path('users/groups/', get_all_groups,  name='get-groups'),
     path('task/', run_task,  name='run_task'),
