@@ -1,4 +1,6 @@
 import logging
+
+from django.contrib.auth.decorators import permission_required
 from rest_framework import status
 from rest_framework.response import Response
 from rest_framework.decorators import api_view, permission_classes
@@ -92,7 +94,6 @@ def delete_user_account(request):
 
 @api_view(['GET'])
 @permission_classes([IsAuthenticated])
-# @has_permission('retrive_job')
 def get_user(request, uuid):
     user = user_service.find_user_by_uuid(uuid)
     data = UseInfoSerializer(user).data
@@ -116,7 +117,8 @@ def get_all_groups(request):
 
 
 @api_view(['PUT'])
-@permission_classes([IsAuthenticated])
+@permission_required("retrive_job", raise_exception=True)
+# @permission_required({"retrive_job","retrive_job"}, raise_exception=True)
 def upload_profile_image(request):
     pass
 
