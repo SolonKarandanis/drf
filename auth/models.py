@@ -1,5 +1,5 @@
 from django.db.models import QuerySet, DateTimeField, EmailField, UUIDField, \
-    TextField, BooleanField, Model, OneToOneField, CASCADE, CharField, TextChoices
+    TextField, BooleanField, Model, OneToOneField, CASCADE, CharField, TextChoices, FileField
 from django.contrib.auth.models import AbstractUser
 from django.contrib.auth.base_user import BaseUserManager
 from django.utils.translation import gettext_lazy as _
@@ -91,6 +91,8 @@ class User(AbstractUser):
     bio = TextField(default=None, null=True)
     is_verified = BooleanField(default=False)
     status = CharField(max_length=40, choices=UserStatus.choices, default=UserStatus.UNVERIFIED)
+    cv = FileField(upload_to='cvs/', null=True, blank=True)
+    uploaded_at = DateTimeField(null=True, blank=True)
 
     date_joined = None
 
