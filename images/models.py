@@ -8,7 +8,7 @@ User = settings.AUTH_USER_MODEL
 
 
 def user_directory_path(instance, filename):
-    return 'images/{0}/'.format(filename)
+    return 'images/'
 
 
 # Create your models here.
@@ -20,8 +20,9 @@ class Images(Model):
     content_object = GenericForeignKey('content_type', 'object_id')
     date_created = DateTimeField(auto_now_add=True, null=False)
     image = ImageField(
-        upload_to=user_directory_path, default='posts/default.jpg')
-    user = ForeignKey(User, on_delete=CASCADE)
+        upload_to='images/', default='posts/default.jpg')
+    uploaded_by = ForeignKey(User, on_delete=CASCADE)
+    uploaded_at = DateTimeField(auto_now=True, null=True)
 
     def __repr__(self):
         return f"<Images id:{self.id} , title: {self.title}>"
