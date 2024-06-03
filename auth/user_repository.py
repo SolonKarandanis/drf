@@ -39,24 +39,28 @@ class UserRepository:
         isAdmin = logged_user.is_staff
 
         if "name" in request:
-            name = request["name"]
-            user_filter.add(
-                Q(
-                    Q(first_name__icontains=name) | Q(last_name__icontains=name)
-                ),
-                Q.OR
-            )
+            name: str = request["name"]
+            if len(name.strip()) != 0:
+                user_filter.add(
+                    Q(
+                        Q(first_name__icontains=name) | Q(last_name__icontains=name)
+                    ),
+                    Q.OR
+                )
         if "email" in request:
-            email = request["email"]
-            user_filter.add(Q(email__icontains=email), Q.OR)
+            email: str = request["email"]
+            if len(email.strip()) != 0:
+                user_filter.add(Q(email__icontains=email), Q.OR)
 
         if "username" in request:
-            username = request["username"]
-            user_filter.add(Q(username__icontains=username), Q.OR)
+            username: str = request["username"]
+            if len(username.strip()) != 0:
+                user_filter.add(Q(username__icontains=username), Q.OR)
 
         if "role" in request:
-            role = request["role"]
-            user_filter.add(Q(groups=role), Q.AND)
+            role: int = request["role"]
+            if role and role > 0:
+                user_filter.add(Q(groups=role), Q.AND)
 
         if not isAdmin:
             user_filter.add(Q(is_verified=True) & Q(is_active=True), Q.AND)
