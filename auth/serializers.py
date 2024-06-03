@@ -256,10 +256,17 @@ class PasswordChangeSerializer(serializers.Serializer):
 
 
 class SearchUsersRequestSerializer(serializers.Serializer):
+    USER_STATUS_CHOICES = (
+        ("UNVERIFIED", "user.unverified"),
+        ("ACTIVE", "user.active"),
+        ("DEACTIVATED", "user.deactivated"),
+        ("DELETED", "user.deleted"),
+    )
     username = serializers.CharField(required=False)
     name = serializers.CharField(required=False)
     email = serializers.CharField(required=False)
     role = serializers.IntegerField(required=False)
+    status = serializers.ChoiceField(choices=USER_STATUS_CHOICES, required=False)
     paging = PagingSerializer(required=True)
 
 
