@@ -1,4 +1,5 @@
 from typing import List
+from datetime import timedelta, date
 from django.db.models import Q
 from .models import User
 import logging
@@ -82,3 +83,14 @@ class UserRepository:
 
     def update_user_fields(self, user: User, fields: List[str]) -> User:
         return user.save(update_fields=fields)
+
+    def remove_unverified_users(self, days: int) -> None:
+        users = User.objects.filter(is_verified=False)
+        today = date.today()
+
+        for x in users:
+            start_date = x.created_date.date()
+            end_date = start_date + timedelta(days=days)
+            if end_date < today:
+                User.objects.get(pk=x.id).delete()
+                logger.info(f'Just deleted  {x.username}')
