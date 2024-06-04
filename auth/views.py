@@ -9,8 +9,6 @@ from rest_framework.permissions import IsAuthenticated, IsAdminUser
 from celery.result import AsyncResult
 
 from cfehome.constants.security_constants import ADMIN
-from cfehome.decorators.HasRole import HasRole
-from cfehome.decorators.has_role import has_role
 from socials.social_service import SocialService
 from .group_service import GroupService
 from .serializers import PaginatedUserSerializer, CreateUserSerializer, UseInfoSerializer, GroupSerializer, \
