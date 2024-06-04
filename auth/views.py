@@ -118,8 +118,13 @@ def get_all_groups(request):
     return Response(data)
 
 
+def email_check(user):
+    return user.email.endswith("@example.com")
+
+
 @api_view(['POST'])
 @permission_classes([IsAuthenticated])
+# @user_passes_test(email_check)
 # @permission_required("retrive_job", raise_exception=True)
 # @permission_required({"retrive_job","retrive_job"}, raise_exception=True)
 def upload_profile_image(request, uuid):
