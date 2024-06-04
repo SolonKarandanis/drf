@@ -119,6 +119,7 @@ def get_all_groups(request):
 
 
 def email_check(user):
+    # security service checks
     return user.email.endswith("@example.com")
 
 
