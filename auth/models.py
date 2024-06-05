@@ -81,6 +81,20 @@ class UserManager(BaseUserManager):
             raise ValueError(_("superuser.is_superuser.true"))
         return self.create_user(email, password, **extra_fields)
 
+    def revert_change(self, version_id: int):
+        """Rewind to a previous version"""
+        try:
+            return self.events.get(id=version_id).revert()
+        except IndexError:
+            return self
+
+    def revert_to_previous_change(self):
+        """Rewind to the previous version"""
+        try:
+            return self.events.order_by("-pgh_id")[1].revert()
+        except IndexError:
+            return self
+
 
 # Create your models here.
 @pghistory.track(append_only=True)
