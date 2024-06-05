@@ -39,7 +39,6 @@ INSTALLED_APPS = [
     'django.contrib.staticfiles',
     'django.contrib.postgres',
     'django_crontab',
-    'easyaudit',
     'corsheaders',
     'rest_framework',
     'rest_framework.authtoken',
@@ -68,8 +67,7 @@ MIDDLEWARE = [
     'django.contrib.auth.middleware.AuthenticationMiddleware',
     'django.contrib.messages.middleware.MessageMiddleware',
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
-    "debug_toolbar.middleware.DebugToolbarMiddleware",
-    'easyaudit.middleware.easyaudit.EasyAuditMiddleware',
+    "debug_toolbar.middleware.DebugToolbarMiddleware"
 ]
 
 ROOT_URLCONF = 'cfehome.urls'
@@ -277,7 +275,3 @@ LOG_FILE =os.path.join(BASE_DIR, 'logs/'),
 CRONJOBS = [
     ('0 0 * * *', 'cfehome.cron.remove_unverified_users', f'>> {LOG_FILE}/cron_jobs.log'),
 ]
-
-DJANGO_EASY_AUDIT_WATCH_MODEL_EVENTS = False
-DJANGO_EASY_AUDIT_WATCH_AUTH_EVENTS = False
-DJANGO_EASY_AUDIT_WATCH_REQUEST_EVENTS = False
