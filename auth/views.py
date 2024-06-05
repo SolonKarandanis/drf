@@ -1,6 +1,6 @@
 import logging
 
-from django.contrib.auth.decorators import permission_required
+from django.contrib.auth.decorators import permission_required, user_passes_test
 from django.core.files.uploadedfile import InMemoryUploadedFile
 from rest_framework import status
 from rest_framework.response import Response
@@ -94,12 +94,12 @@ def delete_user_account(request):
 
 def email_check(user):
     # security service checks
-    return user.email.endswith("@example.com")
+    logger.info(f'user: {user}')
+    return True
 
 
 @api_view(['GET'])
 @permission_classes([IsAuthenticated])
-# @user_passes_test(email_check)
 def get_user(request, uuid):
     user = user_service.find_user_by_uuid(uuid)
     data = UseInfoSerializer(user).data
