@@ -270,3 +270,8 @@ MEDIA_URL = '/media/'
 AMQP_URL = 'amqp://guest:guest@localhost/%2f'
 
 BANNED_IPS = []
+
+LOG_FILE =os.path.join(BASE_DIR, 'logs/'),
+CRONJOBS = [
+    ('0 0 * * *', 'cfehome.cron.remove_unverified_users', f'>> {LOG_FILE}/cron_jobs.log'),
+]

@@ -84,3 +84,4 @@ class UserService:
         title = data_dict['title']
         alt = data_dict['alt']
         image_repo.upload_profile_image(image, title, alt, user, logged_in_user)
+
