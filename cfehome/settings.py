@@ -39,6 +39,8 @@ INSTALLED_APPS = [
     'django.contrib.staticfiles',
     'django.contrib.postgres',
     'django_crontab',
+    'pghistory',
+    'pgtrigger',
     'corsheaders',
     'rest_framework',
     'rest_framework.authtoken',

@@ -8,6 +8,7 @@ from django.contrib.contenttypes.fields import GenericRelation
 from django.utils import timezone
 from datetime import date
 import uuid
+import pghistory
 
 
 class UserStatus(TextChoices):
@@ -82,6 +83,7 @@ class UserManager(BaseUserManager):
 
 
 # Create your models here.
+@pghistory.track()
 class User(AbstractUser):
     created_date = DateTimeField(auto_now_add=True, null=False)
     updated_date = DateTimeField(auto_now=True, null=False)
