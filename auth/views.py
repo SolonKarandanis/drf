@@ -92,8 +92,14 @@ def delete_user_account(request):
     return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
 
+def email_check(user):
+    # security service checks
+    return user.email.endswith("@example.com")
+
+
 @api_view(['GET'])
 @permission_classes([IsAuthenticated])
+# @user_passes_test(email_check)
 def get_user(request, uuid):
     user = user_service.find_user_by_uuid(uuid)
     data = UseInfoSerializer(user).data
@@ -116,14 +122,8 @@ def get_all_groups(request):
     return Response(data)
 
 
-def email_check(user):
-    # security service checks
-    return user.email.endswith("@example.com")
-
-
 @api_view(['POST'])
 @permission_classes([IsAuthenticated])
-# @user_passes_test(email_check)
 # @permission_required("retrive_job", raise_exception=True)
 # @permission_required({"retrive_job","retrive_job"}, raise_exception=True)
 def upload_profile_image(request, uuid):
