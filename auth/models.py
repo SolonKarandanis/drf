@@ -83,7 +83,7 @@ class UserManager(BaseUserManager):
 
 
 # Create your models here.
-@pghistory.track()
+@pghistory.track(append_only=True)
 class User(AbstractUser):
     created_date = DateTimeField(auto_now_add=True, null=False)
     updated_date = DateTimeField(auto_now=True, null=False)
