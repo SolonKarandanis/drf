@@ -1,3 +1,4 @@
+import pgtrigger
 from django.db.models import QuerySet, DateTimeField, EmailField, UUIDField, \
     TextField, BooleanField, Model, OneToOneField, CASCADE, CharField, TextChoices, FileField
 from django.contrib.auth.models import AbstractUser
@@ -114,6 +115,18 @@ class User(AbstractUser):
 
     class Meta:
         ordering = [Lower('username')]
+        triggers = [
+            pgtrigger.SoftDelete(
+                name="pgtrigger_softdelete_is_active",
+                field="is_active",
+                value=False,
+            ),
+            pgtrigger.SoftDelete(
+                name="pgtrigger_softdelete_status",
+                field="status",
+                value=UserStatus.DELETED,
+            )
+        ]
 
     objects = UserManager()
 
