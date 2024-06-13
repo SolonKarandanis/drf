@@ -35,7 +35,7 @@ class UserRepository:
 
     def search(self, request, logged_user: User):
         user_manager = User.objects
-        user_filter = Q(is_active=True) & Q(is_verified=True)
+        user_filter = Q()
         paging = request["paging"]
         isAdmin = logged_user.is_staff
 
