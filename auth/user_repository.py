@@ -51,17 +51,22 @@ class UserRepository:
         if "email" in request:
             email: str = request["email"]
             if len(email.strip()) != 0:
-                user_filter.add(Q(email__icontains=email), Q.OR)
+                user_filter.add(Q(email__icontains=email), Q.AND)
 
         if "username" in request:
             username: str = request["username"]
             if len(username.strip()) != 0:
-                user_filter.add(Q(username__icontains=username), Q.OR)
+                user_filter.add(Q(username__icontains=username), Q.AND)
 
         if "role" in request:
             role: int = request["role"]
             if role and role > 0:
                 user_filter.add(Q(groups=role), Q.AND)
+
+        if "status" in request:
+            status: str = request["status"]
+            if len(status.strip()) != 0:
+                user_filter.add(Q(status=status), Q.AND)
 
         if not isAdmin:
             user_filter.add(Q(is_verified=True) & Q(is_active=True), Q.AND)
