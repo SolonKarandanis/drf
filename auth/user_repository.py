@@ -34,6 +34,15 @@ class UserRepository:
         return User.objects.get(uuid=uuid)
 
     def search(self, request, logged_user: User):
+        user_fields_map = {
+            "id": "id",
+            "username": "username",
+            "firstName": "first_name",
+            "lastName": "last_name",
+            "email": "email",
+            "createdDate": "created_date",
+            "updatedDate": "updated_date"
+        }
         user_manager = User.objects
         user_filter = Q()
         paging = request["paging"]
@@ -75,12 +84,13 @@ class UserRepository:
 
         if "sortField" in paging:
             sortField = paging["sortField"]
-            if hasattr(User, sortField):
+            user_model_field_to_sort = user_fields_map.get(sortField)
+            if hasattr(User, user_model_field_to_sort):
                 if "sortOrder" in paging:
                     sortOrder = paging["sortOrder"]
                     if sortOrder == "DESC":
-                        sortField = f'-{sortField}'
-            return search_filter.order_by(sortField)
+                        user_model_field_to_sort = f'-{user_model_field_to_sort}'
+            return search_filter.order_by(user_model_field_to_sort)
         return search_filter
 
     def update_user(self, user: User) -> User:
