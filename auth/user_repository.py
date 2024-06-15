@@ -83,12 +83,12 @@ class UserRepository:
         search_filter = user_manager.filter(user_filter)
 
         if "sortField" in paging:
-            sortField = paging["sortField"]
-            user_model_field_to_sort = user_fields_map.get(sortField)
+            sort_field = paging["sortField"]
+            user_model_field_to_sort = user_fields_map.get(sort_field)
             if hasattr(User, user_model_field_to_sort):
                 if "sortOrder" in paging:
-                    sortOrder = paging["sortOrder"]
-                    if sortOrder == "DESC":
+                    sort_order = paging["sortOrder"]
+                    if sort_order == "DESC":
                         user_model_field_to_sort = f'-{user_model_field_to_sort}'
             return search_filter.order_by(user_model_field_to_sort)
         return search_filter
