@@ -16,10 +16,10 @@ urlpatterns = [
     path('users/search', search_users,  name='search-users'),
     path('users/create/', create_user,  name='create-user'),
     path('users/account/', get_account,  name='get-account'),
+    path('users/groups/', get_all_groups, name='get-groups'),
     path('users/upload-cv/<str:uuid>/', upload_cv,  name='upload-cv'),
     path('users/upload-profile-image/<str:uuid>/', upload_profile_image,  name='upload-profile-image'),
     path('users/<str:uuid>/', get_user, name='get-user'),
-    path('users/groups/', get_all_groups,  name='get-groups'),
     path('task/', run_task,  name='run_task'),
     path('task/<str:task_id>/', get_status,  name='get_status'),
 ]

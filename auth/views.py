@@ -1,14 +1,12 @@
 import logging
 
-from django.contrib.auth.decorators import permission_required, user_passes_test
 from django.core.files.uploadedfile import InMemoryUploadedFile
 from rest_framework import status
 from rest_framework.response import Response
 from rest_framework.decorators import api_view, permission_classes
-from rest_framework.permissions import IsAuthenticated, IsAdminUser
+from rest_framework.permissions import IsAuthenticated, IsAdminUser, AllowAny
 from celery.result import AsyncResult
 
-from cfehome.constants.security_constants import ADMIN
 from socials.social_service import SocialService
 from .group_service import GroupService
 from .serializers import PaginatedUserSerializer, CreateUserSerializer, UseInfoSerializer, GroupSerializer, \
@@ -115,6 +113,7 @@ def get_account(request):
 
 
 @api_view(['GET'])
+@permission_classes([AllowAny])
 def get_all_groups(request):
     groups = group_service.find_all_groups()
     logger.info(f'groups: {groups}')
