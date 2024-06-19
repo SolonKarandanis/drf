@@ -121,6 +121,13 @@ def get_all_groups(request):
     return Response(data)
 
 
+@api_view(['GET'])
+@permission_classes([IsAuthenticated])
+def get_user_statuses(request):
+    statuses = user_service.get_user_statuses()
+    return Response(statuses)
+
+
 @api_view(['POST'])
 @permission_classes([IsAuthenticated])
 # @permission_required("retrive_job", raise_exception=True)

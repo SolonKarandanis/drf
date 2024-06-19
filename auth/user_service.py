@@ -1,5 +1,5 @@
 import logging
-from typing import List
+from typing import List, Dict
 
 from django.core.files.uploadedfile import InMemoryUploadedFile
 from django.db import transaction
@@ -85,3 +85,11 @@ class UserService:
         alt = data_dict['alt']
         image_repo.upload_profile_image(image, title, alt, user, logged_in_user)
 
+    def get_user_statuses(self) -> Dict[str, str]:
+        user_statuses = {
+            "ACTIVE": "Active",
+            "UNVERIFIED": "Unverified",
+            "DEACTIVATED": "Deactivated",
+            "DELETED": "Deleted"
+        }
+        return user_statuses
