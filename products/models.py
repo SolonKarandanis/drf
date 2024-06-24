@@ -1,12 +1,20 @@
 from django.core.exceptions import ObjectDoesNotExist
 from django.db.models import Q, QuerySet, Manager, Model, SET_NULL, ForeignKey, CharField, TextField, \
-    FloatField, BooleanField, IntegerField, UUIDField, Index
+    FloatField, BooleanField, IntegerField, UUIDField, Index, PROTECT
 from django.conf import settings
 from django.contrib.contenttypes.fields import GenericRelation
 import uuid
 
 # Create your models here.
 User = settings.AUTH_USER_MODEL
+
+
+class Category(Model):
+    name = CharField(max_length=100)
+
+
+class Brand(Model):
+    name = CharField(max_length=100)
 
 
 class ProductQuerySet(QuerySet):
@@ -73,6 +81,8 @@ class Product(Model):
     uuid = UUIDField(default=uuid.uuid4())
     comments = GenericRelation("comments.Comment", related_query_name='product')
     images = GenericRelation("images.Images", related_query_name='product')
+    # brand = ForeignKey(Brand, on_delete=PROTECT)
+    # category many to many
 
     class Meta:
         ordering = ['sku']
