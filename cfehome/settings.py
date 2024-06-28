@@ -132,7 +132,7 @@ DATABASES = {
         'NAME': 'drf',
         'USER': 'drf',
         'PASSWORD': 'drf',
-        'HOST': '192.168.1.5',
+        'HOST': '192.168.1.6',
         'PORT': '5432'
     }
 }
