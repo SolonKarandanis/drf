@@ -17,6 +17,11 @@ class Brand(Model):
     name = CharField(max_length=100)
 
 
+class Attribute(Model):
+    name = CharField(max_length=120, default=None)
+    value = CharField(max_length=120, default=None)
+
+
 class ProductQuerySet(QuerySet):
     def by_uuid(self, uuid: str):
         try:
@@ -78,9 +83,11 @@ class Product(Model):
     price = FloatField()
     public = BooleanField(default=True)
     inventory = IntegerField(blank=True, null=True)
+    number_sold = IntegerField(blank=True, null=True)
     uuid = UUIDField(default=uuid.uuid4())
     comments = GenericRelation("comments.Comment", related_query_name='product')
     images = GenericRelation("images.Images", related_query_name='product')
+
     # brand = ForeignKey(Brand, on_delete=PROTECT)
     # category many to many
 
