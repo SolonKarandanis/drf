@@ -1,6 +1,6 @@
 from django.core.exceptions import ObjectDoesNotExist
 from django.db.models import Q, QuerySet, Manager, Model, SET_NULL, ForeignKey, CharField, TextField, \
-    FloatField, BooleanField, IntegerField, UUIDField, Index, PROTECT
+    FloatField, BooleanField, IntegerField, UUIDField, Index, SlugField
 from django.conf import settings
 from django.contrib.contenttypes.fields import GenericRelation
 import uuid
@@ -11,6 +11,14 @@ User = settings.AUTH_USER_MODEL
 
 class Category(Model):
     name = CharField(max_length=100)
+    slug = SlugField()
+    is_active = BooleanField()
+
+    class Meta:
+        verbose_name_plural = "Categories"
+
+    def __str__(self):
+        return f"{self.name}"
 
 
 class Brand(Model):
@@ -89,7 +97,7 @@ class Product(Model):
     images = GenericRelation("images.Images", related_query_name='product')
 
     # brand = ForeignKey(Brand, on_delete=PROTECT)
-    # category many to many
+    # category ManyToManyField(Category)
 
     class Meta:
         ordering = ['sku']
