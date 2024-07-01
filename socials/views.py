@@ -13,7 +13,7 @@ logger = logging.getLogger('django')
 
 # Create your views here.
 @api_view(['GET'])
-def find_users_socials(request, user_id):
-    queryset = social_service.find_users_socials(user_id)
+def find_users_socials(request, uuid):
+    queryset = social_service.find_users_socials(uuid)
     data = SocialUserSerializer(queryset, many=True).data
     return Response(data)
