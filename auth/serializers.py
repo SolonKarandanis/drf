@@ -124,6 +124,7 @@ class UserDetailSerializer(serializers.ModelSerializer):
         model = UserDetails
         fields = [
             'userId',
+            'country',
             'state',
             'city',
             'address',
