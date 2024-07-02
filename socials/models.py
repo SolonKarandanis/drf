@@ -8,6 +8,7 @@ User = settings.AUTH_USER_MODEL
 class Social(Model):
     name = CharField(max_length=20, default=None, null=False)
     icon = CharField(max_length=100, default=None, null=True)
+    button_css_class = CharField(max_length=100, null=True)
 
     def __str__(self):
         return self.name
