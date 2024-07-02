@@ -9,6 +9,7 @@ class SocialSerializer(serializers.ModelSerializer):
         fields = [
             'name',
             'icon',
+            'button_css_class'
         ]
 
 
@@ -17,6 +18,7 @@ class SocialUserSerializer(serializers.ModelSerializer):
     socialId = serializers.IntegerField(source='social_id', read_only=True)
     socialName = serializers.SerializerMethodField(method_name='get_social_name')
     socialIcon = serializers.SerializerMethodField(method_name='get_social_icon')
+    buttonCssClass = serializers.SerializerMethodField(method_name='get_button_css_class')
 
     class Meta:
         model = SocialUser
@@ -26,7 +28,8 @@ class SocialUserSerializer(serializers.ModelSerializer):
             'socialId',
             'url',
             'socialName',
-            'socialIcon'
+            'socialIcon',
+            'buttonCssClass'
         ]
 
     def get_social_name(self, obj):
@@ -34,3 +37,6 @@ class SocialUserSerializer(serializers.ModelSerializer):
 
     def get_social_icon(self, obj):
         return obj.social.icon
+
+    def get_button_css_class(self, obj):
+        return obj.social.button_css_class
