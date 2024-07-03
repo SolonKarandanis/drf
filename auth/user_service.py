@@ -6,6 +6,7 @@ from django.db import transaction
 from django.utils import timezone
 
 from images.image_repository import ImageRepository
+from images.models import Images
 from .serializers import UploadProfilePictureSerializer
 from .user_repository import UserRepository
 from .models import User, UserStatus
@@ -97,7 +98,8 @@ class UserService:
         return user_statuses
 
     @transaction.atomic
-    def get_user_image(self, uuid: str):
+    def get_user_image(self, uuid: str) -> Images:
         user: User = repo.find_user_by_uuid(uuid)
-        user_image = image_repo.find_image_by_object_id(user.id)
+        user_image = image_repo.find_user_profile_image(user.id)
         logger.info(f'user_image: {user_image}')
+        return user_image
