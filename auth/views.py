@@ -142,10 +142,12 @@ def upload_profile_image(request, uuid):
     return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
 
-@api_view(['POST'])
+@api_view(['GET'])
 @permission_classes([IsAuthenticated])
-def get_user_image(request,uuid):
-    user = user_service.find_user_by_uuid(uuid)
+def get_user_image(request, uuid):
+    user = user_service.get_user_image(uuid)
+    return Response(status=status.HTTP_204_NO_CONTENT)
+
 
 @api_view(['POST'])
 @permission_classes([IsAuthenticated])

@@ -95,3 +95,9 @@ class UserService:
             "DELETED": "Deleted"
         }
         return user_statuses
+
+    @transaction.atomic
+    def get_user_image(self, uuid: str):
+        user: User = repo.find_user_by_uuid(uuid)
+        user_image = image_repo.find_image_by_object_id(user.id)
+        logger.info(f'user_image: {user_image}')
