@@ -6,7 +6,7 @@ from django.db import transaction
 from django.utils import timezone
 
 from images.image_repository import ImageRepository
-from .serializers import UploadCVSerializer, UploadProfilePictureSerializer
+from .serializers import UploadProfilePictureSerializer
 from .user_repository import UserRepository
 from .models import User, UserStatus
 
