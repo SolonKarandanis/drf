@@ -33,8 +33,10 @@ class UserService:
     def find_user_by_id(self, user_id: int) -> User:
         return repo.find_user_by_id(user_id)
 
-    def find_user_by_uuid(self, uuid: str) -> User:
-        return repo.find_user_by_uuid_with_relations(uuid)
+    def find_user_by_uuid(self, uuid: str, fetch_relations: bool = False) -> User:
+        if fetch_relations:
+            return repo.find_user_by_uuid_with_relations(uuid)
+        return repo.find_user_by_uuid(uuid)
 
     def search(self, request, logged_user: User):
         return repo.search(request, logged_user)
