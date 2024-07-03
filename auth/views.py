@@ -7,6 +7,7 @@ from rest_framework.decorators import api_view, permission_classes
 from rest_framework.permissions import IsAuthenticated, IsAdminUser, AllowAny
 from celery.result import AsyncResult
 
+from images.serializers import ImagesSerializer
 from socials.social_service import SocialService
 from .group_service import GroupService
 from .serializers import PaginatedUserSerializer, CreateUserSerializer, UseInfoSerializer, GroupSerializer, \
@@ -146,7 +147,8 @@ def upload_profile_image(request, uuid):
 @permission_classes([IsAuthenticated])
 def get_user_image(request, uuid):
     user_image = user_service.get_user_image(uuid)
-    return Response(status=status.HTTP_204_NO_CONTENT)
+    data = ImagesSerializer(user_image).data
+    return Response(data)
 
 
 @api_view(['POST'])
