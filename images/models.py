@@ -3,6 +3,8 @@ from django.db.models import Model, CharField, TextField, ForeignKey, PositiveSm
 from django.contrib.contenttypes.fields import GenericForeignKey
 from django.contrib.contenttypes.models import ContentType
 from django.conf import settings
+from django.db.models.signals import pre_delete
+from django.dispatch import receiver
 
 User = settings.AUTH_USER_MODEL
 
@@ -36,3 +38,10 @@ class Images(Model):
 
     def __repr__(self):
         return f"<Images id:{self.id} , title: {self.title}>"
+
+
+# delete file from server
+@receiver(pre_delete, sender=Images, dispatch_uid='image_deleted')
+def image_deleted_handler(sender, instance, **kwargs):
+    file = getattr(instance, "image")
+    file.delete(save=False)
