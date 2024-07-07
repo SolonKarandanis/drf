@@ -3,7 +3,7 @@ from django.db.models import Model, CharField, TextField, ForeignKey, PositiveSm
 from django.contrib.contenttypes.fields import GenericForeignKey
 from django.contrib.contenttypes.models import ContentType
 from django.conf import settings
-from django.db.models.signals import pre_delete
+from django.db.models.signals import pre_delete, pre_save
 from django.dispatch import receiver
 
 User = settings.AUTH_USER_MODEL
@@ -38,6 +38,17 @@ class Images(Model):
 
     def __repr__(self):
         return f"<Images id:{self.id} , title: {self.title}>"
+
+
+# delete previous profile image before saving new one
+@receiver(pre_save, sender=Images, dispatch_uid='profile_image_deleted')
+def profile_image_deleted_handler(sender, instance, **kwargs):
+    if instance.id is not None and instance.is_profile_image:
+        for field in instance._meta.fields:
+            if field.name == "icon":
+                file = getattr(instance, field.name)
+                if file:
+                    file.delete(save=False)
 
 
 # delete file from server
