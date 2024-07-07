@@ -150,27 +150,16 @@ class Order(Model):
         self.total_price = sum(oi.total_price for oi in self.order_items.all())
 
 
+# notify supplier for new order
 @receiver(pre_save, sender=Order, dispatch_uid='order_created')
 def order_created_handler(sender, instance, **kwargs):
     supplier_id = instance.supplier.id
-#
-#
-#
-# @receiver(post_save, sender=CartItem, dispatch_uid='cart_item_updated')
-# def cart_item_post_save_handler(sender, instance, **kwargs):
-#     user_id = instance.cart.user.id
-#
-#
-#
-# @receiver(post_delete, sender=Cart, dispatch_uid='cart_deleted')
-# def cart__post_delete_handler(sender, instance, **kwargs):
-#     user_id = instance.user.id
-#
-#
-#
-# @receiver(post_save, sender=Cart, dispatch_uid='cart_updated')
-# def cart_post_save_handler(sender, instance, **kwargs):
-#     user_id = instance.user.id
+
+
+# notify buyer and supplier of order status
+@receiver(pre_save, sender=Order, dispatch_uid='order_status_changed')
+def order_status_changed_handler(sender, instance, **kwargs):
+    supplier_id = instance.supplier.id
 
 
 vector = fts.SearchVector("product_name", "sku", "manufacturer", config="english")
