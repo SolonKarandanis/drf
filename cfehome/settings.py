@@ -48,6 +48,7 @@ INSTALLED_APPS = [
     "django_celery_results",
     'django_celery_beat',
     'channels',
+    'celery',
     'auth',
     'products',
     'cart',
@@ -226,14 +227,16 @@ INTERNAL_IPS = [
 
 # REDIS_URL = 'redis://192.168.1.5:6379/0'
 
+BROKER_URL = os.environ.get('RABBITMQ_URL', 'amqp://guest:guest@localhost:5672/')
+
 # Celery Settings
-CELERY_BROKER_URL = ''
+# CELERY_BROKER_URL = ''
 accept_content = ['application/json']
 result_serializer = 'json'
 task_serializer = 'json'
 CELERY_TIMEZONE = 'Europe/Athens'
 CELERY_ENABLE_UTC = False
-CELERY_RESULT_BACKEND = 'redis://192.168.1.5:6379/0'
+CELERY_RESULT_BACKEND = 'rabbitmq://localhost:5672/MS-7B48-f401d0f0'
 CELERY_BEAT_SCHEDULER = 'django_celery_beat.schedulers:DatabaseScheduler'
 
 # SMTP
