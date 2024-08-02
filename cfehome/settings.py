@@ -133,8 +133,8 @@ DATABASES = {
         'NAME': 'drf',
         'USER': 'drf',
         'PASSWORD': 'drf',
-        # 'HOST': '192.168.1.6',
-        'HOST': 'localhost',
+        'HOST': '192.168.1.6',
+        # 'HOST': 'localhost',
         'PORT': '5432'
     }
 }
