@@ -11,7 +11,10 @@ class Social(Model):
     button_css_class = CharField(max_length=100, null=True)
 
     def __str__(self):
-        return self.name
+        return f"{self.name}"
+
+    def __repr__(self):
+        return f"<Social {self.name}>"
 
 
 class SocialUser(Model):

@@ -133,6 +133,9 @@ class User(AbstractUser):
     def __str__(self):
         return f"{self.username}"
 
+    def __repr__(self):
+        return f"<User {self.username}>"
+
     @property
     def was_created_this_year(self) -> bool:
         current_year = timezone.now().year
