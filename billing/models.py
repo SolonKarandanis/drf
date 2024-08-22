@@ -35,10 +35,23 @@ class Card(Model):
     def expiry_date(self) -> str:
         return "{}/{}".format(self.expiration_month.__str__(), self.expiration_year.__str__())
 
+    @property
+    def is_expired(self) -> bool:
+        current_date = datetime.date.today()
+        current_month = current_date.month
+        current_year = current_date.year
+
+        if self.expiration_year < current_year:
+            return True
+        if self.expiration_month < current_month and self.expiration_year == current_year:
+            return True
+        return False
+
 
 class CardUser(Model):
     card = ForeignKey(Card, on_delete=CASCADE)
     user = ForeignKey(User, on_delete=CASCADE)
+    is_selected = BooleanField(default=False)
 
     def __str__(self):
         return "{}_{}".format(self.card.__str__(), self.user.__str__())
