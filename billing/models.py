@@ -43,7 +43,7 @@ class Card(Model):
 
         if self.expiration_year < current_year:
             return True
-        if self.expiration_month < current_month and self.expiration_year == current_year:
+        if self.expiration_year == current_year and self.expiration_month < current_month:
             return True
         return False
 
