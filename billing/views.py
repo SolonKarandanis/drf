@@ -10,5 +10,17 @@ logger = logging.getLogger('django')
 # Create your views here.
 @api_view(['GET'])
 @permission_classes([IsAuthenticated])
-def get_users_billing_info(request):
+def get_users_payment_cards(request):
+    pass
+
+
+@api_view(['POST'])
+@permission_classes([IsAuthenticated])
+def create_payment_card(request):
+    pass
+
+
+@api_view(['PUT'])
+@permission_classes([IsAuthenticated])
+def edit_payment_card(request):
     pass
