@@ -11,16 +11,22 @@ logger = logging.getLogger('django')
 @api_view(['GET'])
 @permission_classes([IsAuthenticated])
 def get_users_payment_cards(request):
-    pass
+    logged_in_user = get_user_from_request(request)
 
 
 @api_view(['POST'])
 @permission_classes([IsAuthenticated])
 def create_payment_card(request):
-    pass
+    logged_in_user = get_user_from_request(request)
 
 
 @api_view(['PUT'])
 @permission_classes([IsAuthenticated])
 def edit_payment_card(request):
-    pass
+    logged_in_user = get_user_from_request(request)
+
+
+def get_user_from_request(request):
+    logged_in_user = request.user
+    logger.info(f'logged_in_user: {logged_in_user}')
+    return logged_in_user
