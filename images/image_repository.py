@@ -1,6 +1,7 @@
 from typing import List
 
 from django.core.files.uploadedfile import InMemoryUploadedFile
+from django.core.exceptions import ObjectDoesNotExist
 
 from images.models import Images
 from django.conf import settings
@@ -18,7 +19,10 @@ class ImageRepository:
         return Images.objects.filter(object_id=object_id)
 
     def find_user_profile_image(self, object_id: int) -> Images:
-        return Images.objects.get(object_id=object_id)
+        try:
+            return Images.objects.get(object_id=object_id)
+        except ObjectDoesNotExist:
+            return None
 
     def upload_profile_image(self, image: InMemoryUploadedFile, title: str, alt: str, user: User,
                              logged_in_user: User) -> None:

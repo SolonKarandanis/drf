@@ -147,6 +147,8 @@ def upload_profile_image(request, uuid):
 @permission_classes([IsAuthenticated])
 def get_user_image(request, uuid):
     user_image = user_service.get_user_image(uuid)
+    if user_image is None:
+        return Response(status=status.HTTP_404_NOT_FOUND)
     data = ImagesSerializer(user_image).data
     return Response(data)
 
