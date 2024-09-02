@@ -20,15 +20,23 @@ class ImageRepository:
 
     def find_user_profile_image(self, object_id: int) -> Images:
         try:
-            return Images.objects.get(object_id=object_id)
+            return Images.objects.get_queryset().is_profile_image().get(object_id=object_id)
         except ObjectDoesNotExist:
             return None
 
     def upload_profile_image(self, image: InMemoryUploadedFile, title: str, alt: str, user: User,
                              logged_in_user: User) -> None:
+        size: int = image.size
+        type: str = image.content_type
         Images.objects.create(title=title, alt=alt, image=image, content_object=user,
-                              uploaded_by=logged_in_user, is_profile_image=True)
+                              uploaded_by=logged_in_user, is_profile_image=True, size=size, image_type=type)
 
     def upload_product_image(self, image: InMemoryUploadedFile, title: str, alt: str, product: Product,
                              logged_in_user: User) -> None:
         Images.objects.create(title=title, alt=alt, image=image, content_object=product, uploaded_by=logged_in_user)
+
+    def update_image_is_profile_image(self, image: Images) -> None:
+        image.save(update_fields=['is_profile_image'])
+
+    def update_image(self, image: Images) -> None:
+        image.save()

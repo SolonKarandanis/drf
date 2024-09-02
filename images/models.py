@@ -1,5 +1,5 @@
 from django.db.models import Model, CharField, TextField, ForeignKey, PositiveSmallIntegerField, DateTimeField, CASCADE, \
-    ImageField, BooleanField, UniqueConstraint, Q, IntegerField
+    ImageField, BooleanField, UniqueConstraint, Q, IntegerField, QuerySet, Manager
 from django.contrib.contenttypes.fields import GenericForeignKey
 from django.contrib.contenttypes.models import ContentType
 from django.conf import settings
@@ -11,6 +11,16 @@ User = settings.AUTH_USER_MODEL
 
 def user_directory_path(instance, filename):
     return 'images/'
+
+
+class ImagesQuerySet(QuerySet):
+    def is_profile_image(self):
+        return self.filter(is_profile_image=True)
+
+
+class ImagesManager(Manager):
+    def get_queryset(self, *args, **kwargs):
+        return ImagesQuerySet(self.model, using=self._db)
 
 
 # Create your models here.
@@ -28,6 +38,8 @@ class Images(Model):
     is_profile_image = BooleanField(default=False)
     size = IntegerField(blank=True, null=True)
     image_type = CharField(max_length=20, null=True)
+
+    objects = ImagesManager()
 
     class Meta:
         constraints = [

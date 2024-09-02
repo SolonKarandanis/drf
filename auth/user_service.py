@@ -82,6 +82,12 @@ class UserService:
     def upload_profile_image(self, image: InMemoryUploadedFile, request: UploadProfilePictureSerializer, uuid: str,
                              logged_in_user: User) -> None:
         user: User = repo.find_user_by_uuid(uuid)
+
+        existing_image: Images = image_repo.find_user_profile_image(user.id)
+        if existing_image is not None:
+            existing_image.is_profile_image = False
+            image_repo.update_image_is_profile_image(existing_image)
+
         serialized_data = request.data
         data_dict = dict(serialized_data)
         title = data_dict['title']
