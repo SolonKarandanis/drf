@@ -1,5 +1,5 @@
 from django.db.models import Model, CharField, TextField, ForeignKey, PositiveSmallIntegerField, DateTimeField, CASCADE, \
-    ImageField, BooleanField, UniqueConstraint, Q
+    ImageField, BooleanField, UniqueConstraint, Q, IntegerField
 from django.contrib.contenttypes.fields import GenericForeignKey
 from django.contrib.contenttypes.models import ContentType
 from django.conf import settings
@@ -26,6 +26,8 @@ class Images(Model):
     uploaded_by = ForeignKey(User, on_delete=CASCADE)
     uploaded_at = DateTimeField(auto_now=True, null=True)
     is_profile_image = BooleanField(default=False)
+    size = IntegerField(blank=True, null=True)
+    image_type = CharField(max_length=20, null=True)
 
     class Meta:
         constraints = [
