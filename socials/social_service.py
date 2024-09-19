@@ -17,3 +17,4 @@ class SocialService:
     def find_users_socials(self, uuid: str) -> List[SocialUser]:
         user = user_repo.find_user_by_uuid(uuid)
         return repo.find_users_socials(user.id)
+

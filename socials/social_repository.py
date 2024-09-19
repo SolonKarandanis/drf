@@ -11,3 +11,16 @@ class SocialRepository:
     def find_users_socials(self, user_id: int) -> List[SocialUser]:
         return SocialUser.objects.prefetch_related('social').filter(user_id=user_id)
 
+    def create_user_social(self, social_user: SocialUser) -> None:
+        social_user.save()
+
+    def create_user_socials(self, social_user_list: List[SocialUser]) -> None:
+        SocialUser.objects.bulk_create(social_user_list)
+
+    def delete_user_social(self, id: int) -> None:
+        SocialUser.objects.filter(id=id).delete()
+
+    def delete_user_socials(self, id_list: List[int]) -> None:
+        social_users = SocialUser.objects.filter(id__in=id_list)
+        social_users.delete()
+        
