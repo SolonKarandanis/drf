@@ -284,3 +284,17 @@ class UploadProfilePictureSerializer(serializers.Serializer):
     image = serializers.ImageField()
     title = serializers.CharField(required=True)
     alt = serializers.CharField(required=False)
+
+
+class UpdateBioSerializer(serializers.Serializer):
+    bio = serializers.CharField(required=True, allow_blank=True)
+
+
+class UpldateUserContactInfoSerializer(serializers.Serializer):
+    email = serializers.CharField(validators=[validate_email])
+    phone = serializers.CharField(required=False, allow_blank=False)
+    country = serializers.CharField(required=False, allow_blank=False)
+    state = serializers.CharField(required=False, allow_blank=False)
+    city = serializers.CharField(required=False, allow_blank=False)
+    address = serializers.CharField(required=False, allow_blank=False)
+    zip = serializers.CharField(required=False, allow_blank=False)

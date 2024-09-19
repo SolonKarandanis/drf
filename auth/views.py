@@ -12,7 +12,7 @@ from socials.social_service import SocialService
 from .group_service import GroupService
 from .serializers import PaginatedUserSerializer, CreateUserSerializer, UseInfoSerializer, GroupSerializer, \
     UserAccountSerializer, SearchUsersRequestSerializer, PaginatedPOSTUserSerializer, ChangeUserStatusSerializer, \
-    UploadCVSerializer, UploadProfilePictureSerializer
+    UploadCVSerializer, UploadProfilePictureSerializer, UpldateUserContactInfoSerializer, UpdateBioSerializer
 from .tasks import create_task
 from .user_service import UserService
 
@@ -163,6 +163,28 @@ def upload_cv(request, uuid):
         cv: InMemoryUploadedFile = request.FILES.get('cv')
         user_service.upload_cv(cv, uuid)
         return Response(status=status.HTTP_204_NO_CONTENT)
+    return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+
+
+@api_view(['PUT'])
+@permission_classes([IsAuthenticated])
+def update_user_contact_info(request, uuid):
+    serializer = UpldateUserContactInfoSerializer(data=request.data)
+    if serializer.is_valid(raise_exception=True):
+        user = user_service.update_user_contact_info(uuid, serializer)
+        data = UserAccountSerializer(user).data
+        return Response(data)
+    return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+
+
+@api_view(['PUT'])
+@permission_classes([IsAuthenticated])
+def update_user_bio(request, uuid):
+    serializer = UpdateBioSerializer(data=request.data)
+    if serializer.is_valid(raise_exception=True):
+        user = user_service.update_user_bio(uuid, serializer)
+        data = UserAccountSerializer(user).data
+        return Response(data)
     return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
 

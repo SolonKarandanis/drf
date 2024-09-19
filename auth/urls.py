@@ -3,7 +3,7 @@ from rest_framework.authtoken.views import obtain_auth_token
 from rest_framework_simplejwt.views import TokenObtainPairView, TokenRefreshView, TokenVerifyView
 from .views import get_all_users, create_user, get_user, get_account, run_task, get_status, get_all_groups, \
     search_users, activate_user_account, deactivate_user_account, delete_user_account, upload_cv, upload_profile_image, \
-    get_user_statuses, get_user_image
+    get_user_statuses, get_user_image, update_user_bio, update_user_contact_info
 
 urlpatterns = [
     path('', obtain_auth_token),
@@ -23,6 +23,8 @@ urlpatterns = [
     path('users/<str:uuid>/image/', get_user_image,  name='get-user-image'),
     path('users/<str:uuid>/upload-cv/', upload_cv,  name='upload-cv'),
     path('users/<str:uuid>/upload-profile-image/', upload_profile_image,  name='upload-profile-image'),
+    path('users/<str:uuid>/update-bio/', update_user_bio,  name='update-user-bio'),
+    path('users/<str:uuid>/update-contact-info/', update_user_contact_info,  name='update-contact-info'),
     path('task/', run_task,  name='run_task'),
     path('task/<str:task_id>/', get_status,  name='get_status'),
 ]

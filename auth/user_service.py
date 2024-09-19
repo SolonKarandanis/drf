@@ -7,7 +7,7 @@ from django.utils import timezone
 
 from images.image_repository import ImageRepository
 from images.models import Images
-from .serializers import UploadProfilePictureSerializer
+from .serializers import UploadProfilePictureSerializer, UpdateBioSerializer, UpldateUserContactInfoSerializer
 from .user_repository import UserRepository
 from .models import User, UserStatus
 
@@ -69,6 +69,36 @@ class UserService:
 
     def update_user(self, user: User) -> User:
         return repo.update_user(user)
+
+    @transaction.atomic
+    def update_user_contact_info(self, uuid: str, request: UpldateUserContactInfoSerializer) -> User:
+        serialized_data = request.data
+        data_dict = dict(serialized_data)
+        email = data_dict['email']
+        phone = data_dict['phone']
+        country = data_dict['country']
+        state = data_dict['state']
+        city = data_dict['city']
+        address = data_dict['address']
+        zip = data_dict['zip']
+        user = self.find_user_by_uuid(uuid)
+        user.email = email
+        user.phone = phone
+        user.country = country
+        user.state = state
+        user.city = city
+        user.address = address
+        user.zip = zip
+        return repo.update_user(user)
+
+    @transaction.atomic
+    def update_user_bio(self, uuid: str, request: UpdateBioSerializer) -> User:
+        serialized_data = request.data
+        data_dict = dict(serialized_data)
+        bio = data_dict['bio']
+        user = self.find_user_by_uuid(uuid)
+        user.bio = bio
+        return repo.update_user_fields(user, ['bio'])
 
     @transaction.atomic
     def upload_cv(self, cv: InMemoryUploadedFile, uuid: str) -> None:
