@@ -72,33 +72,38 @@ class UserService:
 
     @transaction.atomic
     def update_user_contact_info(self, uuid: str, request: UpldateUserContactInfoSerializer) -> User:
-        serialized_data = request.data
-        data_dict = dict(serialized_data)
-        email = data_dict['email']
-        phone = data_dict['phone']
-        country = data_dict['country']
-        state = data_dict['state']
-        city = data_dict['city']
-        address = data_dict['address']
-        zip = data_dict['zip']
         user = self.find_user_by_uuid(uuid)
-        user.email = email
-        user.phone = phone
-        user.country = country
-        user.state = state
-        user.city = city
-        user.address = address
-        user.zip = zip
-        return repo.update_user(user)
+        if user:
+            serialized_data = request.data
+            data_dict = dict(serialized_data)
+            email = data_dict['email']
+            phone = data_dict['phone']
+            country = data_dict['country']
+            state = data_dict['state']
+            city = data_dict['city']
+            address = data_dict['address']
+            zip = data_dict['zip']
+
+            user.email = email
+            user.phone = phone
+            user.country = country
+            user.state = state
+            user.city = city
+            user.address = address
+            user.zip = zip
+            return repo.update_user(user)
+        return user
 
     @transaction.atomic
     def update_user_bio(self, uuid: str, request: UpdateBioSerializer) -> User:
-        serialized_data = request.data
-        data_dict = dict(serialized_data)
-        bio = data_dict['bio']
         user = self.find_user_by_uuid(uuid)
-        user.bio = bio
-        return repo.update_user_fields(user, ['bio'])
+        if user:
+            serialized_data = request.data
+            data_dict = dict(serialized_data)
+            bio = data_dict['bio']
+            user.bio = bio
+            return repo.update_user_fields(user, ['bio'])
+        return user
 
     @transaction.atomic
     def upload_cv(self, cv: InMemoryUploadedFile, uuid: str) -> None:
