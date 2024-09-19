@@ -40,3 +40,9 @@ class SocialUserSerializer(serializers.ModelSerializer):
 
     def get_button_css_class(self, obj):
         return obj.social.button_css_class
+
+
+class CreateUserSocials(serializers.ModelSerializer):
+    userId = serializers.IntegerField(source='user_id',  required=True)
+    socialId = serializers.IntegerField(source='social_id',  required=True)
+    url = serializers.CharField(required=True, allow_blank=True)
