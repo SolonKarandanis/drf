@@ -1,6 +1,6 @@
 import logging
 from typing import List, Dict
-
+from rest_framework import serializers
 from django.core.files.uploadedfile import InMemoryUploadedFile
 from django.db import transaction
 from django.utils import timezone
@@ -73,36 +73,39 @@ class UserService:
     @transaction.atomic
     def update_user_contact_info(self, uuid: str, request: UpldateUserContactInfoSerializer) -> User:
         user = self.find_user_by_uuid(uuid)
-        if user:
-            serialized_data = request.data
-            data_dict = dict(serialized_data)
-            email = data_dict['email']
-            phone = data_dict['phone']
-            country = data_dict['country']
-            state = data_dict['state']
-            city = data_dict['city']
-            address = data_dict['address']
-            zip = data_dict['zip']
+        if user is None:
+            raise serializers.ValidationError(f"User does not exist")
 
-            user.email = email
-            user.phone = phone
-            user.country = country
-            user.state = state
-            user.city = city
-            user.address = address
-            user.zip = zip
-            return repo.update_user(user)
-        return user
+        serialized_data = request.data
+        data_dict = dict(serialized_data)
+        email = data_dict['email']
+        phone = data_dict['phone']
+        country = data_dict['country']
+        state = data_dict['state']
+        city = data_dict['city']
+        address = data_dict['address']
+        zip = data_dict['zip']
+
+        user.email = email
+        user.phone = phone
+        user.country = country
+        user.state = state
+        user.city = city
+        user.address = address
+        user.zip = zip
+        return repo.update_user(user)
 
     @transaction.atomic
     def update_user_bio(self, uuid: str, request: UpdateBioSerializer) -> User:
         user = self.find_user_by_uuid(uuid)
-        if user:
-            serialized_data = request.data
-            data_dict = dict(serialized_data)
-            bio = data_dict['bio']
-            user.bio = bio
-            return repo.update_user_fields(user, ['bio'])
+        if user is None:
+            raise serializers.ValidationError(f"User does not exist")
+
+        serialized_data = request.data
+        data_dict = dict(serialized_data)
+        bio = data_dict['bio']
+        user.bio = bio
+        return repo.update_user_fields(user, ['bio'])
         return user
 
     @transaction.atomic
