@@ -1,5 +1,5 @@
 # Create your models here.
-from django.db.models import Model, CharField, ForeignKey, CASCADE
+from django.db.models import Model, CharField, ForeignKey, CASCADE, Manager
 from django.conf import settings
 
 User = settings.AUTH_USER_MODEL
@@ -17,10 +17,19 @@ class Social(Model):
         return f"<Social {self.name}>"
 
 
+class SocialUserManager(Manager):
+
+    def initialize_social_user(self, social_id: int, user_id: int, url: str):
+        social_user = self.create(social_id=social_id, user_id=user_id, url=url)
+        return social_user
+
+
 class SocialUser(Model):
     social = ForeignKey(Social, on_delete=CASCADE)
     user = ForeignKey(User, on_delete=CASCADE)
     url = CharField(max_length=500, default=None, null=False)
+
+    objects = SocialUserManager()
 
     def __str__(self):
         return "{}_{}".format(self.social.__str__(), self.user.__str__())
