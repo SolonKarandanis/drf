@@ -1,6 +1,6 @@
 import logging
 from typing import List
-
+from rest_framework import serializers
 from auth.user_repository import UserRepository
 from cfehome import settings
 from socials.models import SocialUser
@@ -28,6 +28,8 @@ class SocialService:
             url = data['url']
 
             exists = repo.exists_by_user_id_and_social_id(user_id, social_id)
+            if exists:
+                raise serializers.ValidationError(f"Entry already exists")
 
     def delete_user_social(self, id: int) -> None:
         pass
