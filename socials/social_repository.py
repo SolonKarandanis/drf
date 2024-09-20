@@ -23,4 +23,6 @@ class SocialRepository:
     def delete_user_socials(self, id_list: List[int]) -> None:
         social_users = SocialUser.objects.filter(id__in=id_list)
         social_users.delete()
-        
+
+    def exists_by_user_id_and_social_id(self, user_id: int, social_id: int) -> bool:
+        return SocialUser.object.filter(user_id=user_id, social_id=social_id).exists()
