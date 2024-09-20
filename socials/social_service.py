@@ -22,7 +22,7 @@ class SocialService:
         return repo.find_users_socials(user.id)
 
     @transaction.atomic
-    def create_user_socials(self, request: CreateUserSocials):
+    def create_user_socials(self, uuid: str, request: CreateUserSocials) -> List[SocialUser]:
         serialized_data = request.data
         data_list = [dict(item) for item in serialized_data]
         items = []
@@ -36,9 +36,12 @@ class SocialService:
             social_user = repo.initialize_social_user(user_id, social_id, url)
             items.append(social_user)
         repo.create_user_socials(items)
+        return self.find_users_socials(uuid)
 
-    def delete_user_social(self, id: int) -> None:
-        pass
+    def delete_user_social(self, uuid: str, id: int) -> List[SocialUser]:
+        repo.delete_user_social(id)
+        return self.find_users_socials(uuid)
 
-    def delete_user_socials(self, id_list: List[int]) -> None:
-        pass
+    def delete_user_socials(self, uuid: str, id_list: List[int]) -> List[SocialUser]:
+        repo.delete_user_socials(id_list)
+        return self.find_users_socials(uuid)
