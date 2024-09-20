@@ -35,7 +35,7 @@ def create_user_socials(request, uuid):
 
 @api_view(['DELETE'])
 @permission_classes([IsAdminUser])
-def delete_user_account(request, uuid: str, id: int):
+def delete_user_social(request, uuid: str, id: int):
     queryset = social_service.delete_user_social(uuid, id)
     data = SocialUserSerializer(queryset, many=True).data
     return Response(data)
