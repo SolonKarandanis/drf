@@ -23,6 +23,10 @@ class UserRepository:
         exists = User.objects.filter(username=username).exists()
         return exists
 
+    def user_user_id_exists(self, id: int) -> bool:
+        exists = User.objects.get(id=id).exists()
+        return exists
+
     def find_user_by_id(self, user_id: int) -> User:
         # socials = Prefetch('socialuser_set', queryset=Social.objects.filter(social__socialuser__user=advisor))
         return User.objects.get_queryset().with_details().with_groups().get(pk=user_id)

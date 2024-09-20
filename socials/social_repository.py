@@ -1,7 +1,7 @@
 from typing import List
 
 from cfehome import settings
-from socials.models import SocialUser
+from socials.models import SocialUser, Social
 
 User = settings.AUTH_USER_MODEL
 
@@ -10,6 +10,12 @@ class SocialRepository:
 
     def find_users_socials(self, user_id: int) -> List[SocialUser]:
         return SocialUser.objects.prefetch_related('social').filter(user_id=user_id)
+
+    def find_social_by_id(self, id: int) -> Social:
+        return Social.objects.get(id=id)
+
+    def exists_social_by_social_by_id(self, id: int) -> bool:
+        return Social.objects.get(id=id).exists()
 
     def create_user_social(self, social_user: SocialUser) -> None:
         social_user.save()

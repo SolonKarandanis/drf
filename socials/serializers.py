@@ -1,6 +1,7 @@
 from rest_framework import serializers
 
 from socials.models import SocialUser, Social
+from socials.validators import validate_user_id, validate_social_id
 
 
 class SocialSerializer(serializers.ModelSerializer):
@@ -43,6 +44,6 @@ class SocialUserSerializer(serializers.ModelSerializer):
 
 
 class CreateUserSocials(serializers.ModelSerializer):
-    userId = serializers.IntegerField(source='user_id',  required=True)
-    socialId = serializers.IntegerField(source='social_id',  required=True)
+    userId = serializers.IntegerField(source='user_id',  required=True, validators=[validate_user_id])
+    socialId = serializers.IntegerField(source='social_id',  required=True, validators=[validate_social_id])
     url = serializers.CharField(required=True, allow_blank=True)
