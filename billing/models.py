@@ -24,9 +24,12 @@ class Card(Model):
     expiration_year = IntegerField(choices=YEAR_CHOICES, null=False)
     cpv = CharField(max_length=3, null=False)
     is_active = BooleanField(default=True)
+    is_selected = BooleanField(default=False)
+    date_created = DateTimeField(auto_now_add=True, null=True)
+    user = ForeignKey(User, on_delete=CASCADE, default=1)
 
     class Meta:
-        ordering = ['-expiration_year']
+        ordering = ['-date_created']
 
     def __str__(self):
         return f"{self.number}"
@@ -50,15 +53,3 @@ class Card(Model):
             return True
         return False
 
-
-class CardUser(Model):
-    card = ForeignKey(Card, on_delete=CASCADE)
-    user = ForeignKey(User, on_delete=CASCADE)
-    is_selected = BooleanField(default=False)
-    date_created = DateTimeField(auto_now_add=True, null=True)
-
-    class Meta:
-        ordering = ['-date_created']
-
-    def __str__(self):
-        return "{}_{}".format(self.card.__str__(), self.user.__str__())
