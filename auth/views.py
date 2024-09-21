@@ -2,6 +2,7 @@ import logging
 
 from django.core.files.uploadedfile import InMemoryUploadedFile
 from rest_framework import status
+from rest_framework import serializers
 from rest_framework.response import Response
 from rest_framework.decorators import api_view, permission_classes
 from rest_framework.permissions import IsAuthenticated, IsAdminUser, AllowAny
@@ -10,6 +11,7 @@ from celery.result import AsyncResult
 from images.serializers import ImagesSerializer
 from socials.social_service import SocialService
 from .group_service import GroupService
+from .models import User
 from .serializers import PaginatedUserSerializer, CreateUserSerializer, UseInfoSerializer, GroupSerializer, \
     UserAccountSerializer, SearchUsersRequestSerializer, PaginatedPOSTUserSerializer, ChangeUserStatusSerializer, \
     UploadCVSerializer, UploadProfilePictureSerializer, UpldateUserContactInfoSerializer, UpdateBioSerializer
@@ -135,6 +137,7 @@ def get_user_statuses(request):
 # @permission_required({"retrive_job","retrive_job"}, raise_exception=True)
 def upload_profile_image(request, uuid):
     logged_in_user = get_user_from_request(request)
+    is_user_me(logged_in_user, uuid)
     serializer = UploadProfilePictureSerializer(data=request.data)
     if serializer.is_valid(raise_exception=True):
         image: InMemoryUploadedFile = request.FILES.get('image')
@@ -190,8 +193,15 @@ def update_user_bio(request, uuid):
 
 def get_user_from_request(request):
     logged_in_user = request.user
-    logger.info(f'logged_in_user: {logged_in_user}')
+    logger.info(f'----->logged_in_user: {logged_in_user}')
     return logged_in_user
+
+
+def is_user_me(logged_in_user: User, uuid: str):
+    request_uuid = str(uuid)
+    logged_in__user_uuid = str(logged_in_user.uuid)
+    if request_uuid != logged_in__user_uuid:
+        raise serializers.ValidationError(f"Action Not Allowed")
 
 
 @api_view(['POST'])

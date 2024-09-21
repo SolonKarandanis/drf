@@ -131,10 +131,10 @@ class User(AbstractUser):
     objects = UserManager()
 
     def __str__(self):
-        return f"{self.username}"
+        return f"username:{self.username} uuid:{self.uuid}"
 
     def __repr__(self):
-        return f"<User {self.username}>"
+        return f"<User username:{self.username} uuid:{self.uuid}>"
 
     @property
     def was_created_this_year(self) -> bool:
