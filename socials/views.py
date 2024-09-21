@@ -1,10 +1,11 @@
 import logging
 
-from rest_framework import status
+from rest_framework import status, serializers
 from rest_framework.permissions import IsAdminUser
 from rest_framework.response import Response
 from rest_framework.decorators import api_view, permission_classes
 
+from auth.models import User
 from socials.serializers import SocialUserSerializer, CreateUserSocials
 from socials.social_service import SocialService
 
@@ -24,6 +25,8 @@ def find_users_socials(request, uuid):
 @api_view(['POST'])
 @permission_classes([IsAdminUser])
 def create_user_socials(request, uuid):
+    logged_in_user = get_user_from_request(request)
+    is_user_me(logged_in_user, uuid)
     serializer = CreateUserSocials(data=request.data, many=True)
     if serializer.is_valid(raise_exception=True):
         serialized_data = serializer.data
@@ -36,6 +39,21 @@ def create_user_socials(request, uuid):
 @api_view(['DELETE'])
 @permission_classes([IsAdminUser])
 def delete_user_social(request, uuid: str, id: int):
+    logged_in_user = get_user_from_request(request)
+    is_user_me(logged_in_user, uuid)
     queryset = social_service.delete_user_social(uuid, id)
     data = SocialUserSerializer(queryset, many=True).data
     return Response(data)
+
+
+def get_user_from_request(request):
+    logged_in_user = request.user
+    logger.info(f'----->logged_in_user: {logged_in_user}')
+    return logged_in_user
+
+
+def is_user_me(logged_in_user: User, uuid: str):
+    request_uuid = str(uuid)
+    logged_in__user_uuid = str(logged_in_user.uuid)
+    if request_uuid != logged_in__user_uuid:
+        raise serializers.ValidationError(f"Action Not Allowed")
