@@ -161,6 +161,8 @@ def get_user_image(request, uuid):
 @api_view(['POST'])
 @permission_classes([IsAuthenticated])
 def upload_cv(request, uuid):
+    logged_in_user = get_user_from_request(request)
+    is_user_me(logged_in_user, uuid)
     serializer = UploadCVSerializer(data=request.data)
     if serializer.is_valid(raise_exception=True):
         cv: InMemoryUploadedFile = request.FILES.get('cv')
@@ -172,6 +174,8 @@ def upload_cv(request, uuid):
 @api_view(['PUT'])
 @permission_classes([IsAuthenticated])
 def update_user_contact_info(request, uuid):
+    logged_in_user = get_user_from_request(request)
+    is_user_me(logged_in_user, uuid)
     serializer = UpldateUserContactInfoSerializer(data=request.data)
     if serializer.is_valid(raise_exception=True):
         user = user_service.update_user_contact_info(uuid, serializer)
@@ -183,6 +187,8 @@ def update_user_contact_info(request, uuid):
 @api_view(['PUT'])
 @permission_classes([IsAuthenticated])
 def update_user_bio(request, uuid):
+    logged_in_user = get_user_from_request(request)
+    is_user_me(logged_in_user, uuid)
     serializer = UpdateBioSerializer(data=request.data)
     if serializer.is_valid(raise_exception=True):
         user = user_service.update_user_bio(uuid, serializer)
