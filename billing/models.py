@@ -12,6 +12,13 @@ class CardType(TextChoices):
     MASTERCARD = 'card.type.mastercard',
 
 
+class CardStatus(TextChoices):
+    ACTIVE = 'card.active',
+    DEACTIVATED = 'card.deactivated',
+    DELETED = 'card.deleted'
+    EXPIRED = 'card.expired',
+
+
 # Create your models here.
 class Card(Model):
     current_year = datetime.date.today().year
@@ -20,6 +27,7 @@ class Card(Model):
 
     number = CharField(max_length=20, null=False)
     type = CharField(max_length=40, choices=CardType.choices)
+    status = CharField(max_length=40, choices=CardStatus.choices, default=CardStatus.ACTIVE)
     expiration_month = IntegerField(choices=MONTH_CHOICE, null=False)
     expiration_year = IntegerField(choices=YEAR_CHOICES, null=False)
     cpv = CharField(max_length=3, null=False)
