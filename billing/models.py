@@ -25,6 +25,9 @@ class Card(Model):
     cpv = CharField(max_length=3, null=False)
     is_active = BooleanField(default=True)
 
+    class Meta:
+        ordering = ['-expiration_year']
+
     def __str__(self):
         return f"{self.number}"
 
@@ -52,6 +55,10 @@ class CardUser(Model):
     card = ForeignKey(Card, on_delete=CASCADE)
     user = ForeignKey(User, on_delete=CASCADE)
     is_selected = BooleanField(default=False)
+    date_created = DateTimeField(auto_now_add=True, null=False)
+
+    class Meta:
+        ordering = ['-date_created']
 
     def __str__(self):
         return "{}_{}".format(self.card.__str__(), self.user.__str__())

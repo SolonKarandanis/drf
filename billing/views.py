@@ -1,8 +1,10 @@
 import logging
-from rest_framework import status
+from rest_framework import status, serializers
 from rest_framework.permissions import IsAuthenticated
 from rest_framework.response import Response
 from rest_framework.decorators import api_view, permission_classes
+
+from auth.models import User
 
 logger = logging.getLogger('django')
 
@@ -28,5 +30,12 @@ def edit_payment_card(request):
 
 def get_user_from_request(request):
     logged_in_user = request.user
-    logger.info(f'logged_in_user: {logged_in_user}')
+    logger.info(f'----->logged_in_user: {logged_in_user}')
     return logged_in_user
+
+
+def is_user_me(logged_in_user: User, uuid: str):
+    request_uuid = str(uuid)
+    logged_in__user_uuid = str(logged_in_user.uuid)
+    if request_uuid != logged_in__user_uuid:
+        raise serializers.ValidationError(f"Action Not Allowed")
