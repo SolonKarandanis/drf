@@ -86,13 +86,13 @@ class UserService:
         address = data_dict['address']
         zip = data_dict['zip']
 
-        user.email = email
-        user.phone = phone
-        user.country = country
-        user.state = state
-        user.city = city
-        user.address = address
-        user.zip = zip
+        user.user_details.email = email
+        user.user_details.phone = phone
+        user.user_details.country = country
+        user.user_details.state = state
+        user.user_details.city = city
+        user.user_details.address = address
+        user.user_details.zip = zip
         return repo.update_user(user)
 
     @transaction.atomic
