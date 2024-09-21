@@ -55,7 +55,7 @@ class CardUser(Model):
     card = ForeignKey(Card, on_delete=CASCADE)
     user = ForeignKey(User, on_delete=CASCADE)
     is_selected = BooleanField(default=False)
-    date_created = DateTimeField(auto_now_add=True, null=False)
+    date_created = DateTimeField(auto_now_add=True, null=True)
 
     class Meta:
         ordering = ['-date_created']
