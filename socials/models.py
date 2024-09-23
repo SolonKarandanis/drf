@@ -33,4 +33,5 @@ class SocialUser(Model):
     objects = SocialUserManager()
 
     def __str__(self):
-        return "{}_{}".format(self.social.__str__(), self.user.__str__())
+        return f"id: {self.id} ,social:{self.social.__str__()}, user:{self.user.__str__()}"
+

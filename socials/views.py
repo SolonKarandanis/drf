@@ -35,7 +35,7 @@ def create_user_socials(request, uuid):
     return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
 
-@api_view(['DELETE'])
+@api_view(['PUT'])
 @permission_classes([IsAuthenticated])
 def delete_user_social(request, uuid: str, id: int):
     logged_in_user = get_user_from_request(request)

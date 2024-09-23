@@ -32,7 +32,7 @@ class SocialService:
             url = data['url']
             exists = repo.exists_by_user_id_and_social_id(user_id, social_id)
             if not exists:
-                social_user = repo.initialize_social_user(user_id, social_id, url)
+                social_user = SocialUser(user_id=user_id, social_id=social_id, url=url)
                 items.append(social_user)
         repo.create_user_socials(items)
         return self.find_users_socials(uuid)

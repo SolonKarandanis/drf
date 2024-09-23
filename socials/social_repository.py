@@ -32,6 +32,3 @@ class SocialRepository:
 
     def exists_by_user_id_and_social_id(self, user_id: int, social_id: int) -> bool:
         return SocialUser.objects.filter(user_id=user_id, social_id=social_id).exists()
-
-    def initialize_social_user(self,social_id: int, user_id: int, url: str):
-        return SocialUser.objects.initialize_social_user(social_id, user_id, url)
