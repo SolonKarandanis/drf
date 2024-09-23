@@ -1,7 +1,7 @@
 from typing import List
 from datetime import timedelta, date
 from django.db.models import Q
-from .models import User
+from .models import User, UserDetails
 import logging
 
 logger = logging.getLogger('django')
@@ -113,3 +113,19 @@ class UserRepository:
             if end_date < today:
                 User.objects.get(pk=x.id).delete()
                 logger.info(f'Just deleted  {x.username}')
+
+    def user_details_user_id_exists(self, id: int) -> bool:
+        return UserDetails.objects.filter(user_id=id).exists()
+
+    def find_user_details_by_user_id(self, id: int) -> UserDetails:
+        try:
+            return UserDetails.objects.get(user_id=id)
+        except UserDetails.DoesNotExist:
+            return None
+
+    def create_user_details(self, id: int) -> UserDetails:
+        details = UserDetails.objects.create(user_id=id)
+        return details
+
+    def update_user_details(self, user_details: UserDetails) -> UserDetails:
+        return UserDetails.objects.update_details(user_details)

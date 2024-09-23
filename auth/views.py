@@ -179,7 +179,7 @@ def update_user_contact_info(request, uuid):
     serializer = UpldateUserContactInfoSerializer(data=request.data)
     if serializer.is_valid(raise_exception=True):
         user = user_service.update_user_contact_info(uuid, serializer)
-        data = UserAccountSerializer(user).data
+        data = UseInfoSerializer(user).data
         return Response(data)
     return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 

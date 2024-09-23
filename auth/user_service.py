@@ -9,7 +9,7 @@ from images.image_repository import ImageRepository
 from images.models import Images
 from .serializers import UploadProfilePictureSerializer, UpdateBioSerializer, UpldateUserContactInfoSerializer
 from .user_repository import UserRepository
-from .models import User, UserStatus
+from .models import User, UserStatus, UserDetails
 
 repo = UserRepository()
 image_repo = ImageRepository()
@@ -75,25 +75,37 @@ class UserService:
         user = self.find_user_by_uuid(uuid)
         if user is None:
             raise serializers.ValidationError(f"User does not exist")
-
         serialized_data = request.data
         data_dict = dict(serialized_data)
-        email = data_dict['email']
-        phone = data_dict['phone']
-        country = data_dict['country']
-        state = data_dict['state']
-        city = data_dict['city']
-        address = data_dict['address']
-        zip = data_dict['zip']
 
-        user.user_details.email = email
-        user.user_details.phone = phone
-        user.user_details.country = country
-        user.user_details.state = state
-        user.user_details.city = city
-        user.user_details.address = address
-        user.user_details.zip = zip
-        return repo.update_user(user)
+        details = repo.find_user_details_by_user_id(user.id)
+        if details is None:
+            details = repo.create_user_details(user.id)
+
+        if "email" in data_dict:
+            email = data_dict['email']
+            user.email = email
+        if "phone" in data_dict:
+            phone = data_dict['phone']
+            details.phone = phone
+        if "country" in data_dict:
+            country = data_dict['country']
+            details.country = country
+        if "state" in data_dict:
+            state = data_dict['state']
+            details.state = state
+        if "city" in data_dict:
+            city = data_dict['city']
+            details.city = city
+        if "address" in data_dict:
+            address = data_dict['address']
+            details.address = address
+        if "zip" in data_dict:
+            zip = data_dict['zip']
+            details.zip = zip
+        repo.update_user(user)
+        repo.update_user_details(details)
+        return self.find_user_by_uuid(uuid)
 
     @transaction.atomic
     def update_user_bio(self, uuid: str, request: UpdateBioSerializer) -> User:

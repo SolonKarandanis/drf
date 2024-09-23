@@ -38,6 +38,7 @@ class UserManager(BaseUserManager):
     Custom user model manager where email is the unique identifiers
     for authentication instead of usernames.
     """
+
     def update_user(self, user):
         user = user.save()
         return user
@@ -145,6 +146,13 @@ class User(AbstractUser):
         return self.created_date.date() > given_date
 
 
+class UserDetailsManager(BaseUserManager):
+
+    def update_details(self, details):
+        details = details.save()
+        return details
+
+
 class UserDetails(Model):
     user = OneToOneField(User, on_delete=CASCADE, primary_key=True, related_name='user_details')
     country = CharField(max_length=120, default=None, null=True)
@@ -153,6 +161,8 @@ class UserDetails(Model):
     address = CharField(max_length=120, default=None, null=True)
     zip = CharField(max_length=20, default=None, null=True)
     phone = CharField(max_length=50, default=None, null=True)
+
+    objects = UserDetailsManager()
 
     def __str__(self):
         return f"{self.state}-{self.city}-{self.address}"
