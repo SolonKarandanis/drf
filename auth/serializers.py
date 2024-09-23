@@ -291,7 +291,7 @@ class UpdateBioSerializer(serializers.Serializer):
 
 
 class UpldateUserContactInfoSerializer(serializers.Serializer):
-    email = serializers.CharField(validators=[validate_email])
+    email = serializers.CharField(required=False, allow_blank=False)
     phone = serializers.CharField(required=False, allow_blank=False)
     country = serializers.CharField(required=False, allow_blank=False)
     state = serializers.CharField(required=False, allow_blank=False)

@@ -84,6 +84,7 @@ class UserService:
 
         if "email" in data_dict:
             email = data_dict['email']
+            self.check_email_validity(email, user.email)
             user.email = email
         if "phone" in data_dict:
             phone = data_dict['phone']
@@ -106,6 +107,12 @@ class UserService:
         repo.update_user(user)
         repo.update_user_details(details)
         return self.find_user_by_uuid(uuid)
+
+    def check_email_validity(self, email: str, existing_user_email: str) -> None:
+        if email != existing_user_email:
+            email_exists = repo.user_email_exists(email=email)
+            if email_exists:
+                raise serializers.ValidationError(f"Email: {email} already exists")
 
     @transaction.atomic
     def update_user_bio(self, uuid: str, request: UpdateBioSerializer) -> User:
