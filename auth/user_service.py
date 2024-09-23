@@ -105,8 +105,8 @@ class UserService:
         data_dict = dict(serialized_data)
         bio = data_dict['bio']
         user.bio = bio
-        return repo.update_user_fields(user, ['bio'])
-        return user
+        repo.update_user_fields(user, ['bio'])
+        return self.find_user_by_uuid(uuid)
 
     @transaction.atomic
     def upload_cv(self, cv: InMemoryUploadedFile, uuid: str) -> None:
