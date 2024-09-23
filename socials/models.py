@@ -1,5 +1,5 @@
 # Create your models here.
-from django.db.models import Model, CharField, ForeignKey, CASCADE, Manager
+from django.db.models import Model, CharField, ForeignKey, CASCADE, Manager, ManyToManyField
 from django.conf import settings
 
 User = settings.AUTH_USER_MODEL
@@ -9,6 +9,7 @@ class Social(Model):
     name = CharField(max_length=20, default=None, null=False)
     icon = CharField(max_length=100, default=None, null=True)
     button_css_class = CharField(max_length=100, null=True)
+    users = ManyToManyField(User, through="SocialUser")
 
     def __str__(self):
         return f"{self.name}"
