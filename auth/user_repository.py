@@ -24,7 +24,7 @@ class UserRepository:
         return exists
 
     def user_user_id_exists(self, id: int) -> bool:
-        exists = User.objects.get(id=id).exists()
+        exists = User.objects.filter(id=id).exists()
         return exists
 
     def find_user_by_id(self, user_id: int) -> User:

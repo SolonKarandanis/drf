@@ -1,7 +1,7 @@
 import logging
 
 from rest_framework import status, serializers
-from rest_framework.permissions import IsAdminUser
+from rest_framework.permissions import IsAuthenticated
 from rest_framework.response import Response
 from rest_framework.decorators import api_view, permission_classes
 
@@ -23,13 +23,12 @@ def find_users_socials(request, uuid):
 
 
 @api_view(['POST'])
-@permission_classes([IsAdminUser])
+@permission_classes([IsAuthenticated])
 def create_user_socials(request, uuid):
     logged_in_user = get_user_from_request(request)
     is_user_me(logged_in_user, uuid)
     serializer = CreateUserSocials(data=request.data, many=True)
     if serializer.is_valid(raise_exception=True):
-        serialized_data = serializer.data
         queryset = social_service.create_user_socials(uuid, serializer)
         data = SocialUserSerializer(queryset, many=True).data
         return Response(data)
@@ -37,7 +36,7 @@ def create_user_socials(request, uuid):
 
 
 @api_view(['DELETE'])
-@permission_classes([IsAdminUser])
+@permission_classes([IsAuthenticated])
 def delete_user_social(request, uuid: str, id: int):
     logged_in_user = get_user_from_request(request)
     is_user_me(logged_in_user, uuid)

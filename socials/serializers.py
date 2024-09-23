@@ -47,3 +47,11 @@ class CreateUserSocials(serializers.ModelSerializer):
     userId = serializers.IntegerField(source='user_id',  required=True, validators=[validate_user_id])
     socialId = serializers.IntegerField(source='social_id',  required=True, validators=[validate_social_id])
     url = serializers.CharField(required=True, allow_blank=True)
+
+    class Meta:
+        model = SocialUser
+        fields = [
+            'userId',
+            'socialId',
+            'url'
+        ]
