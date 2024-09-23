@@ -17,6 +17,8 @@ logger = logging.getLogger('django')
 
 
 class SocialService:
+
+    @transaction.atomic
     def find_users_socials(self, uuid: str) -> List[SocialUser]:
         user = user_repo.find_user_by_uuid(uuid)
         return repo.find_users_socials(user.id)
@@ -37,10 +39,18 @@ class SocialService:
         repo.create_user_socials(items)
         return self.find_users_socials(uuid)
 
+    @transaction.atomic
     def delete_user_social(self, uuid: str, id: int) -> List[SocialUser]:
         repo.delete_user_social(id)
         return self.find_users_socials(uuid)
 
+    @transaction.atomic
     def delete_user_socials(self, uuid: str, id_list: List[int]) -> List[SocialUser]:
         repo.delete_user_socials(id_list)
+        return self.find_users_socials(uuid)
+
+    @transaction.atomic
+    def delete_all_user_socials(self, uuid: str) -> List[SocialUser]:
+        user = user_repo.find_user_by_uuid(uuid)
+        repo.delete_all_user_socials(user.id)
         return self.find_users_socials(uuid)
