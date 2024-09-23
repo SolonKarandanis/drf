@@ -41,11 +41,17 @@ class SocialService:
 
     @transaction.atomic
     def delete_user_social(self, uuid: str, id: int) -> List[SocialUser]:
+        user = user_repo.find_user_by_uuid(uuid)
+        social_user = repo.find_social_user_by_id(id)
+        if social_user and social_user.user != user:
+            raise serializers.ValidationError(f"Action Not Allowed")
         repo.delete_user_social(id)
         return self.find_users_socials(uuid)
 
     @transaction.atomic
     def delete_user_socials(self, uuid: str, id_list: List[int]) -> List[SocialUser]:
+        user = user_repo.find_user_by_uuid(uuid)
+        social_users = repo.find_social_users_by_id_list(id_list)
         repo.delete_user_socials(id_list)
         return self.find_users_socials(uuid)
 

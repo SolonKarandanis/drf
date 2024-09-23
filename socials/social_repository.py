@@ -23,6 +23,12 @@ class SocialRepository:
     def create_user_socials(self, social_user_list: List[SocialUser]) -> None:
         SocialUser.objects.bulk_create(social_user_list)
 
+    def find_social_user_by_id(self,  id: int) -> SocialUser:
+        return Social.objects.filter(id=id)
+
+    def find_social_users_by_id_list(self,  id_list: List[int]) -> List[SocialUser]:
+        return Social.objects.filter(id__in=id_list)
+
     def delete_user_social(self, id: int) -> None:
         SocialUser.objects.filter(id=id).delete()
 
