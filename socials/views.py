@@ -63,7 +63,7 @@ def delete_user_social_by_ids(request, uuid: str):
 def delete_all_user_socials(request, uuid: str):
     logged_in_user = get_user_from_request(request)
     is_user_me(logged_in_user, uuid)
-    social_service.delete_user_socials(uuid)
+    social_service.delete_all_user_socials(uuid)
     return Response(status=status.HTTP_204_NO_CONTENT)
 
 
