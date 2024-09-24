@@ -1,4 +1,4 @@
-from typing import List
+from typing import List, Set
 
 from cfehome import settings
 from socials.models import SocialUser, Social
@@ -32,7 +32,7 @@ class SocialRepository:
     def delete_user_social(self, id: int) -> None:
         SocialUser.objects.filter(id=id).delete()
 
-    def delete_user_socials(self, id_list: List[int]) -> None:
+    def delete_user_socials(self, id_list: Set[int]) -> None:
         social_users = SocialUser.objects.filter(id__in=id_list)
         social_users.delete()
 

@@ -52,7 +52,10 @@ class SocialService:
     def delete_user_socials(self, uuid: str, id_list: List[int]) -> List[SocialUser]:
         user = user_repo.find_user_by_uuid(uuid)
         social_users = repo.find_social_users_by_id_list(id_list)
-        repo.delete_user_socials(id_list)
+        social_user_ids_set = set([s.id for s in social_users])
+        provided_ids_set = set(id_list)
+        common_elements = social_user_ids_set.intersection(provided_ids_set)
+        repo.delete_user_socials(common_elements)
         return self.find_users_socials(uuid)
 
     @transaction.atomic
