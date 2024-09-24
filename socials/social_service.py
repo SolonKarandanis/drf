@@ -44,7 +44,7 @@ class SocialService:
         user = user_repo.find_user_by_uuid(uuid)
         social_user = repo.find_social_user_by_id(id)
         if social_user and social_user.user != user:
-            raise serializers.ValidationError(f"Action Not Allowed")
+            raise serializers.ValidationError(f"Action Not Allowed. That social does not belong to you")
         repo.delete_user_social(id)
         return self.find_users_socials(uuid)
 
