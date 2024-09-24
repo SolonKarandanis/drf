@@ -6,7 +6,7 @@ from rest_framework.response import Response
 from rest_framework.decorators import api_view, permission_classes
 
 from auth.models import User
-from socials.serializers import SocialUserSerializer, CreateUserSocials
+from socials.serializers import SocialUserSerializer, CreateUserSocials, DeleteSocialUserItems
 from socials.social_service import SocialService
 
 social_service = SocialService()
@@ -43,6 +43,28 @@ def delete_user_social(request, uuid: str, id: int):
     queryset = social_service.delete_user_social(uuid, id)
     data = SocialUserSerializer(queryset, many=True).data
     return Response(data)
+
+
+@api_view(['PUT'])
+@permission_classes([IsAuthenticated])
+def delete_user_social_by_ids(request, uuid: str):
+    logged_in_user = get_user_from_request(request)
+    is_user_me(logged_in_user, uuid)
+    serializer = DeleteSocialUserItems(data=request.data, many=True)
+    if serializer.is_valid(raise_exception=True):
+        queryset = social_service.delete_user_socials(uuid, serializer)
+        data = SocialUserSerializer(queryset, many=True).data
+        return Response(data)
+    return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+
+
+@api_view(['DELETE'])
+@permission_classes([IsAuthenticated])
+def delete_all_user_socials(request, uuid: str):
+    logged_in_user = get_user_from_request(request)
+    is_user_me(logged_in_user, uuid)
+    social_service.delete_user_socials(uuid)
+    return Response(status=status.HTTP_204_NO_CONTENT)
 
 
 def get_user_from_request(request):

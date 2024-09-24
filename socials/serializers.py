@@ -44,8 +44,8 @@ class SocialUserSerializer(serializers.ModelSerializer):
 
 
 class CreateUserSocials(serializers.ModelSerializer):
-    userId = serializers.IntegerField(source='user_id',  required=True, validators=[validate_user_id])
-    socialId = serializers.IntegerField(source='social_id',  required=True, validators=[validate_social_id])
+    userId = serializers.IntegerField(source='user_id', required=True, validators=[validate_user_id])
+    socialId = serializers.IntegerField(source='social_id', required=True, validators=[validate_social_id])
     url = serializers.CharField(required=True, allow_blank=True)
 
     class Meta:
@@ -55,3 +55,7 @@ class CreateUserSocials(serializers.ModelSerializer):
             'socialId',
             'url'
         ]
+
+
+class DeleteSocialUserItems(serializers.Serializer):
+    social_item_id = serializers.IntegerField(required=True)
