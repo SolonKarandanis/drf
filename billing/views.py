@@ -12,20 +12,30 @@ logger = logging.getLogger('django')
 # Create your views here.
 @api_view(['GET'])
 @permission_classes([IsAuthenticated])
-def get_users_payment_cards(request):
+def get_users_payment_cards(request, uuid):
     logged_in_user = get_user_from_request(request)
+    is_user_me(logged_in_user, uuid)
 
 
 @api_view(['POST'])
 @permission_classes([IsAuthenticated])
-def create_payment_card(request):
+def create_payment_card(request, uuid):
     logged_in_user = get_user_from_request(request)
+    is_user_me(logged_in_user, uuid)
 
 
 @api_view(['PUT'])
 @permission_classes([IsAuthenticated])
-def edit_payment_card(request):
+def edit_payment_card(request, uuid):
     logged_in_user = get_user_from_request(request)
+    is_user_me(logged_in_user, uuid)
+
+
+@api_view(['PUT'])
+@permission_classes([IsAuthenticated])
+def selected_user_card(request, uuid):
+    logged_in_user = get_user_from_request(request)
+    is_user_me(logged_in_user, uuid)
 
 
 def get_user_from_request(request):
