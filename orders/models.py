@@ -235,6 +235,10 @@ class OrderItem(Model):
     #     output_field=SearchVectorField(),
     # )
 
+    @property
+    def item_total(self):
+        return self.price * self.quantity
+
     objects = OrderItemManager()
 
     class Meta:
