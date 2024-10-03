@@ -16,7 +16,7 @@ logger = logging.getLogger('django')
 
 # Create your views here.
 @api_view(['GET'])
-def find_all_socials():
+def find_all_socials(request):
     queryset = social_service.find_all_socials()
     data = SocialSerializer(queryset, many=True).data
     return Response(data)
