@@ -52,7 +52,7 @@ class SocialService:
     def delete_user_socials(self, uuid: str, request: DeleteSocialUserItems) -> List[SocialUser]:
         serialized_data = request.data
         data_list = [dict(item) for item in serialized_data]
-        id_list = [d['social_item_id'] for d in data_list]
+        id_list = [d['socialItemId'] for d in data_list]
         provided_ids_set = set(id_list)
 
         social_users = self.find_users_socials(uuid)

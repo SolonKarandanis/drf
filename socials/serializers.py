@@ -58,4 +58,4 @@ class CreateUserSocials(serializers.ModelSerializer):
 
 
 class DeleteSocialUserItems(serializers.Serializer):
-    social_item_id = serializers.IntegerField(required=True)
+    socialItemId = serializers.IntegerField(required=True)
