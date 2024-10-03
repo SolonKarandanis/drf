@@ -6,7 +6,7 @@ from rest_framework.response import Response
 from rest_framework.decorators import api_view, permission_classes
 
 from auth.models import User
-from socials.serializers import SocialUserSerializer, CreateUserSocials, DeleteSocialUserItems
+from socials.serializers import SocialUserSerializer, CreateUserSocials, DeleteSocialUserItems, SocialSerializer
 from socials.social_service import SocialService
 
 social_service = SocialService()
@@ -16,6 +16,13 @@ logger = logging.getLogger('django')
 
 # Create your views here.
 @api_view(['GET'])
+def find_all_socials():
+    queryset = social_service.find_all_socials()
+    data = SocialSerializer(queryset, many=True).data
+    return Response(data)
+
+@api_view(['GET'])
+@permission_classes([IsAuthenticated])
 def find_users_socials(request, uuid):
     queryset = social_service.find_users_socials(uuid)
     data = SocialUserSerializer(queryset, many=True).data

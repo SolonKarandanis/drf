@@ -8,6 +8,7 @@ class SocialSerializer(serializers.ModelSerializer):
     class Meta:
         model = Social
         fields = [
+            'id'
             'name',
             'icon',
             'button_css_class'

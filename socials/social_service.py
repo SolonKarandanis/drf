@@ -5,7 +5,7 @@ from django.db import transaction
 from rest_framework import serializers
 from auth.user_repository import UserRepository
 from cfehome import settings
-from socials.models import SocialUser
+from socials.models import SocialUser, Social
 from socials.serializers import CreateUserSocials, DeleteSocialUserItems
 from socials.social_repository import SocialRepository
 
@@ -17,6 +17,9 @@ logger = logging.getLogger('django')
 
 
 class SocialService:
+
+    def find_all_socials(self) -> List[Social]:
+        return repo.find_all_socials()
 
     @transaction.atomic
     def find_users_socials(self, uuid: str) -> List[SocialUser]:
