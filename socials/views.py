@@ -21,6 +21,7 @@ def find_all_socials(request):
     data = SocialSerializer(queryset, many=True).data
     return Response(data)
 
+
 @api_view(['GET'])
 @permission_classes([IsAuthenticated])
 def find_users_socials(request, uuid):
