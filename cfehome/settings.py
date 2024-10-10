@@ -136,7 +136,14 @@ DATABASES = {
         'PASSWORD': 'drf',
         'HOST': '192.168.1.6',
         # 'HOST': 'localhost',
-        'PORT': '5432'
+        'PORT': '5432',
+        "OPTIONS": {
+            "pool": {
+                "min_size": 2,
+                "maz_size": 4,
+                "timeout": 10
+            }
+        }
     }
 }
 

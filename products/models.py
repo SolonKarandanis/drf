@@ -96,6 +96,14 @@ class Product(Model):
     comments = GenericRelation("comments.Comment", related_query_name='product')
     images = GenericRelation("images.Images", related_query_name='product')
 
+    # search = GeneratedField(
+    #     db_persist=True,
+    #     expression=SearchVector(
+    #         "product_name","manufacturer", config="english"
+    #     ),
+    #     output_field=SearchVectorField(),
+    # )
+
     # brand = ForeignKey(Brand, on_delete=PROTECT)
     # category ManyToManyField(Category)
 
