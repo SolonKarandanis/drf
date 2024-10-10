@@ -117,6 +117,7 @@ class Product(Model):
     )
     brand = ForeignKey(Brand, on_delete=PROTECT, db_default=1)
     category = ManyToManyField(Category, db_default=1)
+    attributes = ManyToManyField(Attribute, through="ProductAttributeValues")
 
     class Meta:
         ordering = ['sku']
@@ -155,3 +156,14 @@ class Product(Model):
     @classmethod
     def create(cls):
         pass
+
+
+class ProductAttributeValues(Model):
+    product = ForeignKey(Product, on_delete=CASCADE)
+    attribute = ForeignKey(Attribute, on_delete=CASCADE)
+    attribute_option = ForeignKey(AttributeOptions, on_delete=CASCADE)
+    attribute_value_method = CharField(max_length=120, default=None)
+    attribute_value = FloatField()
+
+    def __str__(self):
+        return f"<ProductAttributeValues product:{self.product} attribute:{self.attribute}>"
