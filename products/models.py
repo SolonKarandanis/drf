@@ -1,7 +1,7 @@
 from django.core.exceptions import ObjectDoesNotExist
 from django.db.models import Q, QuerySet, Manager, Model, SET_NULL, ForeignKey, CharField, TextField, \
     FloatField, BooleanField, IntegerField, UUIDField, Index, SlugField, GeneratedField, PROTECT, ManyToManyField, \
-    CASCADE
+    CASCADE, TextChoices
 from django.conf import settings
 from django.contrib.contenttypes.fields import GenericRelation
 from django.contrib.postgres.search import SearchVector, SearchVectorField
@@ -27,9 +27,14 @@ class Brand(Model):
     name = CharField(max_length=100)
 
 
+class AttributeType(TextChoices):
+    SINGLE = 'attribute.type.single',
+    MULTIPLE = 'attribute.type.multiple',
+
+
 class Attribute(Model):
     name = CharField(max_length=120, default=None)
-    type = CharField(max_length=120, default=None,null=True)
+    type = CharField(max_length=40, choices=AttributeType.choices, default=AttributeType.SINGLE)
 
     def __str__(self):
         return f"<Attribute name:{self.name} type:{self.type}>"
