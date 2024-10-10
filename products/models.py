@@ -45,7 +45,7 @@ class AttributeOptions(Model):
     option_name = CharField(max_length=120, default=None)
 
     def __str__(self):
-        return f"<AttributeOptions option_name:{self.option_name} >"
+        return f"<AttributeOptions attribute name: {self.attribute.name}, option_name:{self.option_name} >"
 
 
 class ProductQuerySet(QuerySet):
