@@ -28,7 +28,18 @@ class Brand(Model):
 
 class Attribute(Model):
     name = CharField(max_length=120, default=None)
-    value = CharField(max_length=120, default=None)
+    type = CharField(max_length=120, default=None)
+
+    def __str__(self):
+        return f"<Attribute name:{self.name} type:{self.type}>"
+
+
+class AttributeOptions(Model):
+    name = CharField(max_length=120, default=None)
+    type = CharField(max_length=120, default=None)
+
+    def __str__(self):
+        return f"<AttributeOptions name:{self.name} type:{self.type}>"
 
 
 class ProductQuerySet(QuerySet):
@@ -127,7 +138,7 @@ class Product(Model):
     objects = ProductManager()
 
     def __str__(self):
-        return f"{self.title}"
+        return f"<Product sku:{self.sku} title:{self.title}>"
 
     @property
     def sale_price(self):

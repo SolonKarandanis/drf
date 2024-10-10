@@ -132,7 +132,7 @@ class User(AbstractUser):
     objects = UserManager()
 
     def __str__(self):
-        return f"username:{self.username} uuid:{self.uuid}"
+        return f"<User username:{self.username} uuid:{self.uuid}>"
 
     def __repr__(self):
         return f"<User username:{self.username} uuid:{self.uuid}>"

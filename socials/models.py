@@ -12,7 +12,7 @@ class Social(Model):
     users = ManyToManyField(User, through="SocialUser")
 
     def __str__(self):
-        return f"{self.name}"
+        return f"<Social {self.name}>"
 
     def __repr__(self):
         return f"<Social {self.name}>"
@@ -33,5 +33,4 @@ class SocialUser(Model):
     objects = SocialUserManager()
 
     def __str__(self):
-        return f"id: {self.id} ,social:{self.social.__str__()}, user:{self.user.__str__()}"
-
+        return f"<SocialUser id:{self.id}, social:{self.social.__str__()}, user:{self.user.__str__()}>"
