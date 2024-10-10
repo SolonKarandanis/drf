@@ -34,7 +34,7 @@ class AttributeType(TextChoices):
 
 class Attribute(Model):
     name = CharField(max_length=120, default=None)
-    type = CharField(max_length=40, choices=AttributeType.choices, default=AttributeType.SINGLE)
+    type = CharField(max_length=40, choices=AttributeType.choices, db_default=AttributeType.SINGLE)
 
     def __str__(self):
         return f"<Attribute name:{self.name} type:{self.type}>"

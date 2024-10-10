@@ -108,7 +108,7 @@ class User(AbstractUser):
     images = GenericRelation("images.Images", related_query_name='user')
     bio = TextField(default=None, null=True)
     is_verified = BooleanField(db_default=False)
-    status = CharField(max_length=40, choices=UserStatus.choices, default=UserStatus.UNVERIFIED)
+    status = CharField(max_length=40, choices=UserStatus.choices, db_default=UserStatus.UNVERIFIED)
     cv = FileField(upload_to='cvs/', null=True, blank=True)
     uploaded_at = DateTimeField(null=True, blank=True)
 
