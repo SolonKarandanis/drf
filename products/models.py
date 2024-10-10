@@ -1,6 +1,6 @@
 from django.core.exceptions import ObjectDoesNotExist
 from django.db.models import Q, QuerySet, Manager, Model, SET_NULL, ForeignKey, CharField, TextField, \
-    FloatField, BooleanField, IntegerField, UUIDField, Index, SlugField, GeneratedField
+    FloatField, BooleanField, IntegerField, UUIDField, Index, SlugField, GeneratedField, PROTECT, ManyToManyField
 from django.conf import settings
 from django.contrib.contenttypes.fields import GenericRelation
 from django.contrib.postgres.search import SearchVector, SearchVectorField
@@ -12,7 +12,7 @@ User = settings.AUTH_USER_MODEL
 
 class Category(Model):
     name = CharField(max_length=100)
-    slug = SlugField()
+    slug = SlugField(null=True)
     is_active = BooleanField()
 
     class Meta:
@@ -103,9 +103,8 @@ class Product(Model):
         ),
         output_field=SearchVectorField(),
     )
-
-    # brand = ForeignKey(Brand, on_delete=PROTECT)
-    # category ManyToManyField(Category)
+    brand = ForeignKey(Brand, on_delete=PROTECT, db_default=1)
+    category = ManyToManyField(Category, db_default=1)
 
     class Meta:
         ordering = ['sku']
