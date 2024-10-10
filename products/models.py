@@ -29,7 +29,7 @@ class Brand(Model):
 
 class Attribute(Model):
     name = CharField(max_length=120, default=None)
-    type = CharField(max_length=120, default=None)
+    type = CharField(max_length=120, default=None,null=True)
 
     def __str__(self):
         return f"<Attribute name:{self.name} type:{self.type}>"
