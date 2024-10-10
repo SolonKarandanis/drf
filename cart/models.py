@@ -53,7 +53,7 @@ class CartManager(Manager):
 class Cart(Model):
     user = OneToOneField(User, on_delete=CASCADE)
     total_price = FloatField()
-    modification_alert = BooleanField(default=False)
+    modification_alert = BooleanField(db_default=False)
     date_created = DateTimeField(auto_now_add=True, null=False)
     date_modified = DateTimeField(auto_now=True, null=False)
     uuid = UUIDField(default=uuid.uuid4())
@@ -102,7 +102,7 @@ class CartItemManager(Manager):
 
 
 class CartItem(Model):
-    modification_alert = BooleanField(default=False)
+    modification_alert = BooleanField(db_default=False)
     quantity = IntegerField(blank=True, null=True)
     unit_price = FloatField()
     total_price = FloatField()

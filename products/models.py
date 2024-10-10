@@ -89,7 +89,7 @@ class Product(Model):
     title = CharField(max_length=120)
     content = TextField(blank=True, null=True)
     price = FloatField()
-    public = BooleanField(default=True)
+    public = BooleanField(db_default=True)
     inventory = IntegerField(blank=True, null=True)
     number_sold = IntegerField(blank=True, null=True)
     uuid = UUIDField(default=uuid.uuid4())

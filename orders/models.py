@@ -106,7 +106,7 @@ class Order(Model):
     status = CharField(max_length=40, choices=OrderStatus.choices)
     total_price = FloatField()
     buyer = ForeignKey(User, on_delete=CASCADE, related_name='buyer')
-    is_shipped = BooleanField(default=False)
+    is_shipped = BooleanField(db_default=False)
     date_shipped = DateTimeField(null=True)
     supplier = ForeignKey(User, on_delete=CASCADE, related_name='supplier')
     uuid = UUIDField(default=uuid.uuid4())

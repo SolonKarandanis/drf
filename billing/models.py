@@ -31,8 +31,8 @@ class Card(Model):
     expiration_month = IntegerField(choices=MONTH_CHOICE, null=False)
     expiration_year = IntegerField(choices=YEAR_CHOICES, null=False)
     cpv = CharField(max_length=3, null=False)
-    is_active = BooleanField(default=True)
-    is_selected = BooleanField(default=False)
+    is_active = BooleanField(db_default=True)
+    is_selected = BooleanField(db_default=False)
     date_created = DateTimeField(auto_now_add=True, null=True)
     user = ForeignKey(User, on_delete=CASCADE, default=1)
 
