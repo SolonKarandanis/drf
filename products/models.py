@@ -1,8 +1,9 @@
 from django.core.exceptions import ObjectDoesNotExist
 from django.db.models import Q, QuerySet, Manager, Model, SET_NULL, ForeignKey, CharField, TextField, \
-    FloatField, BooleanField, IntegerField, UUIDField, Index, SlugField
+    FloatField, BooleanField, IntegerField, UUIDField, Index, SlugField, GeneratedField
 from django.conf import settings
 from django.contrib.contenttypes.fields import GenericRelation
+from django.contrib.postgres.search import SearchVector, SearchVectorField
 import uuid
 
 # Create your models here.
@@ -95,14 +96,13 @@ class Product(Model):
     uuid = UUIDField(default=uuid.uuid4())
     comments = GenericRelation("comments.Comment", related_query_name='product')
     images = GenericRelation("images.Images", related_query_name='product')
-
-    # search = GeneratedField(
-    #     db_persist=True,
-    #     expression=SearchVector(
-    #         "product_name","manufacturer", config="english"
-    #     ),
-    #     output_field=SearchVectorField(),
-    # )
+    search = GeneratedField(
+        db_persist=True,
+        expression=SearchVector(
+            "sku", "title", config="english"
+        ),
+        output_field=SearchVectorField(),
+    )
 
     # brand = ForeignKey(Brand, on_delete=PROTECT)
     # category ManyToManyField(Category)
