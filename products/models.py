@@ -1,7 +1,7 @@
 from django.core.exceptions import ObjectDoesNotExist
 from django.db.models import Q, QuerySet, Manager, Model, SET_NULL, ForeignKey, CharField, TextField, \
     FloatField, BooleanField, IntegerField, UUIDField, Index, SlugField, GeneratedField, PROTECT, ManyToManyField, \
-    CASCADE, TextChoices
+    CASCADE, TextChoices, DateTimeField
 from django.conf import settings
 from django.contrib.contenttypes.fields import GenericRelation
 from django.contrib.postgres.search import SearchVector, SearchVectorField
@@ -101,8 +101,17 @@ class ProductManager(Manager):
         return self.get_queryset().search(query, user=user)
 
 
+class ProductPublishedStatus(TextChoices):
+    PUBLISHED = 'product.status.published',
+    SCHEDULED = 'product.status.scheduled',
+
+
+class ProductAvailability(TextChoices):
+    IN_STOCK = 'product.availability.in.stock',
+    OUT_OF_STOCK = 'product.availability.out.of.stock',
+
+
 class Product(Model):
-    user = ForeignKey(User, default=1, null=True, on_delete=SET_NULL)
     sku = CharField(max_length=120, default=None)
     title = CharField(max_length=120)
     content = TextField(blank=True, null=True)
@@ -111,8 +120,6 @@ class Product(Model):
     inventory = IntegerField(blank=True, null=True)
     number_sold = IntegerField(blank=True, null=True)
     uuid = UUIDField(default=uuid.uuid4())
-    comments = GenericRelation("comments.Comment", related_query_name='product')
-    images = GenericRelation("images.Images", related_query_name='product')
     search = GeneratedField(
         db_persist=True,
         expression=SearchVector(
@@ -120,6 +127,15 @@ class Product(Model):
         ),
         output_field=SearchVectorField(),
     )
+    published_date = DateTimeField(auto_now_add=True, null=True)
+    publish_status = CharField(max_length=40, choices=ProductPublishedStatus.choices,
+                               db_default=ProductPublishedStatus.PUBLISHED)
+    availability_status = CharField(max_length=40, choices=ProductAvailability.choices,
+                                    db_default=ProductAvailability.IN_STOCK)
+
+    comments = GenericRelation("comments.Comment", related_query_name='product')
+    images = GenericRelation("images.Images", related_query_name='product')
+    user = ForeignKey(User, default=1, null=True, on_delete=SET_NULL)
     brand = ForeignKey(Brand, on_delete=PROTECT, db_default=1)
     category = ManyToManyField(Category, db_default=1)
     attributes = ManyToManyField(Attribute, through="ProductAttributeValues")
