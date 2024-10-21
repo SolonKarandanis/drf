@@ -50,3 +50,18 @@ class ProductRepository:
 
     def find_product_skus(self) -> List[str]:
         return Product.objects.get_queryset().product_skus()
+
+    def search_products(self, query: str):
+        return Product.objects.filter(search__icontains=query)
+
+    def get_categories_with_totals(self):
+        pass
+
+    def get_brands_with_totals(self):
+        pass
+
+    def get_discounts_with_totals(self):
+        pass
+
+    def get_sizes_with_totals(self):
+        pass
