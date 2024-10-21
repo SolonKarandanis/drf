@@ -54,3 +54,6 @@ class ProductService:
         product: Product = self.find_by_id(product_id)
         comment_repo.create_product_comment(comment, product, logged_in_user)
         return repo.find_by_id(product_id)
+
+    def search_products(self) -> List[Product]:
+        pass
