@@ -85,7 +85,7 @@ class ProductQuerySet(QuerySet):
         return qs
 
     def fts_search(self, query, user=None):
-        lookup = Q(title__search=query) | Q(content__search=query)
+        lookup = Q(title__search=query) | Q(content__search=query) | Q(sku__search=query)
         qs = self.is_public().filter(lookup)
         if user is not None:
             qs2 = self.filter(user=user).filter(lookup)

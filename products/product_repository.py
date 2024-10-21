@@ -1,12 +1,15 @@
+import logging
+
 from django.shortcuts import get_object_or_404
 from django.conf import settings
 from typing import List
+from django.db.models import Count
 
 from cfehome.repository import IRepository
 from .models import Product
 
 User = settings.AUTH_USER_MODEL
-
+logger = logging.getLogger('django')
 
 class ProductRepository:
 
@@ -51,13 +54,17 @@ class ProductRepository:
     def find_product_skus(self) -> List[str]:
         return Product.objects.get_queryset().product_skus()
 
-    def search_products(self, query: str):
-        return Product.objects.filter(search__icontains=query)
+    def search_products(self, query: str, user: User) -> List[Product]:
+        return Product.objects.get_queryset().fts_search(query, user)
 
     def get_categories_with_totals(self):
         pass
 
     def get_brands_with_totals(self):
+        brands_with_totals_qs = Product.objects\
+            .annotate(brands_count=Count('brands'))\
+            .order_by('-brands_count')
+        logger.info(f'brands_with_totals_qs: {brands_with_totals_qs}')
         pass
 
     def get_discounts_with_totals(self):
