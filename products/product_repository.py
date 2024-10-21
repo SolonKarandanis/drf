@@ -58,17 +58,26 @@ class ProductRepository:
         return Product.objects.get_queryset().fts_search(query, user)
 
     def get_categories_with_totals(self):
-        pass
+        categories_with_totals_qs = Product.objects \
+            .annotate(categories_count=Count('category')) \
+            .order_by('-categories_count')
+        logger.info(f'categories_with_totals_qs: {categories_with_totals_qs}')
+        return categories_with_totals_qs
 
     def get_brands_with_totals(self):
         brands_with_totals_qs = Product.objects\
-            .annotate(brands_count=Count('brands'))\
+            .annotate(brands_count=Count('brand'))\
             .order_by('-brands_count')
         logger.info(f'brands_with_totals_qs: {brands_with_totals_qs}')
-        pass
+        return brands_with_totals_qs
 
     def get_discounts_with_totals(self):
         pass
 
     def get_sizes_with_totals(self):
-        pass
+        sizes_with_totals_qs = Product.objects \
+            .filter(attributes=1) \
+            .annotate(sizes_count=Count('attributes')) \
+            .order_by('-sizes_count')
+        logger.info(f'sizes_with_totals_qs: {sizes_with_totals_qs}')
+        return sizes_with_totals_qs
