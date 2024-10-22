@@ -1,7 +1,7 @@
 import logging
 
 from .serializers import ProductSerializer, CreateProductSerializer, PaginatedProductListSerializer, \
-    PostProductComment
+    PostProductComment, ProductSearchRequestSerializer
 from .models import Product
 from rest_framework import status
 from rest_framework.decorators import api_view, permission_classes
@@ -80,3 +80,27 @@ def post_product_comment(request):
         return Response(response, status=status.HTTP_200_OK)
     return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
+
+@api_view(['POST'])
+@permission_classes([IsAuthenticated])
+def search_products(request):
+    logged_in_user = get_user_from_request(request)
+    serializer = ProductSearchRequestSerializer(data=request.data)
+    if serializer.is_valid(raise_exception=True):
+        products = product_service.search_products(serializer)
+        result = PaginatedProductListSerializer(products, request)
+        return Response(result.page_data)
+    return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+
+
+@api_view(['GET'])
+@permission_classes([IsAuthenticated])
+def get_categories_with_totals(request):
+    result = product_service.get_categories_with_totals()
+    return Response(status=status.HTTP_200_OK)
+
+
+def get_user_from_request(request):
+    logged_in_user = request.user
+    logger.info(f'----->logged_in_user: {logged_in_user}')
+    return logged_in_user

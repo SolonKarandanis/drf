@@ -3,7 +3,7 @@ from django.db import transaction
 from django.conf import settings
 from .models import Product
 from .product_repository import ProductRepository
-from .serializers import PostProductComment
+from .serializers import PostProductComment, ProductSearchRequestSerializer
 from comments.comment_repository import CommentRepository
 
 User = settings.AUTH_USER_MODEL
@@ -55,5 +55,31 @@ class ProductService:
         comment_repo.create_product_comment(comment, product, logged_in_user)
         return repo.find_by_id(product_id)
 
-    def search_products(self) -> List[Product]:
+    def search_products(self, request: ProductSearchRequestSerializer) -> List[Product]:
+        serialized_data = request.data
+        query = None
+        category_id = None
+        brand_id = None
+        size_id = None
+        data_dict = dict(serialized_data)
+        if "query" in data_dict:
+            query = data_dict['query']
+        if "category_id" in data_dict:
+            category_id = data_dict['category_id']
+        if "brand_id" in data_dict:
+            brand_id = data_dict['brand_id']
+        if "size_id" in data_dict:
+            size_id = data_dict['size_id']
+        return repo.search_products(query, None)
+
+    def get_categories_with_totals(self):
+        return repo.get_categories_with_totals()
+
+    def get_brands_with_totals(self):
+        pass
+
+    def get_discounts_with_totals(self):
+        pass
+
+    def get_sizes_with_totals(self):
         pass
