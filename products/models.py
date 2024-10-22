@@ -26,6 +26,9 @@ class Category(Model):
 class Brand(Model):
     name = CharField(max_length=100)
 
+    def __str__(self):
+        return f"<Brand name:{self.name}>"
+
 
 class AttributeType(TextChoices):
     SINGLE = 'attribute.type.single',
@@ -117,18 +120,20 @@ class Product(Model):
     sku = CharField(max_length=120, default=None)
     title = CharField(max_length=120)
     content = TextField(blank=True, null=True)
+    fabric_details = TextField(blank=True, null=True)
+    care_instructions = TextField(blank=True, null=True)
     price = FloatField()
     public = BooleanField(db_default=True)
     inventory = IntegerField(blank=True, null=True)
     number_sold = IntegerField(blank=True, null=True)
     uuid = UUIDField(default=uuid.uuid4())
-    search = GeneratedField(
-        db_persist=True,
-        expression=SearchVector(
-            "sku", "title", "content", config="english"
-        ),
-        output_field=SearchVectorField(),
-    )
+    # search = GeneratedField(
+    #     db_persist=True,
+    #     expression=SearchVector(
+    #         "sku", "title", "content", "fabric_details", "care_instructions", config="english"
+    #     ),
+    #     output_field=SearchVectorField(),
+    # )
     published_date = DateTimeField(auto_now_add=True, null=True)
     publish_status = CharField(max_length=40, choices=ProductPublishedStatus.choices,
                                db_default=ProductPublishedStatus.PUBLISHED)

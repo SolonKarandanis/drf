@@ -117,10 +117,10 @@ class PostProductComment(serializers.Serializer):
 
 
 class ProductSearchRequestSerializer(serializers.Serializer):
-    query = serializers.CharField()
-    category_id = serializers.IntegerField()
-    brand_id = serializers.IntegerField()
-    size_id = serializers.IntegerField()
+    query = serializers.CharField(required=False)
+    category_id = serializers.IntegerField(required=False)
+    brand_id = serializers.IntegerField(required=False)
+    size_id = serializers.IntegerField(required=False)
 
     def __repr__(self):
         return f"<ProductSearchRequest query:{self.query},Category:{self.category_id}, Brand:{self.brand_id}, Size:{self.size_id}>"
