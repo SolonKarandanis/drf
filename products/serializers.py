@@ -32,6 +32,9 @@ class ProductSerializer(serializers.ModelSerializer):
 
 
 class ProductListSerializer(serializers.ModelSerializer):
+    fabricDetails = serializers.CharField(source='fabric_details', read_only=True)
+    careInstructions = serializers.CharField(source='care_instructions', read_only=True)
+
     class Meta:
         model = Product
         fields = [
@@ -39,6 +42,8 @@ class ProductListSerializer(serializers.ModelSerializer):
             'sku',
             'title',
             'content',
+            'fabricDetails',
+            'careInstructions',
             'price',
             'inventory',
             'sale_price',
