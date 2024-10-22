@@ -127,13 +127,13 @@ class Product(Model):
     inventory = IntegerField(blank=True, null=True)
     number_sold = IntegerField(blank=True, null=True)
     uuid = UUIDField(default=uuid.uuid4())
-    # search = GeneratedField(
-    #     db_persist=True,
-    #     expression=SearchVector(
-    #         "sku", "title", "content", "fabric_details", "care_instructions", config="english"
-    #     ),
-    #     output_field=SearchVectorField(),
-    # )
+    search = GeneratedField(
+        db_persist=True,
+        expression=SearchVector(
+            "sku", "title", "content", "fabric_details", "care_instructions", config="english"
+        ),
+        output_field=SearchVectorField(),
+    )
     published_date = DateTimeField(auto_now_add=True, null=True)
     publish_status = CharField(max_length=40, choices=ProductPublishedStatus.choices,
                                db_default=ProductPublishedStatus.PUBLISHED)
