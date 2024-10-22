@@ -47,6 +47,10 @@ class AttributeOptions(Model):
     attribute = ForeignKey(Attribute, on_delete=CASCADE, related_name='attribute_options', null=True)
     option_name = CharField(max_length=120, default=None)
 
+    class Meta:
+        verbose_name_plural = "Attribute Options"
+        db_table = 'products_attribute_options'
+
     def __str__(self):
         return f"<AttributeOptions attribute name: {self.attribute.name}, option_name:{self.option_name} >"
 
@@ -90,7 +94,8 @@ class ProductQuerySet(QuerySet):
     def fts_search(self, query, user=None):
         qs = self.is_public()
         if query:
-            lookup = Q(title__search=query) | Q(content__search=query) | Q(sku__search=query)
+            lookup = Q(title__search=query) | Q(content__search=query) | Q(sku__search=query) | \
+                     Q(fabric_details__search=query) | Q(care_instructions__search=query)
             qs = self.filter(lookup)
         if user is not None:
             qs2 = self.filter(user=user)
@@ -192,6 +197,10 @@ class ProductAttributeValues(Model):
     attribute_option = ForeignKey(AttributeOptions, on_delete=CASCADE)
     attribute_value_method = CharField(max_length=120, default=None)
     attribute_value = FloatField()
+
+    class Meta:
+        verbose_name_plural = "Product Attribute Values"
+        db_table = 'products_attribute_values'
 
     def __str__(self):
         return f"<ProductAttributeValues product:{self.product} attribute:{self.attribute}>"
