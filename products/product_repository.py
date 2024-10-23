@@ -6,8 +6,8 @@ from typing import List
 from django.db.models import Count
 
 from cfehome.repository import IRepository
-from .dtos import CategoriesWithTotals
-from .models import Product, Category
+from .dtos import CategoriesWithTotals, BrandsWithTotals
+from .models import Product, Category, Brand
 
 User = settings.AUTH_USER_MODEL
 logger = logging.getLogger('django')
@@ -70,12 +70,16 @@ class ProductRepository:
         ]
         return result_list
 
-    def get_brands_with_totals(self):
-        brands_with_totals_qs = Product.objects \
-            .annotate(brands_count=Count('brand')) \
-            .order_by('-brands_count')
-        logger.info(f'brands_with_totals_qs: {brands_with_totals_qs}')
-        return brands_with_totals_qs
+    def get_brands_with_totals(self) -> List[BrandsWithTotals]:
+        brands_with_totals_qs = Brand.objects \
+            .annotate(products_count=Count('product')) \
+            .filter(products_count__gt=0) \
+            .order_by('-products_count')
+        result_list: List[BrandsWithTotals] = [
+            BrandsWithTotals(id=brand.id, name=brand.name, total_products=brand.products_count)
+            for brand in brands_with_totals_qs
+        ]
+        return result_list
 
     def get_discounts_with_totals(self):
         pass
