@@ -1,7 +1,8 @@
 import logging
 
 from .serializers import ProductSerializer, CreateProductSerializer, PaginatedProductListSerializer, \
-    PostProductComment, ProductSearchRequestSerializer, CategoriesWithTotalsSerializer, BrandsWithTotalsSerializer
+    PostProductComment, ProductSearchRequestSerializer, CategoriesWithTotalsSerializer, BrandsWithTotalsSerializer, \
+    SizesWithTotalsSerializer
 from .models import Product
 from rest_framework import status
 from rest_framework.decorators import api_view, permission_classes
@@ -112,8 +113,8 @@ def get_brands_with_totals(request):
 @api_view(['GET'])
 @permission_classes([IsAuthenticated])
 def get_sizes_with_totals(request):
-    result = product_service.get_categories_with_totals()
-    data = CategoriesWithTotalsSerializer(result, many=True).data
+    result = product_service.get_sizes_with_totals()
+    data = SizesWithTotalsSerializer(result, many=True).data
     return Response(data, status=status.HTTP_200_OK)
 
 

@@ -2,7 +2,7 @@ from typing import List
 from django.db import transaction
 from django.conf import settings
 
-from .dtos import CategoriesWithTotals, BrandsWithTotals
+from .dtos import CategoriesWithTotals, BrandsWithTotals, SizesWithTotals
 from .models import Product
 from .product_repository import ProductRepository
 from .serializers import PostProductComment, ProductSearchRequestSerializer
@@ -83,5 +83,5 @@ class ProductService:
     def get_discounts_with_totals(self):
         pass
 
-    def get_sizes_with_totals(self):
-        pass
+    def get_sizes_with_totals(self) -> List[SizesWithTotals]:
+        return repo.get_sizes_with_totals()

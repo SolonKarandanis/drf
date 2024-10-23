@@ -1,13 +1,11 @@
 import logging
 
-from django.shortcuts import get_object_or_404
 from django.conf import settings
 from typing import List
 from django.db.models import Count
 
-from cfehome.repository import IRepository
-from .dtos import CategoriesWithTotals, BrandsWithTotals
-from .models import Product, Category, Brand
+from .dtos import CategoriesWithTotals, BrandsWithTotals, SizesWithTotals
+from .models import Product, Category, Brand, AttributeOptions, ProductAttributeValues
 
 User = settings.AUTH_USER_MODEL
 logger = logging.getLogger('django')
@@ -84,10 +82,24 @@ class ProductRepository:
     def get_discounts_with_totals(self):
         pass
 
-    def get_sizes_with_totals(self):
-        sizes_with_totals_qs = Product.objects \
-            .filter(attributes=1) \
-            .annotate(sizes_count=Count('attributes')) \
-            .order_by('-sizes_count')
-        logger.info(f'sizes_with_totals_qs: {sizes_with_totals_qs}')
-        return sizes_with_totals_qs
+    def get_sizes_with_totals(self) -> List[SizesWithTotals]:
+        sub_query = ProductAttributeValues.objects \
+                .get_queryset() \
+                .with_attribute_option() \
+                .filter(attribute_id=1) \
+                .distinct("attribute_option_id")
+
+        # s =
+
+        sizes_with_totals_qs = ProductAttributeValues.objects \
+            .get_queryset() \
+            .with_attribute_option() \
+            .filter(attribute_id=1) \
+            .annotate(products_count=Count('product')) \
+            .filter(products_count__gt=0) \
+            .order_by('-products_count')
+        result_list: List[SizesWithTotals] = [
+            SizesWithTotals(id=sizes.id, name=sizes.attribute_option.option_name, total_products=sizes.products_count)
+            for sizes in sizes_with_totals_qs
+        ]
+        return result_list

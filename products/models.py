@@ -43,9 +43,25 @@ class Attribute(Model):
         return f"<Attribute name:{self.name} type:{self.type}>"
 
 
+class AttributeOptionsQuerySet(QuerySet):
+    def with_attribute(self):
+        return self.select_related('attribute')
+
+    def with_product_attribute_values(self):
+        return self.prefetch_related('productattributevalues')
+
+
+class AttributeOptionsManager(Manager):
+
+    def get_queryset(self, *args, **kwargs):
+        return AttributeOptionsQuerySet(self.model, using=self._db)
+
+
 class AttributeOptions(Model):
     attribute = ForeignKey(Attribute, on_delete=CASCADE, related_name='attribute_options', null=True)
     option_name = CharField(max_length=120, default=None)
+
+    objects = AttributeOptionsManager()
 
     class Meta:
         verbose_name_plural = "Attribute Options"
@@ -191,12 +207,28 @@ class Product(Model):
         pass
 
 
+class ProductAttributeValuesQuerySet(QuerySet):
+    def with_attribute(self):
+        return self.select_related('attribute')
+
+    def with_attribute_option(self):
+        return self.select_related('attribute_option')
+
+
+class ProductAttributeValuesManager(Manager):
+
+    def get_queryset(self, *args, **kwargs):
+        return ProductAttributeValuesQuerySet(self.model, using=self._db)
+
+
 class ProductAttributeValues(Model):
     product = ForeignKey(Product, on_delete=CASCADE)
     attribute = ForeignKey(Attribute, on_delete=CASCADE)
     attribute_option = ForeignKey(AttributeOptions, on_delete=CASCADE)
     attribute_value_method = CharField(max_length=120, default=None, null=True, blank=True)
     attribute_value = FloatField(null=True, blank=True)
+
+    objects = ProductAttributeValuesManager()
 
     class Meta:
         verbose_name_plural = "Product Attribute Values"
