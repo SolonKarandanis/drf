@@ -1,7 +1,7 @@
 import logging
 
 from .serializers import ProductSerializer, CreateProductSerializer, PaginatedProductListSerializer, \
-    PostProductComment, ProductSearchRequestSerializer
+    PostProductComment, ProductSearchRequestSerializer, CategoriesWithTotalsSerializer
 from .models import Product
 from rest_framework import status
 from rest_framework.decorators import api_view, permission_classes
@@ -97,7 +97,8 @@ def search_products(request):
 @permission_classes([IsAuthenticated])
 def get_categories_with_totals(request):
     result = product_service.get_categories_with_totals()
-    return Response(status=status.HTTP_200_OK)
+    data = CategoriesWithTotalsSerializer(result, many=True).data
+    return Response(data, status=status.HTTP_200_OK)
 
 
 def get_user_from_request(request):

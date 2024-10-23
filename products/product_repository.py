@@ -6,10 +6,12 @@ from typing import List
 from django.db.models import Count
 
 from cfehome.repository import IRepository
-from .models import Product
+from .dtos import CategoriesWithTotals
+from .models import Product, Category
 
 User = settings.AUTH_USER_MODEL
 logger = logging.getLogger('django')
+
 
 class ProductRepository:
 
@@ -57,16 +59,20 @@ class ProductRepository:
     def search_products(self, query: str, user: User) -> List[Product]:
         return Product.objects.get_queryset().fts_search(query, user)
 
-    def get_categories_with_totals(self):
-        categories_with_totals_qs = Product.objects \
-            .annotate(categories_count=Count('category')) \
-            .order_by('-categories_count')
-        logger.info(f'categories_with_totals_qs: {categories_with_totals_qs}')
-        return categories_with_totals_qs
+    def get_categories_with_totals(self) -> List[CategoriesWithTotals]:
+        categories_with_totals_qs = Category.objects \
+            .annotate(products_count=Count('product')) \
+            .filter(products_count__gt=0) \
+            .order_by('-products_count')
+        result_list: List[CategoriesWithTotals] = [
+            CategoriesWithTotals(id=category.id, name=category.name, total_products=category.products_count)
+            for category in categories_with_totals_qs
+        ]
+        return result_list
 
     def get_brands_with_totals(self):
-        brands_with_totals_qs = Product.objects\
-            .annotate(brands_count=Count('brand'))\
+        brands_with_totals_qs = Product.objects \
+            .annotate(brands_count=Count('brand')) \
             .order_by('-brands_count')
         logger.info(f'brands_with_totals_qs: {brands_with_totals_qs}')
         return brands_with_totals_qs

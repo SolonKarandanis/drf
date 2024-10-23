@@ -129,3 +129,24 @@ class ProductSearchRequestSerializer(serializers.Serializer):
 
     def __repr__(self):
         return f"<ProductSearchRequest query:{self.query},Category:{self.category_id}, Brand:{self.brand_id}, Size:{self.size_id}>"
+
+
+class CategoriesWithTotalsSerializer(serializers.Serializer):
+    id = serializers.IntegerField()
+    name = serializers.CharField()
+    total_products = serializers.IntegerField()
+
+class BrandsWithTotalsSerializer(serializers.Serializer):
+    id = serializers.IntegerField()
+    name = serializers.CharField()
+    total_products = serializers.IntegerField()
+
+class SizesWithTotalsSerializer(serializers.Serializer):
+    id = serializers.IntegerField()
+    name = serializers.CharField()
+    total_products = serializers.IntegerField()
+
+class DiscountsWithTotalsSerializer(serializers.Serializer):
+    id = serializers.IntegerField()
+    name = serializers.CharField()
+    total_products = serializers.IntegerField()

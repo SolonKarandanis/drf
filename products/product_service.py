@@ -1,6 +1,8 @@
 from typing import List
 from django.db import transaction
 from django.conf import settings
+
+from .dtos import CategoriesWithTotals
 from .models import Product
 from .product_repository import ProductRepository
 from .serializers import PostProductComment, ProductSearchRequestSerializer
@@ -72,7 +74,7 @@ class ProductService:
             size_id = data_dict['size_id']
         return repo.search_products(query, None)
 
-    def get_categories_with_totals(self):
+    def get_categories_with_totals(self) -> List[CategoriesWithTotals]:
         return repo.get_categories_with_totals()
 
     def get_brands_with_totals(self):
