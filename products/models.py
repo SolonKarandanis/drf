@@ -195,8 +195,8 @@ class ProductAttributeValues(Model):
     product = ForeignKey(Product, on_delete=CASCADE)
     attribute = ForeignKey(Attribute, on_delete=CASCADE)
     attribute_option = ForeignKey(AttributeOptions, on_delete=CASCADE)
-    attribute_value_method = CharField(max_length=120, default=None)
-    attribute_value = FloatField()
+    attribute_value_method = CharField(max_length=120, default=None, null=True)
+    attribute_value = FloatField(null=True)
 
     class Meta:
         verbose_name_plural = "Product Attribute Values"
