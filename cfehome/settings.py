@@ -47,6 +47,7 @@ INSTALLED_APPS = [
     "debug_toolbar",
     "django_celery_results",
     'django_celery_beat',
+    "django_elasticsearch_dsl",
     'channels',
     'celery',
     'auth',
@@ -292,3 +293,5 @@ LOG_FILE =os.path.join(BASE_DIR, 'logs/'),
 CRONJOBS = [
     ('0 0 * * *', 'cfehome.cron.remove_unverified_users', f'>> {LOG_FILE}/cron_jobs.log'),
 ]
+
+ELASTICSEARCH_DSL = {"default": {"hosts": "localhost"}}
