@@ -1,11 +1,16 @@
+from decimal import Decimal
+
 from django.core.exceptions import ObjectDoesNotExist
 from django.db.models import Q, QuerySet, Manager, Model, SET_NULL, ForeignKey, CharField, TextField, \
     FloatField, BooleanField, IntegerField, UUIDField, Index, SlugField, GeneratedField, PROTECT, ManyToManyField, \
-    CASCADE, TextChoices, DateTimeField
+    CASCADE, TextChoices, DateTimeField, DecimalField
 from django.conf import settings
 from django.contrib.contenttypes.fields import GenericRelation
 from django.contrib.postgres.search import SearchVector, SearchVectorField
 import uuid
+from django.utils.translation import gettext_lazy as _
+from django.core.exceptions import ValidationError
+from django.core.validators import MinValueValidator
 
 # Create your models here.
 User = settings.AUTH_USER_MODEL
@@ -236,3 +241,52 @@ class ProductAttributeValues(Model):
 
     def __str__(self):
         return f"<ProductAttributeValues product:{self.product} attribute:{self.attribute}>"
+
+
+class DiscountType(TextChoices):
+    SINGLE = 'attribute.type.single',
+    MULTIPLE = 'attribute.type.multiple',
+
+
+class Discount(Model):
+    name = CharField(max_length=255)
+    type = CharField(max_length=40, choices=DiscountType.choices, db_default=DiscountType.SINGLE)
+    description = TextField(blank=True)
+    promo_reduction = IntegerField(default=0)
+    is_active = BooleanField(default=False)
+    is_schedule = BooleanField(default=False)
+    promo_start = DateTimeField()
+    promo_end = DateTimeField()
+
+    def clean(self):
+        if self.promo_start > self.promo_end:
+            raise ValidationError(_("End data before the start date"))
+
+    def __str__(self):
+        return f"<Discount name:{self.name} type:{self.type}>"
+
+
+class ProductsDiscount(Model):
+    product_id = ForeignKey(
+        Product,
+        on_delete=PROTECT,
+    )
+    discount_id = ForeignKey(
+        Discount,
+        on_delete=CASCADE,
+    )
+    discount_price = DecimalField(
+        max_digits=10,
+        decimal_places=2,
+        default=Decimal("0.00"),
+        validators=[
+            MinValueValidator(Decimal("0.00")),
+        ],
+    )
+    price_override = BooleanField(
+        default=False,
+    )
+
+    class Meta:
+        unique_together = (("product_id", "discount_id"),)
+        

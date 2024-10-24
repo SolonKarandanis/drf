@@ -30,6 +30,6 @@ class SearchService:
             )
             search = self.product_document.search().query(q)
             response = search.execute()
-            
+
         except Exception as e:
             return HttpResponse(e, status=500)
