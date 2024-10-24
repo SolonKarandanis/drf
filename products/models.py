@@ -289,4 +289,3 @@ class ProductsDiscount(Model):
 
     class Meta:
         unique_together = (("product_id", "discount_id"),)
-        
