@@ -83,23 +83,15 @@ class ProductRepository:
         pass
 
     def get_sizes_with_totals(self) -> List[SizesWithTotals]:
-        sub_query = ProductAttributeValues.objects \
-                .get_queryset() \
-                .with_attribute_option() \
-                .filter(attribute_id=1) \
-                .distinct("attribute_option_id")
-
-        # s =
-
         sizes_with_totals_qs = ProductAttributeValues.objects \
-            .get_queryset() \
-            .with_attribute_option() \
-            .filter(attribute_id=1) \
-            .annotate(products_count=Count('product')) \
-            .filter(products_count__gt=0) \
-            .order_by('-products_count')
+            .raw("SELECT 1 id, pav.attribute_option_id ,pao.option_name, COUNT(pav.product_id) as total_products "
+                 "FROM products_attribute_values pav "
+                 "JOIN products_attribute_options pao ON pao.id =pav.attribute_option_id "
+                 "WHERE pav.attribute_id =1 "
+                 "GROUP BY pav.attribute_option_id ,pao.option_name "
+                 "HAVING COUNT(pav.product_id) > 0")
         result_list: List[SizesWithTotals] = [
-            SizesWithTotals(id=sizes.id, name=sizes.attribute_option.option_name, total_products=sizes.products_count)
+            SizesWithTotals(id=sizes.attribute_option_id, name=sizes.option_name,  total_products=sizes.total_products)
             for sizes in sizes_with_totals_qs
         ]
         return result_list
