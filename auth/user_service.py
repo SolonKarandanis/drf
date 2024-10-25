@@ -163,6 +163,6 @@ class UserService:
     @transaction.atomic
     def get_user_image(self, uuid: str) -> Images:
         user: User = repo.find_user_by_uuid(uuid)
-        user_image = image_repo.find_user_profile_image(user.id)
+        user_image = image_repo.find_profile_image(user.id)
         logger.info(f'user_image: {user_image}')
         return user_image

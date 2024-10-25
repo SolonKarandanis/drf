@@ -2,7 +2,8 @@ from typing import List
 from django.db import transaction
 from django.conf import settings
 
-from .dtos import CategoriesWithTotals, BrandsWithTotals, SizesWithTotals
+from images.image_repository import ImageRepository
+from .dtos import CategoriesWithTotals, BrandsWithTotals, SizesWithTotals, ProductWithPreviewImage
 from .models import Product
 from .product_repository import ProductRepository
 from .serializers import PostProductComment, ProductSearchRequestSerializer
@@ -11,6 +12,7 @@ from comments.comment_repository import CommentRepository
 User = settings.AUTH_USER_MODEL
 repo = ProductRepository()
 comment_repo = CommentRepository()
+image_repo = ImageRepository()
 
 
 class ProductService:
@@ -57,7 +59,8 @@ class ProductService:
         comment_repo.create_product_comment(comment, product, logged_in_user)
         return repo.find_by_id(product_id)
 
-    def search_products(self, request: ProductSearchRequestSerializer) -> List[Product]:
+    @transaction.atomic
+    def search_products(self, request: ProductSearchRequestSerializer) -> List[ProductWithPreviewImage]:
         serialized_data = request.data
         query = None
         category_id = None
@@ -72,7 +75,15 @@ class ProductService:
             brand_id = data_dict['brand_id']
         if "size_id" in data_dict:
             size_id = data_dict['size_id']
-        return repo.search_products(query, None)
+        product_results = repo.search_products(query, None)
+        product_ids = [product.id for product in product_results]
+        product_preview_images = image_repo.find_profile_images(product_ids)
+        product_preview_images_dict = {image.object_id: image for image in product_preview_images}
+        products_with_preview_images: List[ProductWithPreviewImage] = [
+            ProductWithPreviewImage(product=product, preview_image=product_preview_images_dict.get(product.id))
+            for product in product_results
+        ]
+        return products_with_preview_images
 
     def get_categories_with_totals(self) -> List[CategoriesWithTotals]:
         return repo.get_categories_with_totals()

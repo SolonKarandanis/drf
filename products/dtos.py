@@ -1,5 +1,8 @@
 from dataclasses import dataclass
 
+from images.models import Images
+from products.models import Product
+
 
 @dataclass
 class CategoriesWithTotals:
@@ -27,3 +30,9 @@ class DiscountsWithTotals:
     id: int
     name: str
     total_products: int
+
+
+@dataclass
+class ProductWithPreviewImage:
+    product: Product
+    preview_image: Images

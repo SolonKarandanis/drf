@@ -18,9 +18,15 @@ class ImageRepository:
     def find_image_by_object_id(self, object_id: int) -> List[Images]:
         return Images.objects.filter(object_id=object_id)
 
-    def find_user_profile_image(self, object_id: int) -> Images:
+    def find_profile_image(self, object_id: int) -> Images:
         try:
             return Images.objects.get_queryset().is_profile_image().get(object_id=object_id)
+        except ObjectDoesNotExist:
+            return None
+
+    def find_profile_images(self, object_ids: List[int]) -> List[Images]:
+        try:
+            return Images.objects.get_queryset().is_profile_image().filter(object_id__in=object_ids)
         except ObjectDoesNotExist:
             return None
 

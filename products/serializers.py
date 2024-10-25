@@ -51,15 +51,21 @@ class ProductSerializer(serializers.ModelSerializer):
         ]
 
 
-class ProductListSerializer(serializers.ModelSerializer):
-    fabricDetails = serializers.CharField(source='fabric_details', read_only=True)
-    careInstructions = serializers.CharField(source='care_instructions', read_only=True)
-    publishStatus = serializers.CharField(source='publish_status', read_only=True)
-    availabilityStatus = serializers.CharField(source='availability_status', read_only=True)
-    salePrice = serializers.FloatField(source='sale_price', read_only=True)
+class ProductListSerializer(serializers.Serializer):
+    id = serializers.IntegerField(source='product.id', read_only=True)
+    sku = serializers.CharField(source='product.fabric_details', read_only=True)
+    title = serializers.CharField(source='product.fabric_details', read_only=True)
+    content = serializers.CharField(source='product.fabric_details', read_only=True)
+    fabricDetails = serializers.CharField(source='product.fabric_details', read_only=True)
+    careInstructions = serializers.CharField(source='product.care_instructions', read_only=True)
+    publishStatus = serializers.CharField(source='product.publish_status', read_only=True)
+    availabilityStatus = serializers.CharField(source='product.availability_status', read_only=True)
+    price = serializers.FloatField(source='product.price', read_only=True)
+    inventory = serializers.IntegerField(source='product.inventory', read_only=True)
+    salePrice = serializers.FloatField(source='product.sale_price', read_only=True)
+    uuid = serializers.CharField(source='product.uuid', read_only=True)
 
     class Meta:
-        model = Product
         fields = [
             'id',
             'sku',
