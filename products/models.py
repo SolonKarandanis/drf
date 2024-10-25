@@ -289,3 +289,5 @@ class ProductsDiscount(Model):
 
     class Meta:
         unique_together = (("product_id", "discount_id"),)
+        verbose_name_plural = "Products Discounts"
+        db_table = 'products_product_discount'
