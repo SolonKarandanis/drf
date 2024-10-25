@@ -65,7 +65,7 @@ def create_product(request):
     logged_in_user = request.user
     serializer = CreateProductSerializer(data=request.data, context={'logged_in_user': logged_in_user})
     if serializer.is_valid(raise_exception=True):
-        serializer.save()
+        # serializer.save()
         return Response(serializer.data, status=status.HTTP_201_CREATED)
     return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 

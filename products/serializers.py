@@ -14,26 +14,11 @@ class ProductSerializer(serializers.ModelSerializer):
     title = serializers.CharField(validators=[unique_product_title])
     owner = UserPublicSerializer(source='user', read_only=True)
     comments = CommentSerializer(many=True, read_only=True)
-
-    class Meta:
-        model = Product
-        fields = [
-            'id',
-            'sku',
-            'title',
-            'content',
-            'owner',
-            'price',
-            'inventory',
-            'sale_price',
-            'uuid',
-            'comments'
-        ]
-
-
-class ProductListSerializer(serializers.ModelSerializer):
     fabricDetails = serializers.CharField(source='fabric_details', read_only=True)
     careInstructions = serializers.CharField(source='care_instructions', read_only=True)
+    publishStatus = serializers.CharField(source='publish_status', read_only=True)
+    availabilityStatus = serializers.CharField(source='availability_status', read_only=True)
+    salePrice = serializers.FloatField(source='sale_price', read_only=True)
 
     class Meta:
         model = Product
@@ -44,9 +29,38 @@ class ProductListSerializer(serializers.ModelSerializer):
             'content',
             'fabricDetails',
             'careInstructions',
+            'publishStatus',
+            'availabilityStatus',
+            'owner',
             'price',
             'inventory',
-            'sale_price',
+            'salePrice',
+            'uuid',
+            'comments'
+        ]
+
+
+class ProductListSerializer(serializers.ModelSerializer):
+    fabricDetails = serializers.CharField(source='fabric_details', read_only=True)
+    careInstructions = serializers.CharField(source='care_instructions', read_only=True)
+    publishStatus = serializers.CharField(source='publish_status', read_only=True)
+    availabilityStatus = serializers.CharField(source='availability_status', read_only=True)
+    salePrice = serializers.FloatField(source='sale_price', read_only=True)
+
+    class Meta:
+        model = Product
+        fields = [
+            'id',
+            'sku',
+            'title',
+            'content',
+            'fabricDetails',
+            'careInstructions',
+            'publishStatus',
+            'availabilityStatus',
+            'price',
+            'inventory',
+            'salePrice',
             'uuid'
         ]
 
@@ -87,7 +101,10 @@ class PaginatedProductListSerializer:
 class CreateProductSerializer(serializers.ModelSerializer):
     sku = serializers.CharField(validators=[validate_sku])
     title = serializers.CharField(validators=[unique_product_title])
-    owner = UserPublicSerializer(source='user', read_only=True)
+    fabricDetails = serializers.CharField(source='fabric_details', read_only=True)
+    careInstructions = serializers.CharField(source='care_instructions', read_only=True)
+    publishStatus = serializers.CharField(source='publish_status', read_only=True)
+    availabilityStatus = serializers.CharField(source='availability_status', read_only=True)
 
     class Meta:
         model = Product
@@ -96,26 +113,35 @@ class CreateProductSerializer(serializers.ModelSerializer):
             'sku',
             'title',
             'content',
-            'owner',
+            'fabricDetails',
+            'careInstructions',
             'price',
             'inventory',
+            'publishStatus',
+            'availabilityStatus',
         ]
 
-    def save(self):
-        user = self.context.get("logged_in_user")
-        sku = self.validated_data['sku']
-        title = self.validated_data['title']
-        content = self.validated_data['content']
-        price = self.validated_data['price']
-        inventory = self.validated_data['inventory']
-        new_product = Product(sku=sku, user=user, title=title, content=content, price=price, inventory=inventory)
-        new_product.save()
-        return new_product
+    # def save(self):
+    #     user = self.context.get("logged_in_user")
+    #     sku = self.validated_data['sku']
+    #     title = self.validated_data['title']
+    #     content = self.validated_data['content']
+    #     price = self.validated_data['price']
+    #     inventory = self.validated_data['inventory']
+    #     new_product = Product(sku=sku, user=user, title=title, content=content, price=price, inventory=inventory)
+    #     new_product.save()
+    #     return new_product
 
 
 class PostProductComment(serializers.Serializer):
-    product_id = serializers.IntegerField(validators=[product_exists])
+    productId = serializers.IntegerField(source='product_id', validators=[product_exists])
     comment = serializers.CharField()
+
+    class Meta:
+        fields = [
+            'productId',
+            'comment',
+        ]
 
     def __repr__(self):
         return f"<PostProductComment ProductId:{self.product_id},  Comment:{self.comment}>"
@@ -127,6 +153,11 @@ class ProductSearchRequestSerializer(serializers.Serializer):
     brand_id = serializers.IntegerField(required=False)
     size_id = serializers.IntegerField(required=False)
 
+    class Meta:
+        fields = [
+            'query',
+        ]
+
     def __repr__(self):
         return f"<ProductSearchRequest query:{self.query},Category:{self.category_id}, Brand:{self.brand_id}, Size:{self.size_id}>"
 
@@ -134,19 +165,50 @@ class ProductSearchRequestSerializer(serializers.Serializer):
 class CategoriesWithTotalsSerializer(serializers.Serializer):
     id = serializers.IntegerField()
     name = serializers.CharField()
-    total_products = serializers.IntegerField()
+    totalProducts = serializers.IntegerField(source='total_products', read_only=True)
+
+    class Meta:
+        fields = [
+            'id',
+            'name',
+            'totalProducts',
+        ]
+
 
 class BrandsWithTotalsSerializer(serializers.Serializer):
     id = serializers.IntegerField()
     name = serializers.CharField()
-    total_products = serializers.IntegerField()
+    totalProducts = serializers.IntegerField(source='total_products', read_only=True)
+
+    class Meta:
+        fields = [
+            'id',
+            'name',
+            'totalProducts',
+        ]
+
 
 class SizesWithTotalsSerializer(serializers.Serializer):
     id = serializers.IntegerField()
     name = serializers.CharField()
-    total_products = serializers.IntegerField()
+    totalProducts = serializers.IntegerField(source='total_products', read_only=True)
+
+    class Meta:
+        fields = [
+            'id',
+            'name',
+            'totalProducts',
+        ]
+
 
 class DiscountsWithTotalsSerializer(serializers.Serializer):
     id = serializers.IntegerField()
     name = serializers.CharField()
-    total_products = serializers.IntegerField()
+    totalProducts = serializers.IntegerField(source='total_products', read_only=True)
+
+    class Meta:
+        fields = [
+            'id',
+            'name',
+            'totalProducts',
+        ]
