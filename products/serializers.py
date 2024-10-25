@@ -9,6 +9,16 @@ from comments.serializers import CommentSerializer
 
 logger = logging.getLogger('django')
 
+AVAILABILITY_STATUS_CHOICES = [
+    "product.availability.in.stock",
+    "product.availability.out.of.stock",
+]
+
+PUBLISH_STATUS_CHOICES = [
+    "product.status.published",
+    "product.status.scheduled",
+]
+
 
 class ProductSerializer(serializers.ModelSerializer):
     title = serializers.CharField(validators=[unique_product_title])
@@ -16,8 +26,9 @@ class ProductSerializer(serializers.ModelSerializer):
     comments = CommentSerializer(many=True, read_only=True)
     fabricDetails = serializers.CharField(source='fabric_details', read_only=True)
     careInstructions = serializers.CharField(source='care_instructions', read_only=True)
-    publishStatus = serializers.CharField(source='publish_status', read_only=True)
-    availabilityStatus = serializers.CharField(source='availability_status', read_only=True)
+    publishStatus = serializers.ChoiceField(source='publish_status', read_only=True, choices=PUBLISH_STATUS_CHOICES)
+    availabilityStatus = serializers.ChoiceField(source='availability_status', read_only=True,
+                                                 choices=AVAILABILITY_STATUS_CHOICES)
     salePrice = serializers.FloatField(source='sale_price', read_only=True)
 
     class Meta:
