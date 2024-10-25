@@ -2,6 +2,8 @@ import logging
 
 from rest_framework import serializers
 from django.core.paginator import Paginator
+
+from images.serializers import ImagesSerializer
 from .models import Product
 from .validators import unique_product_title, validate_sku, product_exists
 from auth.serializers import UserPublicSerializer
@@ -64,6 +66,7 @@ class ProductListSerializer(serializers.Serializer):
     inventory = serializers.IntegerField(source='product.inventory', read_only=True)
     salePrice = serializers.FloatField(source='product.sale_price', read_only=True)
     uuid = serializers.CharField(source='product.uuid', read_only=True)
+    previewImage = ImagesSerializer(source='preview_image', read_only=True)
 
     class Meta:
         fields = [
@@ -78,6 +81,7 @@ class ProductListSerializer(serializers.Serializer):
             'price',
             'inventory',
             'salePrice',
+            'previewImage'
             'uuid'
         ]
 
