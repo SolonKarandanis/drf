@@ -6,16 +6,21 @@ from .validators import is_quantity_valid
 
 
 class CartItemSerializer(serializers.ModelSerializer):
+    modificationAlert = serializers.BooleanField(source='modification_alert', read_only=True)
+    unitPrice = serializers.IntegerField(source='unit_price', read_only=True)
+    totalPrice = serializers.IntegerField(source='total_price', read_only=True)
+    productId = serializers.IntegerField(source='product_id', read_only=True)
+
     class Meta:
         model = CartItem
         fields = [
             'id',
-            'modification_alert',
+            'modificationAlert',
             'quantity',
-            'unit_price',
-            'total_price',
+            'unitPrice',
+            'totalPrice',
             'uuid',
-            'product_id',
+            'productId',
         ]
 
 
@@ -28,36 +33,57 @@ class PaginatedCartItemListSerializer(ModelPaginationSerializer):
 
 
 class CartSerializer(serializers.ModelSerializer):
-    cart_items = CartItemSerializer(many=True, read_only=True)
+    cartItems = CartItemSerializer(many=True, read_only=True)
+    modificationAlert = serializers.BooleanField(source='modification_alert', read_only=True)
+    totalPrice = serializers.IntegerField(source='total_price', read_only=True)
+    dateCreated = serializers.DateField(source='date_created', read_only=True)
+    dateModified = serializers.DateField(source='date_modified', read_only=True)
 
     class Meta:
         model = Cart
         fields = [
             'id',
-            'modification_alert',
-            'total_price',
-            'date_created',
-            'date_modified',
+            'modificationAlert',
+            'totalPrice',
+            'dateCreated',
+            'dateModified',
             'uuid',
-            'cart_items',
+            'cartItems',
         ]
 
 
 class AddToCart(serializers.Serializer):
-    product_id = serializers.IntegerField()
+    productId = serializers.IntegerField(source='product_id', read_only=True)
     quantity = serializers.IntegerField(validators=[is_quantity_valid])
+
+    class Meta:
+        fields = [
+            'productId',
+            'quantity',
+        ]
 
     def __repr__(self):
         return f"<AddOrUpdateCart ProductId:{self.product_id},  Quantity:{self.quantity}>"
 
 
 class UpdateQuantity(serializers.Serializer):
-    cart_item_id = serializers.IntegerField()
+    cartItemId = serializers.IntegerField(source='cart_item_id', read_only=True)
     quantity = serializers.IntegerField(validators=[is_quantity_valid])
+
+    class Meta:
+        fields = [
+            'cartItemId',
+            'quantity',
+        ]
 
     def __repr__(self):
         return f"<UpdateQuantity CartItemId:{self.cart_item_id},  Quantity:{self.quantity}>"
 
 
 class DeleteCartItems(serializers.Serializer):
-    cart_item_id = serializers.IntegerField()
+    cartItemId = serializers.IntegerField(source='cart_item_id', read_only=True)
+
+    class Meta:
+        fields = [
+            'cartItemId'
+        ]

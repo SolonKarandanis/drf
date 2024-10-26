@@ -11,57 +11,77 @@ logger = logging.getLogger('django')
 
 
 class OrderItemSerializer(serializers.ModelSerializer):
+    productId = serializers.IntegerField(source='product_id', read_only=True)
+    productName = serializers.CharField(source='product_name', read_only=True)
+    startDate = serializers.DateField(source='start_date', read_only=True)
+    endDate = serializers.DateField(source='end_date', read_only=True)
+    totalPrice = serializers.IntegerField(source='total_price', read_only=True)
+
+
     class Meta:
         model = OrderItem
         fields = [
             'id',
-            'product_id',
-            'product_name',
+            'productId',
+            'productName',
             'sku',
             'manufacturer',
-            'start_date',
-            'end_date',
+            'startDate',
+            'endDate',
             'status',
             'price',
             'quantity',
-            'total_price',
+            'totalPrice',
             'uuid',
         ]
 
 
 class OrderSerializer(serializers.ModelSerializer):
-    order_items = OrderItemSerializer(many=True, read_only=True)
+    orderItems = OrderItemSerializer(many=True, read_only=True)
     comments = CommentSerializer(many=True, read_only=True)
+    buyerId = serializers.IntegerField(source='buyer_id', read_only=True)
+    supplierId = serializers.IntegerField(source='supplier_id', read_only=True)
+    productName = serializers.CharField(source='product_name', read_only=True)
+    dateShipped = serializers.DateField(source='date_shipped', read_only=True)
+    isShipped = serializers.BooleanField(source='is_shipped', read_only=True)
+    totalPrice = serializers.IntegerField(source='total_price', read_only=True)
 
     class Meta:
         model = Order
         fields = [
             'id',
             'date_created',
-            'buyer_id',
-            'supplier_id',
+            'buyerId',
+            'supplierId',
             'status',
-            'total_price',
-            'is_shipped',
-            'date_shipped',
+            'totalPrice',
+            'isShipped',
+            'dateShipped',
             'uuid',
-            'order_items',
+            'orderItems',
             'comments'
         ]
 
 
 class OrderListSerializer(serializers.ModelSerializer):
+    dateCreated = serializers.DateField(source='date_created', read_only=True)
+    buyerId = serializers.IntegerField(source='buyer_id', read_only=True)
+    supplierId = serializers.IntegerField(source='supplier_id', read_only=True)
+    totalPrice = serializers.IntegerField(source='total_price', read_only=True)
+    isShipped = serializers.BooleanField(source='is_shipped', read_only=True)
+    dateShipped = serializers.DateField(source='date_shipped', read_only=True)
+
     class Meta:
         model = Order
         fields = [
             'id',
-            'date_created',
-            'buyer_id',
-            'supplier_id',
+            'dateCreated',
+            'buyerId',
+            'supplierId',
             'status',
-            'total_price',
-            'is_shipped',
-            'date_shipped',
+            'totalPrice',
+            'isShipped',
+            'dateShipped',
             'uuid'
         ]
 

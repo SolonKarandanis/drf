@@ -4,9 +4,9 @@ from .models import Comment
 
 class CommentSerializer(serializers.ModelSerializer):
     contentType = serializers.CharField(source='content_type', read_only=True)
-    objectId = serializers.CharField(source='object_id', read_only=True)
-    dateCreated = serializers.CharField(source='date_created', read_only=True)
-    userId = serializers.CharField(source='user_id', read_only=True)
+    objectId = serializers.IntegerField(source='object_id', read_only=True)
+    dateCreated = serializers.DateField(source='date_created', read_only=True)
+    userId = serializers.IntegerField(source='user_id', read_only=True)
     username = serializers.CharField(source='user_username', read_only=True)
     userEmail = serializers.CharField(source='user_email', read_only=True)
 
