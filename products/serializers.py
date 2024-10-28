@@ -55,9 +55,9 @@ class ProductSerializer(serializers.ModelSerializer):
 
 class ProductListSerializer(serializers.Serializer):
     id = serializers.IntegerField(source='product.id', read_only=True)
-    sku = serializers.CharField(source='product.fabric_details', read_only=True)
-    title = serializers.CharField(source='product.fabric_details', read_only=True)
-    content = serializers.CharField(source='product.fabric_details', read_only=True)
+    sku = serializers.CharField(source='product.sku', read_only=True)
+    title = serializers.CharField(source='product.title', read_only=True)
+    content = serializers.CharField(source='product.content', read_only=True)
     fabricDetails = serializers.CharField(source='product.fabric_details', read_only=True)
     careInstructions = serializers.CharField(source='product.care_instructions', read_only=True)
     publishStatus = serializers.CharField(source='product.publish_status', read_only=True)
@@ -169,7 +169,7 @@ class PostProductComment(serializers.Serializer):
 
 
 class ProductSearchRequestSerializer(serializers.Serializer):
-    query = serializers.CharField(required=False, allow_blank=True)
+    query = serializers.CharField(required=False, allow_null=True,allow_blank=True)
     category_id = serializers.IntegerField(required=False)
     brand_id = serializers.IntegerField(required=False)
     size_id = serializers.IntegerField(required=False)
