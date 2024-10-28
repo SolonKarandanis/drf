@@ -169,7 +169,7 @@ class PostProductComment(serializers.Serializer):
 
 
 class ProductSearchRequestSerializer(serializers.Serializer):
-    query = serializers.CharField(required=False)
+    query = serializers.CharField(required=False, allow_blank=True)
     category_id = serializers.IntegerField(required=False)
     brand_id = serializers.IntegerField(required=False)
     size_id = serializers.IntegerField(required=False)
