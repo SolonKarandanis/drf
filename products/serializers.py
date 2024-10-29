@@ -3,6 +3,7 @@ import logging
 from rest_framework import serializers
 from django.core.paginator import Paginator
 
+from cfehome.serializers import PagingSerializer
 from images.serializers import ImagesSerializer
 from .models import Product
 from .validators import unique_product_title, validate_sku, product_exists
@@ -119,6 +120,31 @@ class PaginatedProductListSerializer:
         self.page_data = {'count': count, 'previous': previous, 'next': next, 'data': serializer.data}
 
 
+class PaginatedPOSTProductListSerializer:
+    """
+    Serializes page objects of product querysets.
+    """
+    def __init__(self, data, paging):
+        limit = paging["limit"]
+        page = paging["page"]
+        logger.info(f'page: {page}')
+        logger.info(f'size: {limit}')
+        paginator = Paginator(data, limit)
+        try:
+            data = paginator.page(page)
+        except PageNotAnInteger:
+            data = paginator.page(1)
+        except EmptyPage:
+            data = paginator.page(paginator.num_pages)
+        count = paginator.count
+        pages = paginator.num_pages
+
+        previous = None if not data.has_previous() else data.previous_page_number()
+        next = None if not data.has_next() else data.next_page_number()
+        serializer = ProductListSerializer(data, many=True)
+        self.page_data = {'count': count, 'pages': pages, 'previous': previous, 'next': next, 'data': serializer.data}
+
+
 class CreateProductSerializer(serializers.ModelSerializer):
     sku = serializers.CharField(validators=[validate_sku])
     title = serializers.CharField(validators=[unique_product_title])
@@ -173,6 +199,7 @@ class ProductSearchRequestSerializer(serializers.Serializer):
     category_id = serializers.IntegerField(required=False)
     brand_id = serializers.IntegerField(required=False)
     size_id = serializers.IntegerField(required=False)
+    paging = PagingSerializer(required=True)
 
     class Meta:
         fields = [
