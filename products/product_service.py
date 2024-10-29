@@ -77,7 +77,7 @@ class ProductService:
             size_id = data_dict['size_id']
         product_results = repo.search_products(query, None)
         product_ids = [product.id for product in product_results]
-        product_preview_images = image_repo.find_profile_images(product_ids)
+        product_preview_images = image_repo.find_product_profile_images(product_ids)
         product_preview_images_dict = {image.object_id: image for image in product_preview_images}
         products_with_preview_images: List[ProductWithPreviewImage] = [
             ProductWithPreviewImage(product=product, preview_image=product_preview_images_dict.get(product.id))

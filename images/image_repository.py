@@ -19,16 +19,13 @@ class ImageRepository:
         return Images.objects.filter(object_id=object_id)
 
     def find_profile_image(self, object_id: int) -> Images:
-        try:
-            return Images.objects.get_queryset().is_profile_image().get(object_id=object_id)
-        except ObjectDoesNotExist:
-            return None
+        images = Images.objects.get_queryset().is_profile_image().filter(object_id=object_id, content_type_id=17)
+        if len(images) >1:
+            return images[0]
+        return None
 
-    def find_profile_images(self, object_ids: List[int]) -> List[Images]:
-        try:
-            return Images.objects.get_queryset().is_profile_image().filter(object_id__in=object_ids)
-        except ObjectDoesNotExist:
-            return None
+    def find_product_profile_images(self, object_ids: List[int]) -> List[Images]:
+        return Images.objects.get_queryset().is_profile_image().filter(object_id__in=object_ids, content_type_id=18)
 
     def upload_profile_image(self, image: InMemoryUploadedFile, title: str, alt: str, user: User,
                              logged_in_user: User) -> None:
