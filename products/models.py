@@ -255,8 +255,8 @@ class Discount(Model):
     promo_reduction = IntegerField(default=0)
     is_active = BooleanField(default=False)
     is_schedule = BooleanField(default=False)
-    promo_start = DateTimeField()
-    promo_end = DateTimeField()
+    discount_start = DateTimeField()
+    discount_end = DateTimeField()
 
     def clean(self):
         if self.promo_start > self.promo_end:
