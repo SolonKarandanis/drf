@@ -196,9 +196,9 @@ class PostProductComment(serializers.Serializer):
 
 class ProductSearchRequestSerializer(serializers.Serializer):
     query = serializers.CharField(required=False, allow_null=True,allow_blank=True)
-    category_id = serializers.IntegerField(required=False)
-    brand_id = serializers.IntegerField(required=False)
-    size_id = serializers.IntegerField(required=False)
+    categories = serializers.IntegerField(required=False)
+    brands = serializers.IntegerField(required=False)
+    sizes = serializers.IntegerField(required=False)
     paging = PagingSerializer(required=True)
 
     class Meta:
@@ -207,7 +207,7 @@ class ProductSearchRequestSerializer(serializers.Serializer):
         ]
 
     def __repr__(self):
-        return f"<ProductSearchRequest query:{self.query},Category:{self.category_id}, Brand:{self.brand_id}, Size:{self.size_id}>"
+        return f"<ProductSearchRequest query:{self.query},Category:{self.categories}, Brand:{self.brands}, Size:{self.sizes}>"
 
 
 class CategoriesWithTotalsSerializer(serializers.Serializer):

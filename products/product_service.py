@@ -63,18 +63,18 @@ class ProductService:
     def search_products(self, request: ProductSearchRequestSerializer) -> List[ProductWithPreviewImage]:
         serialized_data = request.data
         query = None
-        category_id = None
-        brand_id = None
-        size_id = None
+        categories = None
+        brands = None
+        sizes = None
         data_dict = dict(serialized_data)
         if "query" in data_dict:
             query = data_dict['query']
-        if "category_id" in data_dict:
-            category_id = data_dict['category_id']
-        if "brand_id" in data_dict:
-            brand_id = data_dict['brand_id']
-        if "size_id" in data_dict:
-            size_id = data_dict['size_id']
+        if "categories" in data_dict:
+            categories = data_dict['categories']
+        if "brands" in data_dict:
+            brands = data_dict['brands']
+        if "sizes" in data_dict:
+            sizes = data_dict['sizes']
         product_results = repo.search_products(query, None)
         product_ids = [product.id for product in product_results]
         product_preview_images = image_repo.find_product_profile_images(product_ids)
