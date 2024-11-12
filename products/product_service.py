@@ -75,7 +75,7 @@ class ProductService:
             brands = data_dict['brands']
         if "sizes" in data_dict:
             sizes = data_dict['sizes']
-        product_results = repo.search_products(query, categories, brands, sizes ,None)
+        product_results = repo.search_products(query, categories, brands, sizes, None)
         product_ids = [product.id for product in product_results]
         product_preview_images = image_repo.find_product_profile_images(product_ids)
         product_preview_images_dict = {image.object_id: image for image in product_preview_images}

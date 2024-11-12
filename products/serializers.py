@@ -195,10 +195,10 @@ class PostProductComment(serializers.Serializer):
 
 
 class ProductSearchRequestSerializer(serializers.Serializer):
-    query = serializers.CharField(required=False, allow_null=True,allow_blank=True)
-    categories = serializers.IntegerField(required=False)
-    brands = serializers.IntegerField(required=False)
-    sizes = serializers.IntegerField(required=False)
+    query = serializers.CharField(required=False, allow_null=True, allow_blank=True)
+    categories = serializers.ListField(child=serializers.IntegerField(required=False))
+    brands = serializers.ListField(child=serializers.IntegerField(required=False))
+    sizes = serializers.ListField(child=serializers.IntegerField(required=False))
     paging = PagingSerializer(required=True)
 
     class Meta:

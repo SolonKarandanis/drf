@@ -56,7 +56,7 @@ class ProductRepository:
 
     def search_products(self, query: str, categories: List[int],
                         brands: List[int], sizes: List[int], user: User) -> List[Product]:
-        return Product.objects.get_queryset().fts_search(query, user)
+        return Product.objects.get_queryset().fts_search(query, categories, brands, sizes, user)
 
     def get_categories_with_totals(self) -> List[CategoriesWithTotals]:
         categories_with_totals_qs = Category.objects \

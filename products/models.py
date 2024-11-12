@@ -11,6 +11,7 @@ import uuid
 from django.utils.translation import gettext_lazy as _
 from django.core.exceptions import ValidationError
 from django.core.validators import MinValueValidator
+from typing import List
 
 # Create your models here.
 User = settings.AUTH_USER_MODEL
@@ -112,12 +113,15 @@ class ProductQuerySet(QuerySet):
             qs = (qs | qs2).distinct()
         return qs
 
-    def fts_search(self, query, user=None):
+    def fts_search(self, query, categories: List[int],
+                        brands: List[int], sizes: List[int], user=None):
         qs = self.is_public()
         if query:
             lookup = Q(title__search=query) | Q(content__search=query) | Q(sku__search=query) | \
                      Q(fabric_details__search=query) | Q(care_instructions__search=query)
             qs = self.filter(lookup)
+        # if categories
+
         if user is not None:
             qs2 = self.filter(user=user)
             qs = (qs | qs2).distinct()
