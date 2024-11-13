@@ -3,7 +3,7 @@ from decimal import Decimal
 from django.core.exceptions import ObjectDoesNotExist
 from django.db.models import Q, QuerySet, Manager, Model, SET_NULL, ForeignKey, CharField, TextField, \
     FloatField, BooleanField, IntegerField, UUIDField, Index, SlugField, GeneratedField, PROTECT, ManyToManyField, \
-    CASCADE, TextChoices, DateTimeField, DecimalField
+    CASCADE, TextChoices, DateTimeField, DecimalField, Subquery
 from django.conf import settings
 from django.contrib.contenttypes.fields import GenericRelation
 from django.contrib.postgres.search import SearchVector, SearchVectorField
@@ -120,7 +120,19 @@ class ProductQuerySet(QuerySet):
             lookup = Q(title__search=query) | Q(content__search=query) | Q(sku__search=query) | \
                      Q(fabric_details__search=query) | Q(care_instructions__search=query)
             qs = self.filter(lookup)
-        # if categories
+        if len(categories):
+            lookup = Q(category__in=categories)
+            qs = self.filter(lookup)
+
+        if len(brands):
+            lookup = Q(brand__in=brands)
+            qs = self.filter(lookup)
+
+        if len(sizes):
+            lookup = Q(attribute_id=1) & Q(attribute_option__in=sizes)
+            subquery = ProductAttributeValues.objects.filter(lookup)
+
+            qs = self.filter(attributes__attribute_option__in=Subquery(subquery.values('attribute_option_id')))
 
         if user is not None:
             qs2 = self.filter(user=user)
