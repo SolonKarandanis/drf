@@ -132,7 +132,7 @@ class ProductQuerySet(QuerySet):
             lookup = Q(attribute_id=1) & Q(attribute_option__in=sizes)
             subquery = ProductAttributeValues.objects.filter(lookup)
 
-            qs = self.filter(attributes__attribute_option__in=Subquery(subquery.values('attribute_option_id')))
+            qs = self.filter(id__in=Subquery(subquery.values('product_id')))
 
         if user is not None:
             qs2 = self.filter(user=user)
