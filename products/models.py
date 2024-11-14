@@ -120,15 +120,15 @@ class ProductQuerySet(QuerySet):
             lookup = Q(title__search=query) | Q(content__search=query) | Q(sku__search=query) | \
                      Q(fabric_details__search=query) | Q(care_instructions__search=query)
             qs = self.filter(lookup)
-        if len(categories):
+        if categories and len(categories) > 0:
             lookup = Q(category__in=categories)
             qs = self.filter(lookup)
 
-        if len(brands):
+        if brands and len(brands) > 0:
             lookup = Q(brand__in=brands)
             qs = self.filter(lookup)
 
-        if len(sizes):
+        if sizes and len(sizes) > 0:
             lookup = Q(attribute_id=1) & Q(attribute_option__in=sizes)
             subquery = ProductAttributeValues.objects.filter(lookup)
 
