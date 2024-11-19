@@ -28,6 +28,8 @@ class Comment(Model):
     user = ForeignKey(User,  on_delete=CASCADE)
     user_username = CharField(max_length=50, null=True)
     user_email = EmailField(null=True)
+    user_first_name = CharField(max_length=50, null=True)
+    user_last_name = CharField(max_length=50, null=True)
 
     objects = CommentManager()
 
