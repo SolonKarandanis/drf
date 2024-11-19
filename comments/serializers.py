@@ -9,6 +9,8 @@ class CommentSerializer(serializers.ModelSerializer):
     userId = serializers.IntegerField(source='user_id', read_only=True)
     username = serializers.CharField(source='user_username', read_only=True)
     userEmail = serializers.CharField(source='user_email', read_only=True)
+    userFirstName = serializers.CharField(source='user_first_name', read_only=True)
+    userLastName = serializers.CharField(source='user_last_name', read_only=True)
 
     class Meta:
         model = Comment
@@ -21,4 +23,6 @@ class CommentSerializer(serializers.ModelSerializer):
             'userId',
             'username',
             'userEmail',
+            'userFirstName',
+            'userLastName',
         ]
