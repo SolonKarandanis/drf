@@ -90,6 +90,9 @@ class ProductQuerySet(QuerySet):
     def with_owner(self):
         return self.select_related('user')
 
+    def with_brand(self):
+        return self.select_related('brand')
+
     def with_comments(self):
         return self.prefetch_related('comments')
 
