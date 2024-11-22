@@ -43,7 +43,6 @@ class ProductSerializer(serializers.ModelSerializer):
                                                  choices=AVAILABILITY_STATUS_CHOICES)
     salePrice = serializers.FloatField(source='sale_price', read_only=True)
     brand = BrandSerializer(read_only=True)
-    images = ImagesSerializer(many=True, read_only=True)
 
     class Meta:
         model = Product
@@ -63,7 +62,6 @@ class ProductSerializer(serializers.ModelSerializer):
             'salePrice',
             'uuid',
             'comments',
-            'images'
         ]
 
 

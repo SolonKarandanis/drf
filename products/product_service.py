@@ -3,6 +3,7 @@ from django.db import transaction
 from django.conf import settings
 
 from images.image_repository import ImageRepository
+from images.models import Images
 from .dtos import CategoriesWithTotals, BrandsWithTotals, SizesWithTotals, ProductWithPreviewImage
 from .models import Product
 from .product_repository import ProductRepository
@@ -19,6 +20,10 @@ class ProductService:
 
     def find_by_uuid(self, uuid: str) -> Product:
         return repo.find_by_uuid(uuid)
+
+    def find_product_images_by_uuid(self, uuid: str) -> List[Images]:
+        product = repo.find_by_uuid(uuid, False)
+        return image_repo.find_product_images(product.id)
 
     def find_by_id(self, product_id: int) -> Product:
         return repo.find_by_id(product_id)

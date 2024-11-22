@@ -1,5 +1,6 @@
 import logging
 
+from images.serializers import ImagesSerializer
 from .serializers import ProductSerializer, CreateProductSerializer, PaginatedProductListSerializer, \
     PostProductComment, ProductSearchRequestSerializer, CategoriesWithTotalsSerializer, BrandsWithTotalsSerializer, \
     SizesWithTotalsSerializer, PaginatedPOSTProductListSerializer
@@ -21,6 +22,14 @@ logger = logging.getLogger('django')
 def get_product(request, uuid: str, *args, **kwargs):
     product = product_service.find_by_uuid(uuid)
     data = ProductSerializer(product, many=False).data
+    return Response(data)
+
+
+@api_view(['GET'])
+@permission_classes([IsAuthenticated])
+def get_product_images(request, uuid: str):
+    images = product_service.find_product_images_by_uuid(uuid)
+    data = ImagesSerializer(many=True, read_only=True)
     return Response(data)
 
 

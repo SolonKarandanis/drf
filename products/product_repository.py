@@ -13,9 +13,11 @@ logger = logging.getLogger('django')
 
 class ProductRepository:
 
-    def find_by_uuid(self, uuid: str) -> Product:
-        product = Product.objects.get_queryset().with_brand().with_comments().with_images().by_uuid(uuid)
-        return product
+    def find_by_uuid(self, uuid: str, fetch_children: bool = True) -> Product:
+        qs = Product.objects.get_queryset()
+        if fetch_children:
+            return qs.with_brand().with_comments().by_uuid(uuid)
+        return qs.by_uuid(uuid)
 
     def find_by_id(self, product_id: int) -> Product:
         product = Product.objects.get_queryset().with_comments().get(pk=product_id)

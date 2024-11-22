@@ -20,9 +20,12 @@ class ImageRepository:
 
     def find_profile_image(self, object_id: int) -> Images:
         images = Images.objects.get_queryset().is_profile_image().filter(object_id=object_id, content_type_id=17)
-        if len(images) >1:
+        if len(images) > 1:
             return images[0]
         return None
+
+    def find_product_images(self, object_id: int) -> List[Images]:
+        return Images.objects.filter(object_id=object_id, content_type_id=18)
 
     def find_product_profile_images(self, object_ids: List[int]) -> List[Images]:
         return Images.objects.get_queryset().is_profile_image().filter(object_id__in=object_ids, content_type_id=18)
