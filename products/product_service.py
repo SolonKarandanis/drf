@@ -7,7 +7,7 @@ from images.models import Images
 from .dtos import CategoriesWithTotals, BrandsWithTotals, SizesWithTotals, ProductWithPreviewImage
 from .models import Product
 from .product_repository import ProductRepository
-from .serializers import PostProductComment, ProductSearchRequestSerializer
+from .serializers import PostProductComment, ProductSearchRequestSerializer, SimilarProductsRequestSerializer
 from comments.comment_repository import CommentRepository
 
 User = settings.AUTH_USER_MODEL
@@ -24,6 +24,13 @@ class ProductService:
     def find_product_images_by_uuid(self, uuid: str) -> List[Images]:
         product = repo.find_by_uuid(uuid, False)
         return image_repo.find_product_images(product.id)
+
+    def find_similar_products(self, request: SimilarProductsRequestSerializer) -> List[Product]:
+        serialized_data = request.data
+        data_dict = dict(serialized_data)
+        category_ids = data_dict['categoryIds']
+        limit = data_dict['limit']
+        return repo.find_products_by_category_ids(category_ids, limit)
 
     def find_by_id(self, product_id: int) -> Product:
         return repo.find_by_id(product_id)

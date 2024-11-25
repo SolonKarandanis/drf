@@ -19,6 +19,9 @@ class ProductRepository:
             return qs.with_brand().with_comments().with_categories().by_uuid(uuid)
         return qs.by_uuid(uuid)
 
+    def find_products_by_category_ids(self, category_ids: List[int], limit: int = 7) -> List[Product]:
+        return Product.objects.filter(category__id__in=category_ids)[:limit]
+
     def find_by_id(self, product_id: int) -> Product:
         product = Product.objects.get_queryset().with_comments().get(pk=product_id)
         return product
@@ -94,7 +97,7 @@ class ProductRepository:
                  "GROUP BY pav.attribute_option_id ,pao.option_name "
                  "HAVING COUNT(pav.product_id) > 0")
         result_list: List[SizesWithTotals] = [
-            SizesWithTotals(id=sizes.attribute_option_id, name=sizes.option_name,  total_products=sizes.total_products)
+            SizesWithTotals(id=sizes.attribute_option_id, name=sizes.option_name, total_products=sizes.total_products)
             for sizes in sizes_with_totals_qs
         ]
         return result_list

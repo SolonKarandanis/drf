@@ -3,7 +3,8 @@ import logging
 from images.serializers import ImagesSerializer
 from .serializers import ProductSerializer, CreateProductSerializer, PaginatedProductListSerializer, \
     PostProductComment, ProductSearchRequestSerializer, CategoriesWithTotalsSerializer, BrandsWithTotalsSerializer, \
-    SizesWithTotalsSerializer, PaginatedPOSTProductListSerializer
+    SizesWithTotalsSerializer, PaginatedPOSTProductListSerializer, SimilarProductsRequestSerializer, \
+    SimilarProductsResponseSerializer
 from .models import Product
 from rest_framework import status
 from rest_framework.decorators import api_view, permission_classes
@@ -23,6 +24,17 @@ def get_product(request, uuid: str, *args, **kwargs):
     product = product_service.find_by_uuid(uuid)
     data = ProductSerializer(product, many=False).data
     return Response(data)
+
+
+@api_view(['POST'])
+@permission_classes([IsAuthenticated])
+def get_similar_products(request, uuid: str):
+    serializer = SimilarProductsRequestSerializer(data=request.data)
+    if serializer.is_valid(raise_exception=True):
+        products = product_service.find_similar_products(serializer)
+        data = SimilarProductsResponseSerializer(products, many=True).data
+        return Response(data)
+    return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
 
 @api_view(['GET'])

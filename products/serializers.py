@@ -284,3 +284,29 @@ class DiscountsWithTotalsSerializer(serializers.Serializer):
             'name',
             'totalProducts',
         ]
+
+
+class SimilarProductsRequestSerializer(serializers.Serializer):
+    categoryIds = serializers.ListField(child=serializers.IntegerField())
+    limit = serializers.IntegerField()
+
+
+class SimilarProductsResponseSerializer(serializers.Serializer):
+    id = serializers.IntegerField(source='product.id', read_only=True)
+    sku = serializers.CharField(source='product.sku', read_only=True)
+    title = serializers.CharField(source='product.title', read_only=True)
+    price = serializers.FloatField(source='product.price', read_only=True)
+    salePrice = serializers.FloatField(source='product.sale_price', read_only=True)
+    uuid = serializers.CharField(source='product.uuid', read_only=True)
+    previewImage = ImagesSerializer(source='preview_image', read_only=True)
+
+    class Meta:
+        fields = [
+            'id',
+            'sku',
+            'title',
+            'price',
+            'salePrice',
+            'previewImage'
+            'uuid'
+        ]

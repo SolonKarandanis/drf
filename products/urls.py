@@ -14,5 +14,6 @@ urlpatterns = [
     # path('<str:uuid>/delete/', views.product_delete_view, name='product-delete'),
     path('<str:uuid>/', views.get_product, name='product-detail'),
     path('<str:uuid>/images/', views.get_product_images, name='product-detail-images'),
+    path('<str:uuid>/similar-products/', views.get_similar_products, name='product-detail-similar-products'),
     path('supplier/<str:uuid>/', views.get_supplier_product, name='product-supplier-detail'),
 ]
