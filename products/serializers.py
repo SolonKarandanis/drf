@@ -192,17 +192,6 @@ class CreateProductSerializer(serializers.ModelSerializer):
             'availabilityStatus',
         ]
 
-    # def save(self):
-    #     user = self.context.get("logged_in_user")
-    #     sku = self.validated_data['sku']
-    #     title = self.validated_data['title']
-    #     content = self.validated_data['content']
-    #     price = self.validated_data['price']
-    #     inventory = self.validated_data['inventory']
-    #     new_product = Product(sku=sku, user=user, title=title, content=content, price=price, inventory=inventory)
-    #     new_product.save()
-    #     return new_product
-
 
 class PostProductComment(serializers.Serializer):
     productId = serializers.IntegerField(source='product_id', validators=[product_exists])

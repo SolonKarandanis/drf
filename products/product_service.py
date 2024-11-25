@@ -7,7 +7,8 @@ from images.models import Images
 from .dtos import CategoriesWithTotals, BrandsWithTotals, SizesWithTotals, ProductWithPreviewImage
 from .models import Product
 from .product_repository import ProductRepository
-from .serializers import PostProductComment, ProductSearchRequestSerializer, SimilarProductsRequestSerializer
+from .serializers import PostProductComment, ProductSearchRequestSerializer, SimilarProductsRequestSerializer, \
+    CreateProductSerializer
 from comments.comment_repository import CommentRepository
 
 User = settings.AUTH_USER_MODEL
@@ -108,3 +109,14 @@ class ProductService:
 
     def get_sizes_with_totals(self) -> List[SizesWithTotals]:
         return repo.get_sizes_with_totals()
+
+    def create_product(self, request: CreateProductSerializer, logged_in_user: User) -> Product:
+        serialized_data = request.data
+        data_dict = dict(serialized_data)
+        sku = data_dict['sku']
+        title = data_dict['title']
+        content = data_dict['content']
+        price = data_dict['price']
+        inventory = data_dict['inventory']
+        new_product = Product(sku=sku, user=logged_in_user, title=title, content=content, price=price,
+                              inventory=inventory)
