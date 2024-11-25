@@ -5,7 +5,7 @@ from django.core.paginator import Paginator
 
 from cfehome.serializers import PagingSerializer
 from images.serializers import ImagesSerializer
-from .models import Product, Brand
+from .models import Product, Brand, Category
 from .validators import unique_product_title, validate_sku, product_exists
 from auth.serializers import UserPublicSerializer
 from comments.serializers import CommentSerializer
@@ -32,6 +32,16 @@ class BrandSerializer(serializers.ModelSerializer):
         ]
 
 
+class CategorySerializer(serializers.ModelSerializer):
+    class Meta:
+        model = Category
+        fields = [
+            'id',
+            'name',
+            'slug'
+        ]
+
+
 class ProductSerializer(serializers.ModelSerializer):
     title = serializers.CharField(validators=[unique_product_title])
     owner = UserPublicSerializer(source='user', read_only=True)
@@ -43,6 +53,7 @@ class ProductSerializer(serializers.ModelSerializer):
                                                  choices=AVAILABILITY_STATUS_CHOICES)
     salePrice = serializers.FloatField(source='sale_price', read_only=True)
     brand = BrandSerializer(read_only=True)
+    categories = CategorySerializer(source='category', many=True, read_only=True)
 
     class Meta:
         model = Product
@@ -57,6 +68,7 @@ class ProductSerializer(serializers.ModelSerializer):
             'availabilityStatus',
             'owner',
             'brand',
+            'categories',
             'price',
             'inventory',
             'salePrice',

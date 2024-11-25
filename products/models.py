@@ -96,8 +96,8 @@ class ProductQuerySet(QuerySet):
     def with_comments(self):
         return self.prefetch_related('comments')
 
-    def with_images(self):
-        return self.prefetch_related('images')
+    def with_categories(self):
+        return self.prefetch_related('category')
 
     def owned_by(self, user):
         return self.filter(user=user)
