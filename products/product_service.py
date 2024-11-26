@@ -26,12 +26,20 @@ class ProductService:
         product = repo.find_by_uuid(uuid, False)
         return image_repo.find_product_images(product.id)
 
-    def find_similar_products(self, request: SimilarProductsRequestSerializer) -> List[Product]:
+    def find_similar_products(self, request: SimilarProductsRequestSerializer) -> List[ProductWithPreviewImage]:
         serialized_data = request.data
         data_dict = dict(serialized_data)
         category_ids = data_dict['categoryIds']
         limit = data_dict['limit']
-        return repo.find_products_by_category_ids(category_ids, limit)
+        product_results = repo.find_products_by_category_ids(category_ids, limit)
+        product_ids = [product.id for product in product_results]
+        product_preview_images = image_repo.find_product_profile_images(product_ids)
+        product_preview_images_dict = {image.object_id: image for image in product_preview_images}
+        products_with_preview_images: List[ProductWithPreviewImage] = [
+            ProductWithPreviewImage(product=product, preview_image=product_preview_images_dict.get(product.id))
+            for product in product_results
+        ]
+        return products_with_preview_images
 
     def find_by_id(self, product_id: int) -> Product:
         return repo.find_by_id(product_id)
