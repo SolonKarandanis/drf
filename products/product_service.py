@@ -32,13 +32,7 @@ class ProductService:
         category_ids = data_dict['categoryIds']
         limit = data_dict['limit']
         product_results = repo.find_products_by_category_ids(category_ids, limit)
-        product_ids = [product.id for product in product_results]
-        product_preview_images = image_repo.find_product_profile_images(product_ids)
-        product_preview_images_dict = {image.object_id: image for image in product_preview_images}
-        products_with_preview_images: List[ProductWithPreviewImage] = [
-            ProductWithPreviewImage(product=product, preview_image=product_preview_images_dict.get(product.id))
-            for product in product_results
-        ]
+        products_with_preview_images = self.products_to_products_with_preview_images(product_results)
         return products_with_preview_images
 
     def find_by_id(self, product_id: int) -> Product:
@@ -97,6 +91,10 @@ class ProductService:
         if "sizes" in data_dict:
             sizes = data_dict['sizes']
         product_results = repo.search_products(query, categories, brands, sizes, None)
+        products_with_preview_images = self.products_to_products_with_preview_images(product_results)
+        return products_with_preview_images
+
+    def products_to_products_with_preview_images(self, product_results: List[Product]) -> List[ProductWithPreviewImage]:
         product_ids = [product.id for product in product_results]
         product_preview_images = image_repo.find_product_profile_images(product_ids)
         product_preview_images_dict = {image.object_id: image for image in product_preview_images}
