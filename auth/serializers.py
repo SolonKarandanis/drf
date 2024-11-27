@@ -30,6 +30,7 @@ class UserPublicSerializer(serializers.Serializer):
     firstName = serializers.CharField(source="first_name")
     lastName = serializers.CharField(source="last_name")
     email = serializers.CharField()
+    uuid = serializers.CharField()
 
 
 class UserIdSerializer(serializers.Serializer):
