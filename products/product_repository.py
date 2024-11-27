@@ -16,7 +16,7 @@ class ProductRepository:
     def find_by_uuid(self, uuid: str, fetch_children: bool = True) -> Product:
         qs = Product.objects.get_queryset()
         if fetch_children:
-            return qs.with_brand().with_comments().with_categories().by_uuid(uuid)
+            return qs.with_brand().with_comments().with_categories().with_owner().by_uuid(uuid)
         return qs.by_uuid(uuid)
 
     def find_products_by_category_ids(self, category_ids: List[int], limit: int = 7) -> List[Product]:

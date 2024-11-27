@@ -25,8 +25,11 @@ class UserProductInlineSerializer(serializers.Serializer):
 
 
 class UserPublicSerializer(serializers.Serializer):
-    username = serializers.CharField(read_only=True)
     id = serializers.IntegerField(read_only=True)
+    username = serializers.CharField(read_only=True)
+    firstName = serializers.CharField(source="first_name")
+    lastName = serializers.CharField(source="last_name")
+    email = serializers.CharField()
 
 
 class UserIdSerializer(serializers.Serializer):
