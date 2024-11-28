@@ -5,7 +5,7 @@ from django.conf import settings
 from images.image_repository import ImageRepository
 from images.models import Images
 from .dtos import CategoriesWithTotals, BrandsWithTotals, SizesWithTotals, ProductWithPreviewImage
-from .models import Product
+from .models import Product, ProductAttributeValues
 from .product_repository import ProductRepository
 from .serializers import PostProductComment, ProductSearchRequestSerializer, SimilarProductsRequestSerializer, \
     CreateProductSerializer
@@ -22,10 +22,12 @@ class ProductService:
     def find_by_uuid(self, uuid: str) -> Product:
         return repo.find_by_uuid(uuid)
 
+    @transaction.atomic
     def find_product_images_by_uuid(self, uuid: str) -> List[Images]:
         product = repo.find_by_uuid(uuid, False)
         return image_repo.find_product_images(product.id)
 
+    @transaction.atomic
     def find_similar_products(self, request: SimilarProductsRequestSerializer) -> List[ProductWithPreviewImage]:
         serialized_data = request.data
         data_dict = dict(serialized_data)
@@ -34,6 +36,11 @@ class ProductService:
         product_results = repo.find_products_by_category_ids(category_ids, limit)
         products_with_preview_images = self.products_to_products_with_preview_images(product_results)
         return products_with_preview_images
+
+    @transaction.atomic
+    def find_product_attributes(self, uuid: str) -> List[ProductAttributeValues]:
+        product = repo.find_by_uuid(uuid, False)
+        return repo.find_product_attributes(product.id)
 
     def find_by_id(self, product_id: int) -> Product:
         return repo.find_by_id(product_id)
