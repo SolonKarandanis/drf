@@ -191,6 +191,9 @@ class Product(Model):
     brand = ForeignKey(Brand, on_delete=PROTECT, db_default=1)
     category = ManyToManyField(Category, db_default=1)
     attributes = ManyToManyField(Attribute, through="ProductAttributeValues")
+    average_rating = FloatField(blank=True, null=True)
+    number_of_ratings = IntegerField(blank=True, null=True)
+
 
     class Meta:
         ordering = ['sku']
@@ -286,11 +289,11 @@ class Discount(Model):
 
 
 class ProductsDiscount(Model):
-    product_id = ForeignKey(
+    product = ForeignKey(
         Product,
-        on_delete=PROTECT,
+        on_delete=CASCADE,
     )
-    discount_id = ForeignKey(
+    discount = ForeignKey(
         Discount,
         on_delete=CASCADE,
     )
@@ -310,3 +313,12 @@ class ProductsDiscount(Model):
         unique_together = (("product_id", "discount_id"),)
         verbose_name_plural = "Products Discounts"
         db_table = 'products_product_discount'
+
+
+class ProductRating(Model):
+    product = ForeignKey(
+        Product,
+        on_delete=CASCADE,
+    )
+    user = ForeignKey(User, default=1, null=True, on_delete=CASCADE)
+    rating = IntegerField(blank=True, null=True)
