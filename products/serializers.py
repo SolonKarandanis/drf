@@ -17,10 +17,20 @@ AVAILABILITY_STATUS_CHOICES = [
     "product.availability.out.of.stock",
 ]
 
+AVAILABILITY_STATUS_LABEL_OPTIONS = {
+    "product.availability.in.stock": "In Stock",
+    "product.availability.out.of.stock": "Out of Stock",
+}
+
 PUBLISH_STATUS_CHOICES = [
     "product.status.published",
     "product.status.scheduled",
 ]
+
+PUBLISH_STATUS_LABEL_OPTIONS = {
+    "product.status.published": "Published",
+    "product.status.scheduled": "Scheduled",
+}
 
 
 class BrandSerializer(serializers.ModelSerializer):
@@ -49,13 +59,23 @@ class ProductSerializer(serializers.ModelSerializer):
     fabricDetails = serializers.CharField(source='fabric_details', read_only=True)
     careInstructions = serializers.CharField(source='care_instructions', read_only=True)
     publishStatus = serializers.ChoiceField(source='publish_status', read_only=True, choices=PUBLISH_STATUS_CHOICES)
+    publishStatusLabel = serializers.SerializerMethodField('_get_publish_status_label')
     availabilityStatus = serializers.ChoiceField(source='availability_status', read_only=True,
                                                  choices=AVAILABILITY_STATUS_CHOICES)
+    availabilityStatusLabel = serializers.SerializerMethodField('_get_availability_status_label')
     salePrice = serializers.FloatField(source='sale_price', read_only=True)
     averageRating = serializers.FloatField(source='average_rating', read_only=True)
     numberOfRatings = serializers.IntegerField(source='number_of_ratings', read_only=True)
     brand = BrandSerializer(read_only=True)
     categories = CategorySerializer(source='category', many=True, read_only=True)
+
+    def _get_availability_status_label(self, product_object) -> str:
+        availability_status = getattr(product_object, 'availability_status')
+        return AVAILABILITY_STATUS_LABEL_OPTIONS[availability_status]
+
+    def _get_publish_status_label(self, product_object) -> str:
+        publish_status = getattr(product_object, 'publish_status')
+        return PUBLISH_STATUS_LABEL_OPTIONS[publish_status]
 
 
     class Meta:
@@ -68,7 +88,9 @@ class ProductSerializer(serializers.ModelSerializer):
             'fabricDetails',
             'careInstructions',
             'publishStatus',
+            'publishStatusLabel',
             'availabilityStatus',
+            'availabilityStatusLabel',
             'owner',
             'brand',
             'categories',
