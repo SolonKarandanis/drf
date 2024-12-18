@@ -289,11 +289,11 @@ class Discount(Model):
 
 
 class ProductsDiscount(Model):
-    product = ForeignKey(
+    product_id = ForeignKey(
         Product,
         on_delete=CASCADE,
     )
-    discount = ForeignKey(
+    discount_id = ForeignKey(
         Discount,
         on_delete=CASCADE,
     )
