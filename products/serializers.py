@@ -54,6 +54,8 @@ class ProductSerializer(serializers.ModelSerializer):
     salePrice = serializers.FloatField(source='sale_price', read_only=True)
     brand = BrandSerializer(read_only=True)
     categories = CategorySerializer(source='category', many=True, read_only=True)
+    averageRating = serializers.FloatField(source='product.average_rating', read_only=True)
+    numberOfRatings = serializers.IntegerField(source='product.number_of_ratings', read_only=True)
 
     class Meta:
         model = Product
@@ -72,6 +74,8 @@ class ProductSerializer(serializers.ModelSerializer):
             'price',
             'inventory',
             'salePrice',
+            'averageRating',
+            'numberOfRatings',
             'uuid',
             'comments',
         ]
@@ -91,6 +95,7 @@ class ProductListSerializer(serializers.Serializer):
     salePrice = serializers.FloatField(source='product.sale_price', read_only=True)
     uuid = serializers.CharField(source='product.uuid', read_only=True)
     previewImage = ImagesSerializer(source='preview_image', read_only=True)
+    averageRating = serializers.FloatField(source='product.average_rating', read_only=True)
 
     class Meta:
         fields = [
@@ -105,7 +110,8 @@ class ProductListSerializer(serializers.Serializer):
             'price',
             'inventory',
             'salePrice',
-            'previewImage'
+            'averageRating',
+            'previewImage',
             'uuid'
         ]
 
@@ -288,6 +294,8 @@ class SimilarProductsResponseSerializer(serializers.Serializer):
     salePrice = serializers.FloatField(source='product.sale_price', read_only=True)
     uuid = serializers.CharField(source='product.uuid', read_only=True)
     previewImage = ImagesSerializer(source='preview_image', read_only=True)
+    averageRating = serializers.FloatField(source='product.average_rating', read_only=True)
+    numberOfRatings = serializers.IntegerField(source='product.number_of_ratings', read_only=True)
 
     class Meta:
         fields = [
@@ -296,6 +304,8 @@ class SimilarProductsResponseSerializer(serializers.Serializer):
             'title',
             'price',
             'salePrice',
+            'averageRating',
+            'numberOfRatings',
             'previewImage'
             'uuid'
         ]
