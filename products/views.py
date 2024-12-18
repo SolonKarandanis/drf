@@ -28,7 +28,7 @@ def get_product(request, uuid: str, *args, **kwargs):
 
 @api_view(['POST'])
 @permission_classes([IsAuthenticated])
-def get_similar_products(request, uuid: str):
+def get_similar_products(request):
     serializer = SimilarProductsRequestSerializer(data=request.data)
     if serializer.is_valid(raise_exception=True):
         products = product_service.find_similar_products(serializer)

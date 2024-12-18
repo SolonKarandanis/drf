@@ -12,8 +12,8 @@ urlpatterns = [
     path('sizes/', views.get_sizes_with_totals, name='product-sizes'),
     # path('<str:uuid>/update/', views.product_update_view, name='product-update'),
     # path('<str:uuid>/delete/', views.product_delete_view, name='product-delete'),
+    path('similar-products/', views.get_similar_products, name='product-detail-similar-products'),
     path('<str:uuid>/', views.get_product, name='product-detail'),
     path('<str:uuid>/images/', views.get_product_images, name='product-detail-images'),
-    path('<str:uuid>/similar-products/', views.get_similar_products, name='product-detail-similar-products'),
     path('supplier/<str:uuid>/', views.get_supplier_product, name='product-supplier-detail'),
 ]
