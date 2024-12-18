@@ -52,10 +52,11 @@ class ProductSerializer(serializers.ModelSerializer):
     availabilityStatus = serializers.ChoiceField(source='availability_status', read_only=True,
                                                  choices=AVAILABILITY_STATUS_CHOICES)
     salePrice = serializers.FloatField(source='sale_price', read_only=True)
+    averageRating = serializers.FloatField(source='average_rating', read_only=True)
+    numberOfRatings = serializers.IntegerField(source='number_of_ratings', read_only=True)
     brand = BrandSerializer(read_only=True)
     categories = CategorySerializer(source='category', many=True, read_only=True)
-    averageRating = serializers.FloatField(source='product.average_rating', read_only=True)
-    numberOfRatings = serializers.IntegerField(source='product.number_of_ratings', read_only=True)
+
 
     class Meta:
         model = Product
