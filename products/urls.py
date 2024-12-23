@@ -15,5 +15,6 @@ urlpatterns = [
     path('similar-products/', views.get_similar_products, name='product-detail-similar-products'),
     path('<str:uuid>/', views.get_product, name='product-detail'),
     path('<str:uuid>/images/', views.get_product_images, name='product-detail-images'),
+    path('<str:uuid>/similar-products/', views.get_similar_products_by_uuid, name='product-detail-similar-products-by-id'),
     path('supplier/<str:uuid>/', views.get_supplier_product, name='product-supplier-detail'),
 ]

@@ -31,7 +31,11 @@ def get_product(request, uuid: str, *args, **kwargs):
 def get_similar_products(request):
     serializer = SimilarProductsRequestSerializer(data=request.data)
     if serializer.is_valid(raise_exception=True):
-        products = product_service.find_similar_products(serializer)
+        serialized_data = request.data
+        data_dict = dict(serialized_data)
+        category_ids = data_dict['categoryIds']
+        limit = data_dict['limit']
+        products = product_service.find_similar_products(category_ids, limit)
         data = SimilarProductsResponseSerializer(products, many=True).data
         return Response(data)
     return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
@@ -39,9 +43,21 @@ def get_similar_products(request):
 
 @api_view(['GET'])
 @permission_classes([IsAuthenticated])
+def get_similar_products_by_uuid(request, uuid: str):
+    limit = request.GET.get('limit', 5)
+    logger.info(f'limit: {limit}')
+    product = product_service.find_by_uuid(uuid)
+    category_ids = [category.id for category in product.category]
+    products = product_service.find_similar_products(category_ids, limit)
+    data = SimilarProductsResponseSerializer(products, many=True).data
+    return Response(data)
+
+
+@api_view(['GET'])
+@permission_classes([IsAuthenticated])
 def get_product_images(request, uuid: str):
     images = product_service.find_product_images_by_uuid(uuid)
-    data = ImagesSerializer(images,many=True, read_only=True)
+    data = ImagesSerializer(images, many=True, read_only=True)
     return Response(data)
 
 

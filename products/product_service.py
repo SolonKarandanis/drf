@@ -28,11 +28,7 @@ class ProductService:
         return image_repo.find_product_images(product.id)
 
     @transaction.atomic
-    def find_similar_products(self, request: SimilarProductsRequestSerializer) -> List[ProductWithPreviewImage]:
-        serialized_data = request.data
-        data_dict = dict(serialized_data)
-        category_ids = data_dict['categoryIds']
-        limit = data_dict['limit']
+    def find_similar_products(self, category_ids: List[int], limit: int) -> List[ProductWithPreviewImage]:
         product_results = repo.find_products_by_category_ids(category_ids, limit)
         products_with_preview_images = self.products_to_products_with_preview_images(product_results)
         return products_with_preview_images
