@@ -5,7 +5,7 @@ from django.conf import settings
 from images.image_repository import ImageRepository
 from images.models import Images
 from .dtos import CategoriesWithTotals, BrandsWithTotals, SizesWithTotals, ProductWithPreviewImage
-from .models import Product, ProductAttributeValues
+from .models import Product, ProductAttributeValues, Category
 from .product_repository import ProductRepository
 from .serializers import PostProductComment, ProductSearchRequestSerializer, SimilarProductsRequestSerializer, \
     CreateProductSerializer
@@ -129,3 +129,6 @@ class ProductService:
         inventory = data_dict['inventory']
         new_product = Product(sku=sku, user=logged_in_user, title=title, content=content, price=price,
                               inventory=inventory)
+
+    def find_product_categories(self, product_uuid: str) -> List[Category]:
+       return repo.find_product_categories(product_uuid)

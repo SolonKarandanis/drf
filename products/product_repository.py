@@ -104,3 +104,6 @@ class ProductRepository:
             for sizes in sizes_with_totals_qs
         ]
         return result_list
+
+    def find_product_categories(self, product_uuid:str)-> List[Category]:
+        return Category.objects.filter(product__uuid=product_uuid)

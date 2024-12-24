@@ -45,9 +45,9 @@ def get_similar_products(request):
 @permission_classes([IsAuthenticated])
 def get_similar_products_by_uuid(request, uuid: str):
     limit = request.GET.get('limit', 5)
-    logger.info(f'limit: {limit}')
-    product = product_service.find_by_uuid(uuid)
-    category_ids = [category.id for category in product.category]
+    logger.info(f'Product Views --->limit: {limit}')
+    categories = product_service.find_product_categories(uuid)
+    category_ids = [category.id for category in categories]
     products = product_service.find_similar_products(category_ids, limit)
     data = SimilarProductsResponseSerializer(products, many=True).data
     return Response(data)
