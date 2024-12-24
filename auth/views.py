@@ -119,7 +119,7 @@ def get_account(request):
 @permission_classes([AllowAny])
 def get_all_groups(request):
     groups = group_service.find_all_groups()
-    logger.info(f'groups: {groups}')
+    logger.info(f'---> Auth Views ---> groups: {groups}')
     data = GroupSerializer(groups, many=True).data
     return Response(data)
 
@@ -199,7 +199,7 @@ def update_user_bio(request, uuid):
 
 def get_user_from_request(request):
     logged_in_user = request.user
-    logger.info(f'----->logged_in_user: {logged_in_user}')
+    logger.info(f'---> Auth Views ---> logged_in_user: {logged_in_user}')
     return logged_in_user
 
 

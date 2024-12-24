@@ -45,7 +45,7 @@ def get_similar_products(request):
 @permission_classes([IsAuthenticated])
 def get_similar_products_by_uuid(request, uuid: str):
     limit = request.GET.get('limit', 5)
-    logger.info(f'Product Views --->limit: {limit}')
+    logger.info(f'---> Product Views ---> limit: {limit}')
     categories = product_service.find_product_categories(uuid)
     category_ids = [category.id for category in categories]
     products = product_service.find_similar_products(category_ids, limit)
@@ -90,8 +90,8 @@ def get_all_supplier_products(request):
 def create_page_obj(request, queryset):
     page = request.GET.get('page', 1)
     size = request.GET.get('size', 10)
-    logger.info(f'page: {page}')
-    logger.info(f'size: {size}')
+    logger.info(f'---> Product Views ---> page: {page}')
+    logger.info(f'---> Product Views ---> size: {size}')
     paginator = Paginator(queryset, size)
     return paginator.page(page)
 
@@ -159,5 +159,5 @@ def get_sizes_with_totals(request):
 
 def get_user_from_request(request):
     logged_in_user = request.user
-    logger.info(f'----->logged_in_user: {logged_in_user}')
+    logger.info(f'---> Product Views ---> logged_in_user: {logged_in_user}')
     return logged_in_user
