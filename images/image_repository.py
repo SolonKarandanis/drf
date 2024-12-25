@@ -20,7 +20,7 @@ class ImageRepository:
 
     def find_profile_image(self, object_id: int) -> Images:
         images = Images.objects.get_queryset().is_profile_image().filter(object_id=object_id, content_type_id=17)
-        if len(images) > 1:
+        if len(images) >= 1:
             return images[0]
         return None
 
