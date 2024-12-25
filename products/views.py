@@ -57,7 +57,7 @@ def get_similar_products_by_uuid(request, uuid: str):
 @permission_classes([IsAuthenticated])
 def get_product_images(request, uuid: str):
     images = product_service.find_product_images_by_uuid(uuid)
-    data = ImagesSerializer(images, many=True, read_only=True)
+    data = ImagesSerializer(images, many=True, read_only=True).data
     return Response(data)
 
 
