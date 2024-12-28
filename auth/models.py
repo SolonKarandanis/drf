@@ -67,6 +67,7 @@ class UserManager(BaseUserManager):
         email = self.normalize_email(email)
         user = self.model(email=email, **extra_fields)
         user.set_password(password)
+        user.uuid = uuid.uuid4()
         user.save()
         return user
 
@@ -79,6 +80,7 @@ class UserManager(BaseUserManager):
         extra_fields.setdefault("is_active", True)
         extra_fields.setdefault("is_verified", True)
         extra_fields.setdefault("status", UserStatus.ACTIVE)
+        extra_fields.setdefault("uuid", uuid.uuid4())
 
         if extra_fields.get("is_staff") is not True:
             raise ValueError(_("superuser.is_staff.true"))

@@ -7,12 +7,15 @@ from django.utils import timezone
 
 from images.image_repository import ImageRepository
 from images.models import Images
-from .serializers import UploadProfilePictureSerializer, UpdateBioSerializer, UpldateUserContactInfoSerializer
+from .group_repository import GroupRepository
+from .serializers import UploadProfilePictureSerializer, UpdateBioSerializer, UpldateUserContactInfoSerializer, \
+    CreateUserSerializer
 from .user_repository import UserRepository
 from .models import User, UserStatus, UserDetails
 
 repo = UserRepository()
 image_repo = ImageRepository()
+groupRepo = GroupRepository()
 
 logger = logging.getLogger('django')
 
@@ -169,3 +172,29 @@ class UserService:
         user_image = image_repo.find_profile_image(user.id)
         logger.info(f'user_image: {user_image}')
         return user_image
+
+    def create_user(self,role:int, email:str, password:str, **extra_fields) ->User :
+        if role == 3:
+            return repo.create_superuser(email, password, **extra_fields)
+        return repo.create_user(email, password, **extra_fields)
+
+
+    @transaction.atomic
+    def register_user(self, request: CreateUserSerializer) -> User:
+        serialized_data = request.data
+        data_dict = dict(serialized_data)
+        username = data_dict['username']
+        email = data_dict['email']
+        first_name = data_dict['first_name']
+        last_name = data_dict['last_name']
+        password = data_dict['password']
+        password2 = data_dict['password2']
+        role = int(data_dict['role'])
+
+        if password != password2:
+            raise serializers.ValidationError({'password': 'Passwords must match.'})
+
+        user:User = self.create_user(role,email,password,username=username,first_name=first_name,last_name=last_name)
+        group = groupRepo.find_by_id(role)
+        user.groups.add(group)
+        return user

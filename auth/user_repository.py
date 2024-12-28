@@ -137,3 +137,9 @@ class UserRepository:
 
     def update_user_details(self, user_details: UserDetails) -> UserDetails:
         return UserDetails.objects.update_details(user_details)
+
+    def create_user(self,email:str, password:str, **extra_fields) -> User:
+        return User.objects.create_user(email,password,**extra_fields)
+
+    def create_superuser(self, email: str, password: str, **extra_fields) -> User:
+        return User.objects.create_superuser(email, password, **extra_fields)
