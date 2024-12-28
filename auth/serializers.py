@@ -1,18 +1,41 @@
 import logging
 import uuid
-
+import json
 from rest_framework import serializers
 from django.contrib.auth.models import Group
 from django.core.paginator import Paginator, PageNotAnInteger, EmptyPage
 
+from rest_framework_simplejwt.serializers import TokenObtainPairSerializer
+from rest_framework import exceptions
+
 from .group_repository import GroupRepository
+from .user_repository import UserRepository
 from .validators import validate_username, validate_email, validate_role
 from .models import User, UserDetails
 from cfehome.serializers import PagingSerializer
 
 groupRepo = GroupRepository()
+userRepo= UserRepository()
 
 logger = logging.getLogger('django')
+
+class LoginSerializer(TokenObtainPairSerializer):
+    def validate(self, attrs):
+        try:
+            request = self.context["request"]
+        except KeyError:
+            logger.info(f'------>LoginSerializer ------>KeyError')
+        finally:
+            username = attrs.get("username")
+            logger.info(f'------>LoginSerializer ------>username: {username}')
+            user_to_login = userRepo.find_active_user(username)
+            logger.info(f'------>LoginSerializer ------> user_to_login: {user_to_login}')
+            if user_to_login is None:
+                error_message = "This User Profile is not active"
+                error_name = "not_active_profile"
+                raise exceptions.AuthenticationFailed(error_message, error_name)
+            return super().validate(attrs)
+
 
 
 class UserProductInlineSerializer(serializers.Serializer):

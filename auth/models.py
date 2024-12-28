@@ -23,6 +23,9 @@ class UserQuerySet(QuerySet):
     def is_active(self):
         return self.filter(is_active=True)
 
+    def is_verified(self):
+        return self.filter(is_verified=True)
+
     def is_staff(self):
         return self.filter(is_staff=True)
 

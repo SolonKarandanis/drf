@@ -1,6 +1,7 @@
 from typing import List
 from datetime import timedelta, date
 from django.db.models import Q
+from django.core.exceptions import ObjectDoesNotExist
 from .models import User, UserDetails
 import logging
 
@@ -11,6 +12,13 @@ class UserRepository:
 
     def find_all_users(self) -> List[User]:
         return User.objects.all()
+
+    def find_active_user(self, username: str) -> User | None:
+        try:
+            return User.objects.get_queryset().is_verified().is_active().get(username=username)
+        except ObjectDoesNotExist:
+            return None
+
 
     def user_email_exists(self, email: str) -> bool:
         exists = User.objects.filter(email=email).exists()

@@ -6,6 +6,7 @@ from rest_framework import serializers
 from rest_framework.response import Response
 from rest_framework.decorators import api_view, permission_classes
 from rest_framework.permissions import IsAuthenticated, IsAdminUser, AllowAny
+from rest_framework_simplejwt.views import TokenObtainPairView
 from celery.result import AsyncResult
 
 from images.serializers import ImagesSerializer
@@ -14,7 +15,8 @@ from .group_service import GroupService
 from .models import User
 from .serializers import PaginatedUserSerializer, CreateUserSerializer, UseInfoSerializer, GroupSerializer, \
     UserAccountSerializer, SearchUsersRequestSerializer, PaginatedPOSTUserSerializer, ChangeUserStatusSerializer, \
-    UploadCVSerializer, UploadProfilePictureSerializer, UpldateUserContactInfoSerializer, UpdateBioSerializer
+    UploadCVSerializer, UploadProfilePictureSerializer, UpldateUserContactInfoSerializer, UpdateBioSerializer, \
+    LoginSerializer
 from .tasks import create_task
 from .user_service import UserService
 
@@ -26,6 +28,9 @@ group_service = GroupService()
 
 
 # Create your views here.
+class LoginView(TokenObtainPairView):
+    serializer_class = LoginSerializer
+
 
 @api_view(['GET'])
 @permission_classes([IsAuthenticated])

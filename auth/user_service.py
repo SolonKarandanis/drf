@@ -22,6 +22,9 @@ class UserService:
     def find_all_users(self) -> List[User]:
         return repo.find_all_users()
 
+    def find_active_user(self, username: str) -> User:
+        return repo.find_active_user(username)
+
     def user_username_exists(self, username: str) -> bool:
         return repo.user_username_exists(username)
 
