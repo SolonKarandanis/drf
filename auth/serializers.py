@@ -253,25 +253,6 @@ class CreateUserSerializer(serializers.ModelSerializer):
             'role',
         ]
 
-    def save(self):
-        username = self.validated_data['username']
-        email = self.validated_data['email']
-        first_name = self.validated_data['first_name']
-        last_name = self.validated_data['last_name']
-        password = self.validated_data['password']
-        password2 = self.validated_data['password2']
-        role = self.validated_data['role']
-        user = User(username=username, email=email, first_name=first_name, last_name=last_name)
-
-        if password != password2:
-            raise serializers.ValidationError({'password': 'Passwords must match.'})
-        user.set_password(password)
-        user.uuid = uuid.uuid4()
-        group = groupRepo.find_by_id(role)
-        user.save()
-        user.groups.add(group)
-        return user
-
 
 class PasswordChangeSerializer(serializers.Serializer):
     current_password = serializers.CharField(style={"input_type": "password"}, required=True)

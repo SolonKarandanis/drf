@@ -54,11 +54,12 @@ def search_users(request):
 
 
 @api_view(['POST'])
-def create_user(request):
+def register_user(request):
     serializer = CreateUserSerializer(data=request.data)
     if serializer.is_valid(raise_exception=True):
-        serializer.save()
-        return Response(status=status.HTTP_201_CREATED)
+        created_user =user_service.register_user(serializer)
+        data = UseInfoSerializer(created_user).data
+        return Response(data)
     return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
 
