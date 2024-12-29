@@ -5,6 +5,7 @@ from django.core.files.uploadedfile import InMemoryUploadedFile
 from django.db import transaction
 from django.utils import timezone
 
+from cfehome.constants.security_constants import ADMIN_ID
 from images.image_repository import ImageRepository
 from images.models import Images
 from .group_repository import GroupRepository
@@ -174,7 +175,7 @@ class UserService:
         return user_image
 
     def create_user(self,role:int, email:str, password:str, **extra_fields) ->User :
-        if role == 3:
+        if role == ADMIN_ID:
             return repo.create_superuser(email, password, **extra_fields)
         return repo.create_user(email, password, **extra_fields)
 
@@ -185,13 +186,13 @@ class UserService:
         data_dict = dict(serialized_data)
         username = data_dict['username']
         email = data_dict['email']
-        first_name = data_dict['first_name']
-        last_name = data_dict['last_name']
+        first_name = data_dict['firstName']
+        last_name = data_dict['lastName']
         password = data_dict['password']
-        password2 = data_dict['password2']
+        confirm_password = data_dict['confirmPassword']
         role = int(data_dict['role'])
 
-        if password != password2:
+        if password != confirm_password:
             raise serializers.ValidationError({'password': 'Passwords must match.'})
 
         user:User = self.create_user(role,email,password,username=username,first_name=first_name,last_name=last_name)

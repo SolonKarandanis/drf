@@ -233,12 +233,13 @@ class UseInfoSerializer(serializers.ModelSerializer):
         return obj.get_group_permissions()
 
 
-class CreateUserSerializer(serializers.ModelSerializer):
+class CreateUserSerializer(serializers.Serializer):
     firstName = serializers.CharField(source="first_name")
     lastName = serializers.CharField(source="last_name")
     username = serializers.CharField(validators=[validate_username])
     email = serializers.CharField(validators=[validate_email])
-    password2 = serializers.CharField(write_only=True)
+    password = serializers.CharField()
+    confirmPassword = serializers.CharField()
     role = serializers.IntegerField(validators=[validate_role])
 
     class Meta:
@@ -246,7 +247,7 @@ class CreateUserSerializer(serializers.ModelSerializer):
         fields = [
             'username',
             'password',
-            'password2',
+            'confirmPassword',
             'firstName',
             'lastName',
             'email',

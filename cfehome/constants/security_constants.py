@@ -3,6 +3,10 @@ ADMIN = 'ADMIN'
 BUYER = 'Buyer'
 SUPPLIER = 'Supplier'
 
+ADMIN_ID=3
+BUYER_ID=1
+SUPPLIER_ID=2
+
 # Permissions
 ADD_LOG_ENTRY = 'add_logentry',
 CHANGE_LOG_ENTRY = 'change_logentry',

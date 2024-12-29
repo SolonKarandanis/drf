@@ -58,6 +58,7 @@ def register_user(request):
     serializer = CreateUserSerializer(data=request.data)
     if serializer.is_valid(raise_exception=True):
         created_user =user_service.register_user(serializer)
+        logger.info(f'----> Auth views ----> register_user ----> created_user: {created_user}')
         data = UseInfoSerializer(created_user).data
         return Response(data)
     return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
