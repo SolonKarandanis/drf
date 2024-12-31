@@ -1,6 +1,4 @@
 import logging
-import uuid
-import json
 from rest_framework import serializers
 from django.contrib.auth.models import Group
 from django.core.paginator import Paginator, PageNotAnInteger, EmptyPage
@@ -18,6 +16,13 @@ groupRepo = GroupRepository()
 userRepo= UserRepository()
 
 logger = logging.getLogger('django')
+
+USER_STATUS_LABEL_OPTIONS = {
+    "user.unverified": "Unverified",
+    "user.active": "Active",
+    "user.deactivated": "Deactivated",
+    "user.deleted": "Deleted",
+}
 
 class LoginSerializer(TokenObtainPairSerializer):
     def validate(self, attrs):
@@ -171,6 +176,11 @@ class UserAccountSerializer(serializers.ModelSerializer):
     isVerified = serializers.CharField(source="is_verified")
     createdDate = serializers.CharField(source="created_date")
     updatedDate = serializers.CharField(source="updated_date")
+    statusLabel = serializers.SerializerMethodField('_get_status_label')
+
+    def _get_status_label(self, user_object) -> str:
+        status = getattr(user_object, 'status')
+        return USER_STATUS_LABEL_OPTIONS[status]
 
     class Meta:
         model = User
@@ -184,6 +194,7 @@ class UserAccountSerializer(serializers.ModelSerializer):
             'isStaff',
             'isVerified',
             'status',
+            'statusLabel',
             'createdDate',
             'updatedDate',
             'uuid',
@@ -207,6 +218,11 @@ class UseInfoSerializer(serializers.ModelSerializer):
     isVerified = serializers.CharField(source="is_verified")
     createdDate = serializers.CharField(source="created_date")
     updatedDate = serializers.CharField(source="updated_date")
+    statusLabel = serializers.SerializerMethodField('_get_status_label')
+
+    def _get_status_label(self, user_object) -> str:
+        status = getattr(user_object, 'status')
+        return USER_STATUS_LABEL_OPTIONS[status]
 
     class Meta:
         model = User
@@ -220,6 +236,7 @@ class UseInfoSerializer(serializers.ModelSerializer):
             'isStaff',
             'isVerified',
             'status',
+            'statusLabel',
             'createdDate',
             'updatedDate',
             'bio',
