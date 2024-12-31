@@ -273,7 +273,7 @@ class CreateUserSerializer(serializers.Serializer):
 
 
 class ResetUserPasswordSerializer(serializers.Serializer):
-    email = serializers.CharField(validators=[validate_email])
+    email = serializers.CharField(required=True)
     newPassword = serializers.CharField(required=True)
     confirmPassword = serializers.CharField(required=True)
 
