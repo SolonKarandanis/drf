@@ -148,7 +148,7 @@ def upload_profile_image(request, uuid):
     serializer = UploadProfilePictureSerializer(data=request.data)
     if serializer.is_valid(raise_exception=True):
         image: InMemoryUploadedFile = request.FILES.get('image')
-        user_service.upload_profile_image(image, serializer, uuid, logged_in_user)
+        user_service.upload_profile_image(image, serializer, logged_in_user)
         user_image = user_service.get_user_image(uuid)
         data = ImagesSerializer(user_image).data
         return Response(data)
@@ -214,7 +214,7 @@ def is_user_me(logged_in_user: User, uuid: str):
     request_uuid = str(uuid)
     logged_in__user_uuid = str(logged_in_user.uuid)
     if request_uuid != logged_in__user_uuid:
-        raise serializers.ValidationError(f"Action Not Allowed")
+        raise serializers.ValidationError({"not-allowed":"Action not allowed."})
 
 
 @api_view(['POST'])

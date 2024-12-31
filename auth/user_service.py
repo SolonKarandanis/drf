@@ -10,7 +10,7 @@ from images.image_repository import ImageRepository
 from images.models import Images
 from .group_repository import GroupRepository
 from .serializers import UploadProfilePictureSerializer, UpdateBioSerializer, UpldateUserContactInfoSerializer, \
-    CreateUserSerializer
+    CreateUserSerializer, ResetUserPasswordSerializer
 from .user_repository import UserRepository
 from .models import User, UserStatus, UserDetails
 
@@ -143,11 +143,10 @@ class UserService:
         repo.update_user_fields(user, ['cv', 'uploaded_at'])
 
     @transaction.atomic
-    def upload_profile_image(self, image: InMemoryUploadedFile, request: UploadProfilePictureSerializer, uuid: str,
+    def upload_profile_image(self, image: InMemoryUploadedFile, request: UploadProfilePictureSerializer,
                              logged_in_user: User) -> None:
-        user: User = repo.find_user_by_uuid(uuid)
 
-        existing_image: Images = image_repo.find_user_profile_image(user.id)
+        existing_image: Images = image_repo.find_user_profile_image(logged_in_user.id)
         if existing_image is not None:
             existing_image.is_profile_image = False
             image_repo.update_image_is_profile_image(existing_image)
@@ -156,7 +155,7 @@ class UserService:
         data_dict = dict(serialized_data)
         title = data_dict['title']
         alt = data_dict['alt']
-        image_repo.upload_profile_image(image, title, alt, user, logged_in_user)
+        image_repo.upload_profile_image(image, title, alt, logged_in_user, logged_in_user)
 
     def get_user_statuses(self) -> Dict[str, str]:
         user_statuses = {
@@ -199,3 +198,21 @@ class UserService:
         group = groupRepo.find_by_id(role)
         user.groups.add(group)
         return user
+
+    @transaction.atomic
+    def reset_password(self,request: ResetUserPasswordSerializer,  logged_in_user: User) -> None:
+        serialized_data = request.data
+        data_dict = dict(serialized_data)
+        email = data_dict['email']
+        new_password = data_dict['newPassword']
+        confirm_password = data_dict['confirmPassword']
+
+        user = repo.find_user_by_email(email)
+
+        if user.id != logged_in_user.id:
+            raise serializers.ValidationError({"not-allowed":"Action not allowed."})
+
+        if new_password != confirm_password:
+            raise serializers.ValidationError({'password': 'Passwords must match.'})
+
+        repo.update_user_fields(user,["password"])
