@@ -222,4 +222,5 @@ class UserService:
         if new_password != confirm_password:
             raise serializers.ValidationError({'password': 'Passwords must match.'})
 
+        user.set_password(new_password)
         repo.update_user_fields(user,["password"])
