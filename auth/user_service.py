@@ -5,7 +5,8 @@ from django.core.files.uploadedfile import InMemoryUploadedFile
 from django.db import transaction
 from django.utils import timezone
 
-from cfehome.constants.security_constants import ADMIN_ID
+from cfehome.constants.security_constants import ADMIN_ID, ADMIN
+from cfehome.utils.user_util import UserUtil
 from images.image_repository import ImageRepository
 from images.models import Images
 from .group_repository import GroupRepository
@@ -208,8 +209,9 @@ class UserService:
         confirm_password = data_dict['confirmPassword']
 
         user = repo.find_user_by_email(email)
+        is_admin = UserUtil.has_role(user,ADMIN)
 
-        if user.id != logged_in_user.id:
+        if not is_admin and (user.id != logged_in_user.id):
             raise serializers.ValidationError({"not-allowed":"Action not allowed."})
 
         if new_password != confirm_password:

@@ -16,7 +16,7 @@ from .models import User
 from .serializers import PaginatedUserSerializer, CreateUserSerializer, UseInfoSerializer, GroupSerializer, \
     UserAccountSerializer, SearchUsersRequestSerializer, PaginatedPOSTUserSerializer, ChangeUserStatusSerializer, \
     UploadCVSerializer, UploadProfilePictureSerializer, UpldateUserContactInfoSerializer, UpdateBioSerializer, \
-    LoginSerializer
+    LoginSerializer, ResetUserPasswordSerializer
 from .tasks import create_task
 from .user_service import UserService
 
@@ -99,6 +99,16 @@ def delete_user_account(request):
         return Response(status=status.HTTP_204_NO_CONTENT)
     return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
+
+@api_view(['PUT'])
+@permission_classes([IsAuthenticated])
+def reset_user_password(request):
+    logged_in_user = get_user_from_request(request)
+    serializer = ResetUserPasswordSerializer(data=request.data)
+    if serializer.is_valid(raise_exception=True):
+        user_service.reset_password(serializer,logged_in_user)
+        return Response(status=status.HTTP_204_NO_CONTENT)
+    return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
 def email_check(user):
     # security service checks
