@@ -53,6 +53,11 @@ class UserService:
     @transaction.atomic
     def change_user_account_status(self, status: str, user_uuid: str) -> None:
         user: User = self.find_user_by_uuid(user_uuid)
+        is_admin = UserUtil.has_role(user, ADMIN)
+
+        if not is_admin:
+            raise serializers.ValidationError({"not-allowed": "Action not allowed."})
+
         user.status = status
         if UserStatus.ACTIVE.__eq__(status):
             user.is_active = True
