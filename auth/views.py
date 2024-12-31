@@ -72,7 +72,9 @@ def activate_user_account(request):
         serialized_data = serializer.data
         user_uuid = serialized_data["userId"]
         user_service.user_account_status_activated(user_uuid)
-        return Response(status=status.HTTP_204_NO_CONTENT)
+        user = user_service.find_user_by_uuid(user_uuid, True)
+        data = UseInfoSerializer(user).data
+        return Response(data)
     return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
 
@@ -84,7 +86,9 @@ def deactivate_user_account(request):
         serialized_data = serializer.data
         user_uuid = serialized_data["userId"]
         user_service.user_account_status_deactivated(user_uuid)
-        return Response(status=status.HTTP_204_NO_CONTENT)
+        user = user_service.find_user_by_uuid(user_uuid, True)
+        data = UseInfoSerializer(user).data
+        return Response(data)
     return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
 
@@ -96,7 +100,9 @@ def delete_user_account(request):
         serialized_data = serializer.data
         user_uuid = serialized_data["userId"]
         user_service.user_account_status_deleted(user_uuid)
-        return Response(status=status.HTTP_204_NO_CONTENT)
+        user = user_service.find_user_by_uuid(user_uuid, True)
+        data = UseInfoSerializer(user).data
+        return Response(data)
     return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
 
