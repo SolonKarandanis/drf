@@ -53,6 +53,8 @@ class CategorySerializer(serializers.ModelSerializer):
 
 
 class AttributeOptionSerializer(serializers.ModelSerializer):
+    name = serializers.CharField(source='option_name', read_only=True)
+
     class Meta:
         model = AttributeOptions
         fields = [

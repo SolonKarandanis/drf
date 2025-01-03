@@ -131,7 +131,7 @@ class ProductService:
                               inventory=inventory)
 
     def find_product_categories(self, product_uuid: str) -> List[Category]:
-       return repo.find_product_categories(product_uuid)
+        return repo.find_product_categories(product_uuid)
 
     def find_all_categories(self) -> List[Category]:
         return repo.find_all_categories()
