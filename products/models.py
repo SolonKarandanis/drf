@@ -59,13 +59,13 @@ class AttributeOptionsQuerySet(QuerySet):
         return self.prefetch_related('productattributevalues')
 
     def colours(self):
-        return self.filter(id=COLOR_ATTRIBUTE_OPTION_ID)
+        return self.filter(attribute__id=COLOR_ATTRIBUTE_OPTION_ID)
 
     def sizes(self):
-        return self.filter(id=SIZE_ATTRIBUTE_OPTION_ID)
+        return self.filter(attribute__id=SIZE_ATTRIBUTE_OPTION_ID)
 
     def genders(self):
-        return self.filter(id=GENDER_ATTRIBUTE_OPTION_ID)
+        return self.filter(attribute__id=GENDER_ATTRIBUTE_OPTION_ID)
 
 
 class AttributeOptionsManager(Manager):
