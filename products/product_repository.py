@@ -117,7 +117,7 @@ class ProductRepository:
     def find_all_sizes(self) -> List[AttributeOptions]:
         return AttributeOptions.objects.get_queryset().sizes()
 
-    def find_all_colors(self) -> List[AttributeOptions]:
+    def find_all_colours(self) -> List[AttributeOptions]:
         return AttributeOptions.objects.get_queryset().colours()
 
     def find_all_genders(self) -> List[AttributeOptions]:

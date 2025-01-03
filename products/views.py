@@ -4,7 +4,7 @@ from images.serializers import ImagesSerializer
 from .serializers import ProductSerializer, CreateProductSerializer, PaginatedProductListSerializer, \
     PostProductComment, ProductSearchRequestSerializer, CategoriesWithTotalsSerializer, BrandsWithTotalsSerializer, \
     SizesWithTotalsSerializer, PaginatedPOSTProductListSerializer, SimilarProductsRequestSerializer, \
-    SimilarProductsResponseSerializer
+    SimilarProductsResponseSerializer, BrandSerializer, CategorySerializer, AttributeOptionSerializer
 from .models import Product
 from rest_framework import status
 from rest_framework.decorators import api_view, permission_classes
@@ -154,6 +154,46 @@ def get_brands_with_totals(request):
 def get_sizes_with_totals(request):
     result = product_service.get_sizes_with_totals()
     data = SizesWithTotalsSerializer(result, many=True).data
+    return Response(data, status=status.HTTP_200_OK)
+
+
+@api_view(['GET'])
+@permission_classes([IsAuthenticated])
+def get_all_brands(request):
+    result = product_service.find_all_brands()
+    data = BrandSerializer(result, many=True).data
+    return Response(data, status=status.HTTP_200_OK)
+
+
+@api_view(['GET'])
+@permission_classes([IsAuthenticated])
+def get_all_categories(request):
+    result = product_service.find_all_categories()
+    data = CategorySerializer(result, many=True).data
+    return Response(data, status=status.HTTP_200_OK)
+
+
+@api_view(['GET'])
+@permission_classes([IsAuthenticated])
+def get_all_sizes(request):
+    result = product_service.find_all_sizes()
+    data = AttributeOptionSerializer(result, many=True).data
+    return Response(data, status=status.HTTP_200_OK)
+
+
+@api_view(['GET'])
+@permission_classes([IsAuthenticated])
+def get_all_colours(request):
+    result = product_service.find_all_colours()
+    data = AttributeOptionSerializer(result, many=True).data
+    return Response(data, status=status.HTTP_200_OK)
+
+
+@api_view(['GET'])
+@permission_classes([IsAuthenticated])
+def get_all_genders(request):
+    result = product_service.find_all_genders()
+    data = AttributeOptionSerializer(result, many=True).data
     return Response(data, status=status.HTTP_200_OK)
 
 
