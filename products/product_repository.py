@@ -105,5 +105,20 @@ class ProductRepository:
         ]
         return result_list
 
-    def find_product_categories(self, product_uuid:str)-> List[Category]:
+    def find_product_categories(self, product_uuid: str) -> List[Category]:
         return Category.objects.filter(product__uuid=product_uuid)
+
+    def find_all_categories(self) -> List[Category]:
+        return Category.objects.all()
+
+    def find_all_brands(self) -> List[Brand]:
+        return Brand.objects.all()
+
+    def find_all_sizes(self) -> List[AttributeOptions]:
+        return AttributeOptions.objects.get_queryset().sizes()
+
+    def find_all_colors(self) -> List[AttributeOptions]:
+        return AttributeOptions.objects.get_queryset().colours()
+
+    def find_all_genders(self) -> List[AttributeOptions]:
+        return AttributeOptions.objects.get_queryset().genders()

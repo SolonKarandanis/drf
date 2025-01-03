@@ -14,6 +14,8 @@ from django.core.validators import MinValueValidator
 from typing import List
 
 # Create your models here.
+from products.constants import COLOR_ATTRIBUTE_OPTION_ID, SIZE_ATTRIBUTE_OPTION_ID, GENDER_ATTRIBUTE_OPTION_ID
+
 User = settings.AUTH_USER_MODEL
 
 
@@ -55,6 +57,15 @@ class AttributeOptionsQuerySet(QuerySet):
 
     def with_product_attribute_values(self):
         return self.prefetch_related('productattributevalues')
+
+    def colours(self):
+        return self.filter(id=COLOR_ATTRIBUTE_OPTION_ID)
+
+    def sizes(self):
+        return self.filter(id=SIZE_ATTRIBUTE_OPTION_ID)
+
+    def genders(self):
+        return self.filter(id=GENDER_ATTRIBUTE_OPTION_ID)
 
 
 class AttributeOptionsManager(Manager):
