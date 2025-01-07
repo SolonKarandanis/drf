@@ -64,9 +64,9 @@ class AttributeOptionSerializer(serializers.ModelSerializer):
 
 
 class ProductAttributeValuesSerializer(serializers.ModelSerializer):
-    productId = serializers.IntegerField(source='product__id', read_only=True)
-    attributeId = serializers.IntegerField(source='attribute__id', read_only=True)
-    attributeOptionId = serializers.IntegerField(source='attribute_option__id', read_only=True)
+    productId = serializers.IntegerField(source='product_id', read_only=True)
+    attributeId = serializers.IntegerField(source='attribute_id', read_only=True)
+    attributeOptionId = serializers.IntegerField(source='attribute_option_id', read_only=True)
 
     class Meta:
         model = ProductAttributeValues
@@ -360,9 +360,9 @@ class SimilarProductsResponseSerializer(serializers.Serializer):
 
 
 class ProductAttributesSerializer(serializers.Serializer):
-    colors = ProductAttributeValuesSerializer(source='colors', read_only=True, many=True)
-    sizes = ProductAttributeValuesSerializer(source='sizes', read_only=True, many=True)
-    genders = ProductAttributeValuesSerializer(source='genders', read_only=True, many=True)
+    colors = ProductAttributeValuesSerializer(read_only=True, many=True)
+    sizes = ProductAttributeValuesSerializer(read_only=True, many=True)
+    genders = ProductAttributeValuesSerializer(read_only=True, many=True)
 
     class Meta:
         fields = [

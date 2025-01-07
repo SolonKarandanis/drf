@@ -58,7 +58,7 @@ def get_similar_products_by_uuid(request, uuid: str):
 @permission_classes([IsAuthenticated])
 def get_product_attributes(request, uuid: str):
     results = product_service.find_product_attributes(uuid)
-    data = ProductAttributesSerializer(results, many=True).data
+    data = ProductAttributesSerializer(results).data
     return Response(data)
 
 
