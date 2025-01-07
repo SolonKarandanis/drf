@@ -4,7 +4,8 @@ from images.serializers import ImagesSerializer
 from .serializers import ProductSerializer, CreateProductSerializer, PaginatedProductListSerializer, \
     PostProductComment, ProductSearchRequestSerializer, CategoriesWithTotalsSerializer, BrandsWithTotalsSerializer, \
     SizesWithTotalsSerializer, PaginatedPOSTProductListSerializer, SimilarProductsRequestSerializer, \
-    SimilarProductsResponseSerializer, BrandSerializer, CategorySerializer, AttributeOptionSerializer
+    SimilarProductsResponseSerializer, BrandSerializer, CategorySerializer, AttributeOptionSerializer, \
+    ProductAttributesSerializer
 from .models import Product
 from rest_framework import status
 from rest_framework.decorators import api_view, permission_classes
@@ -50,6 +51,14 @@ def get_similar_products_by_uuid(request, uuid: str):
     category_ids = [category.id for category in categories]
     products = product_service.find_similar_products(category_ids, limit)
     data = SimilarProductsResponseSerializer(products, many=True).data
+    return Response(data)
+
+
+@api_view(['GET'])
+@permission_classes([IsAuthenticated])
+def get_product_attributes(request, uuid: str):
+    results = product_service.find_product_attributes(uuid)
+    data = ProductAttributesSerializer(results, many=True).data
     return Response(data)
 
 

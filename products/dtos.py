@@ -1,4 +1,5 @@
 from dataclasses import dataclass
+from typing import List
 
 from images.models import Images
 from products.models import Product, ProductAttributeValues
@@ -40,6 +41,6 @@ class ProductWithPreviewImage:
 
 @dataclass
 class ProductAttributes:
-    colors: ProductAttributeValues
-    sizes: ProductAttributeValues
-    genders: ProductAttributeValues
+    colors: List[ProductAttributeValues]
+    sizes: List[ProductAttributeValues]
+    genders: List[ProductAttributeValues]

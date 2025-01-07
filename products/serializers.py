@@ -360,9 +360,9 @@ class SimilarProductsResponseSerializer(serializers.Serializer):
 
 
 class ProductAttributesSerializer(serializers.Serializer):
-    colors = ProductAttributeValuesSerializer(source='colors', read_only=True)
-    sizes = ProductAttributeValuesSerializer(source='sizes', read_only=True)
-    genders = ProductAttributeValuesSerializer(source='genders', read_only=True)
+    colors = ProductAttributeValuesSerializer(source='colors', read_only=True, many=True)
+    sizes = ProductAttributeValuesSerializer(source='sizes', read_only=True, many=True)
+    genders = ProductAttributeValuesSerializer(source='genders', read_only=True, many=True)
 
     class Meta:
         fields = [
