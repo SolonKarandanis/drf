@@ -4,6 +4,7 @@ from django.conf import settings
 from typing import List
 from django.db.models import Count
 
+from .constants import SIZE_ATTRIBUTE_OPTION_ID, COLOR_ATTRIBUTE_OPTION_ID, GENDER_ATTRIBUTE_OPTION_ID
 from .dtos import CategoriesWithTotals, BrandsWithTotals, SizesWithTotals
 from .models import Product, Category, Brand, AttributeOptions, ProductAttributeValues
 
@@ -104,6 +105,21 @@ class ProductRepository:
             for sizes in sizes_with_totals_qs
         ]
         return result_list
+
+    def find_product_genders(self, product_uuid: str) -> List[ProductAttributeValues]:
+        return ProductAttributeValues.objects.get_queryset() \
+            .filter(product__uuid=product_uuid) \
+            .filter(attribute__id=GENDER_ATTRIBUTE_OPTION_ID)
+
+    def find_product_colors(self, product_uuid: str) -> List[ProductAttributeValues]:
+        return ProductAttributeValues.objects.get_queryset() \
+            .filter(product__uuid=product_uuid) \
+            .filter(attribute__id=COLOR_ATTRIBUTE_OPTION_ID)
+
+    def find_product_sizes(self, product_uuid: str) -> List[ProductAttributeValues]:
+        return ProductAttributeValues.objects.get_queryset() \
+            .filter(product__uuid=product_uuid)\
+            .filter(attribute__id=SIZE_ATTRIBUTE_OPTION_ID)
 
     def find_product_categories(self, product_uuid: str) -> List[Category]:
         return Category.objects.filter(product__uuid=product_uuid)

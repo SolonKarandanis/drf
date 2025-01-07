@@ -119,6 +119,7 @@ class ProductService:
     def get_sizes_with_totals(self) -> List[SizesWithTotals]:
         return repo.get_sizes_with_totals()
 
+    @transaction.atomic
     def create_product(self, request: CreateProductSerializer, logged_in_user: User) -> Product:
         serialized_data = request.data
         data_dict = dict(serialized_data)
@@ -132,6 +133,12 @@ class ProductService:
 
     def find_product_categories(self, product_uuid: str) -> List[Category]:
         return repo.find_product_categories(product_uuid)
+
+    @transaction.atomic
+    def find_product_attributes(self, product_uuid: str):
+        colors = repo.find_product_colors(product_uuid)
+        sizes = repo.find_product_sizes(product_uuid)
+        genders = repo.find_product_genders(product_uuid)
 
     def find_all_categories(self) -> List[Category]:
         return repo.find_all_categories()

@@ -5,7 +5,7 @@ from django.core.paginator import Paginator
 
 from cfehome.serializers import PagingSerializer
 from images.serializers import ImagesSerializer
-from .models import Product, Brand, Category, AttributeOptions
+from .models import Product, Brand, Category, AttributeOptions, ProductAttributeValues
 from .validators import unique_product_title, validate_sku, product_exists
 from auth.serializers import UserPublicSerializer
 from comments.serializers import CommentSerializer
@@ -60,6 +60,21 @@ class AttributeOptionSerializer(serializers.ModelSerializer):
         fields = [
             'id',
             'name',
+        ]
+
+
+class ProductAttributeValuesSerializer(serializers.ModelSerializer):
+    productId = serializers.IntegerField(source='product__id', read_only=True)
+    attributeId = serializers.IntegerField(source='attribute__id', read_only=True)
+    attributeOptionId = serializers.IntegerField(source='attribute_option__id', read_only=True)
+
+    class Meta:
+        model = ProductAttributeValues
+        fields = [
+            'id',
+            'productId',
+            'attributeId',
+            'attributeOptionId',
         ]
 
 
@@ -341,4 +356,17 @@ class SimilarProductsResponseSerializer(serializers.Serializer):
             'numberOfRatings',
             'previewImage'
             'uuid'
+        ]
+
+
+class ProductAttributesSerializer(serializers.Serializer):
+    colors = ProductAttributeValuesSerializer(source='colors', read_only=True)
+    sizes = ProductAttributeValuesSerializer(source='sizes', read_only=True)
+    genders = ProductAttributeValuesSerializer(source='genders', read_only=True)
+
+    class Meta:
+        fields = [
+            'colors',
+            'sizes',
+            'genders'
         ]

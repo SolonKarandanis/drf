@@ -1,7 +1,7 @@
 from dataclasses import dataclass
 
 from images.models import Images
-from products.models import Product
+from products.models import Product, ProductAttributeValues
 
 
 @dataclass
@@ -36,3 +36,10 @@ class DiscountsWithTotals:
 class ProductWithPreviewImage:
     product: Product
     preview_image: Images
+
+
+@dataclass
+class ProductAttributes:
+    colors: ProductAttributeValues
+    sizes: ProductAttributeValues
+    genders: ProductAttributeValues
