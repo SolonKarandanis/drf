@@ -84,6 +84,7 @@ class ProductSerializer(serializers.ModelSerializer):
     comments = CommentSerializer(many=True, read_only=True)
     fabricDetails = serializers.CharField(source='fabric_details', read_only=True)
     careInstructions = serializers.CharField(source='care_instructions', read_only=True)
+    publishedDate = serializers.DateTimeField(source='published_date', read_only=True, format="%Y-%m-%d %H:%M")
     publishStatus = serializers.ChoiceField(source='publish_status', read_only=True, choices=PUBLISH_STATUS_CHOICES)
     publishStatusLabel = serializers.SerializerMethodField('_get_publish_status_label')
     availabilityStatus = serializers.ChoiceField(source='availability_status', read_only=True,
@@ -112,6 +113,7 @@ class ProductSerializer(serializers.ModelSerializer):
             'content',
             'fabricDetails',
             'careInstructions',
+            'publishedDate',
             'publishStatus',
             'publishStatusLabel',
             'availabilityStatus',
