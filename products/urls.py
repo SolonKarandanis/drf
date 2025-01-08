@@ -9,6 +9,7 @@ urlpatterns = [
     path('search/', views.search_products, name='search-products'),
     path('categories/', views.get_all_categories, name='all-categories'),
     path('brands/', views.get_all_brands, name='all-brands'),
+    path('all-attributes/', views.get_all_attributes, name='all-attributes'),
     path('sizes/', views.get_all_sizes, name='all-sizes'),
     path('colours/', views.get_all_colours, name='all-colours'),
     path('genders/', views.get_all_genders, name='all-genders'),

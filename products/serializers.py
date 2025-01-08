@@ -370,3 +370,16 @@ class ProductAttributesSerializer(serializers.Serializer):
             'sizes',
             'genders'
         ]
+
+
+class AllAttributeOptionsSerializer(serializers.Serializer):
+    colors = AttributeOptionSerializer(read_only=True, many=True)
+    sizes = AttributeOptionSerializer(read_only=True, many=True)
+    genders = AttributeOptionSerializer(read_only=True, many=True)
+
+    class Meta:
+        fields = [
+            'colors',
+            'sizes',
+            'genders'
+        ]

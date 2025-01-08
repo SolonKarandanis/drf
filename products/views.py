@@ -5,7 +5,7 @@ from .serializers import ProductSerializer, CreateProductSerializer, PaginatedPr
     PostProductComment, ProductSearchRequestSerializer, CategoriesWithTotalsSerializer, BrandsWithTotalsSerializer, \
     SizesWithTotalsSerializer, PaginatedPOSTProductListSerializer, SimilarProductsRequestSerializer, \
     SimilarProductsResponseSerializer, BrandSerializer, CategorySerializer, AttributeOptionSerializer, \
-    ProductAttributesSerializer
+    ProductAttributesSerializer, AllAttributeOptionsSerializer
 from .models import Product
 from rest_framework import status
 from rest_framework.decorators import api_view, permission_classes
@@ -179,6 +179,14 @@ def get_all_brands(request):
 def get_all_categories(request):
     result = product_service.find_all_categories()
     data = CategorySerializer(result, many=True).data
+    return Response(data, status=status.HTTP_200_OK)
+
+
+@api_view(['GET'])
+@permission_classes([IsAuthenticated])
+def get_all_attributes(request):
+    result = product_service.find_all_attributes()
+    data = AllAttributeOptionsSerializer(result, many=True).data
     return Response(data, status=status.HTTP_200_OK)
 
 

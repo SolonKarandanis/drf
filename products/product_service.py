@@ -4,7 +4,8 @@ from django.conf import settings
 
 from images.image_repository import ImageRepository
 from images.models import Images
-from .dtos import CategoriesWithTotals, BrandsWithTotals, SizesWithTotals, ProductWithPreviewImage, ProductAttributes
+from .dtos import CategoriesWithTotals, BrandsWithTotals, SizesWithTotals, ProductWithPreviewImage, ProductAttributes, \
+    AllAttributeOptions
 from .models import Product, ProductAttributeValues, Category, Brand, AttributeOptions
 from .product_repository import ProductRepository
 from .serializers import PostProductComment, ProductSearchRequestSerializer, SimilarProductsRequestSerializer, \
@@ -135,7 +136,7 @@ class ProductService:
         return repo.find_product_categories(product_uuid)
 
     @transaction.atomic
-    def find_product_attributes(self, product_uuid: str) -> ProductAttributes :
+    def find_product_attributes(self, product_uuid: str) -> ProductAttributes:
         colors = repo.find_product_colors(product_uuid)
         sizes = repo.find_product_sizes(product_uuid)
         genders = repo.find_product_genders(product_uuid)
@@ -147,6 +148,14 @@ class ProductService:
 
     def find_all_brands(self) -> List[Brand]:
         return repo.find_all_brands()
+
+    @transaction.atomic
+    def find_all_attributes(self) -> AllAttributeOptions:
+        colors = self.find_all_colours()
+        sizes = self.find_all_sizes()
+        genders = self.find_all_genders()
+        attribute_options = AllAttributeOptions(colors=colors, sizes=sizes, genders=genders)
+        return attribute_options
 
     def find_all_sizes(self) -> List[AttributeOptions]:
         return repo.find_all_sizes()
