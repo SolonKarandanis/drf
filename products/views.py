@@ -186,7 +186,7 @@ def get_all_categories(request):
 @permission_classes([IsAuthenticated])
 def get_all_attributes(request):
     result = product_service.find_all_attributes()
-    data = AllAttributeOptionsSerializer(result, many=True).data
+    data = AllAttributeOptionsSerializer(result).data
     return Response(data, status=status.HTTP_200_OK)
 
 
