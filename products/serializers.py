@@ -237,6 +237,12 @@ class SaveProductSerializer(serializers.Serializer):
     publishStatus = serializers.ChoiceField(choices=PUBLISH_STATUS_CHOICES, required=False)
     availabilityStatus = serializers.ChoiceField(choices=AVAILABILITY_STATUS_CHOICES, required=False)
     publishedDate = serializers.DateTimeField(read_only=True, format="%Y-%m-%d %H:%M")
+    categories = serializers.ListField(child=serializers.IntegerField(required=True), required=True)
+    brands = serializers.ListField(child=serializers.IntegerField(required=True), required=True)
+    sizes = serializers.ListField(child=serializers.IntegerField(required=True), required=True)
+    genders = serializers.ListField(child=serializers.IntegerField(required=True), required=True)
+    colors = serializers.ListField(child=serializers.IntegerField(required=True), required=True)
+    images = serializers.ListField(child=serializers.ImageField(required=True), required=True)
 
     def validate(self, data):
         """
@@ -265,7 +271,13 @@ class SaveProductSerializer(serializers.Serializer):
             'inventory',
             'publishStatus',
             'availabilityStatus',
-            'publishedDate'
+            'publishedDate',
+            'categories',
+            'brands',
+            'sizes',
+            'genders',
+            'colors',
+            'images',
         ]
 
 

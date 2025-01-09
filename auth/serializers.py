@@ -13,7 +13,7 @@ from .models import User, UserDetails
 from cfehome.serializers import PagingSerializer
 
 groupRepo = GroupRepository()
-userRepo= UserRepository()
+userRepo = UserRepository()
 
 logger = logging.getLogger('django')
 
@@ -23,6 +23,7 @@ USER_STATUS_LABEL_OPTIONS = {
     "user.deactivated": "Deactivated",
     "user.deleted": "Deleted",
 }
+
 
 class LoginSerializer(TokenObtainPairSerializer):
     def validate(self, attrs):
@@ -40,7 +41,6 @@ class LoginSerializer(TokenObtainPairSerializer):
                 error_name = "not_active_profile"
                 raise exceptions.AuthenticationFailed(error_message, error_name)
             return super().validate(attrs)
-
 
 
 class UserProductInlineSerializer(serializers.Serializer):
