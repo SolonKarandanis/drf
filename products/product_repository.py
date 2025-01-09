@@ -144,3 +144,7 @@ class ProductRepository:
 
     def find_all_genders(self) -> List[AttributeOptions]:
         return AttributeOptions.objects.get_queryset().genders()
+
+    def save_product(self, product: Product) -> Product:
+        product.save()
+        return product

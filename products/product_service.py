@@ -1,7 +1,7 @@
 from typing import List
 from django.db import transaction
 from django.conf import settings
-
+from django.core.files.uploadedfile import InMemoryUploadedFile
 from images.image_repository import ImageRepository
 from images.models import Images
 from .dtos import CategoriesWithTotals, BrandsWithTotals, SizesWithTotals, ProductWithPreviewImage, ProductAttributes, \
@@ -121,16 +121,39 @@ class ProductService:
         return repo.get_sizes_with_totals()
 
     @transaction.atomic
-    def create_product(self, request: SaveProductSerializer, logged_in_user: User) -> Product:
+    def create_product(self, request: SaveProductSerializer, images: List[InMemoryUploadedFile],
+                       logged_in_user: User) -> Product:
         serialized_data = request.data
         data_dict = dict(serialized_data)
         sku = data_dict['sku']
         title = data_dict['title']
-        content = data_dict['content']
         price = data_dict['price']
         inventory = data_dict['inventory']
-        new_product = Product(sku=sku, user=logged_in_user, title=title, content=content, price=price,
-                              inventory=inventory)
+        publish_status = data_dict['publishStatus']
+        availability_status = data_dict['availabilityStatus']
+        published_date = data_dict['publishedDate']
+        categories = data_dict['categories']
+        brands = data_dict['brands']
+        sizes = data_dict['sizes']
+        genders = data_dict['genders']
+        colors = data_dict['colors']
+
+        new_product = Product(sku=sku, user=logged_in_user, title=title, price=price, inventory=inventory,
+                              publish_status=publish_status, availability_status=availability_status,
+                              published_date=published_date)
+
+        if "content" in data_dict:
+            content = data_dict['content']
+            new_product.content = content
+        if "fabricDetails" in data_dict:
+            fabric_details = data_dict['fabricDetails']
+            new_product.fabric_details = fabric_details
+        if "careInstructions" in data_dict:
+            care_instructions = data_dict['careInstructions']
+            new_product.care_instructions = care_instructions
+        repo.save_product(new_product)
+
+        return new_product
 
     def find_product_categories(self, product_uuid: str) -> List[Category]:
         return repo.find_product_categories(product_uuid)
