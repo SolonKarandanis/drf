@@ -225,18 +225,22 @@ class PaginatedPOSTProductListSerializer:
         self.page_data = {'count': count, 'pages': pages, 'previous': previous, 'next': next, 'data': serializer.data}
 
 
-class CreateProductSerializer(serializers.ModelSerializer):
+class CreateProductSerializer(serializers.Serializer):
     sku = serializers.CharField(validators=[validate_sku])
     title = serializers.CharField(validators=[unique_product_title])
-    fabricDetails = serializers.CharField(source='fabric_details', read_only=True)
-    careInstructions = serializers.CharField(source='care_instructions', read_only=True)
-    publishStatus = serializers.CharField(source='publish_status', read_only=True)
-    availabilityStatus = serializers.CharField(source='availability_status', read_only=True)
+    content = serializers.CharField(required=False, allow_null=True, allow_blank=True)
+    fabricDetails = serializers.CharField(source='fabric_details', required=False, allow_null=True, allow_blank=True)
+    careInstructions = serializers.CharField(source='care_instructions', required=False,
+                                             allow_null=True, allow_blank=True)
+    price = serializers.FloatField(read_only=True)
+    inventory = serializers.IntegerField(read_only=True)
+    publishStatus = serializers.ChoiceField(choices=PUBLISH_STATUS_CHOICES, required=False)
+    availabilityStatus = serializers.ChoiceField(choices=AVAILABILITY_STATUS_CHOICES, required=False)
+    publishedDate = serializers.DateTimeField(read_only=True, format="%Y-%m-%d %H:%M")
+
 
     class Meta:
-        model = Product
         fields = [
-            'id',
             'sku',
             'title',
             'content',
@@ -246,6 +250,7 @@ class CreateProductSerializer(serializers.ModelSerializer):
             'inventory',
             'publishStatus',
             'availabilityStatus',
+            'publishedDate'
         ]
 
 

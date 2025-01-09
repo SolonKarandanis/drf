@@ -118,6 +118,12 @@ def create_product(request):
 
 @api_view(['PUT'])
 @permission_classes([IsAuthenticated])
+def update_product(request):
+    logged_in_user = request.user
+
+
+@api_view(['PUT'])
+@permission_classes([IsAuthenticated])
 def post_product_comment(request):
     logged_in_user = request.user
     serializer = PostProductComment(data=request.data, many=False)

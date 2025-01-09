@@ -52,6 +52,12 @@ class ProductRepository:
         products = Product.objects.filter(pk__in=product_ids)
         return products
 
+    def exists_product_by_sku(self, sku: str) -> bool:
+        return Product.objects.filter(sku=sku).exists()
+
+    def exists_product_by_id(self, product_id: int) -> bool:
+        return Product.objects.filter(pk=product_id).exists()
+
     def update_product_price(self, product: Product) -> Product:
         product.save(update_fields=['price'])
         return product

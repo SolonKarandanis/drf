@@ -179,11 +179,10 @@ class UserService:
         logger.info(f'user_image: {user_image}')
         return user_image
 
-    def create_user(self,role:int, email:str, password:str, **extra_fields) ->User :
+    def create_user(self, role: int, email: str, password: str, **extra_fields) -> User:
         if role == ADMIN_ID:
             return repo.create_superuser(email, password, **extra_fields)
         return repo.create_user(email, password, **extra_fields)
-
 
     @transaction.atomic
     def register_user(self, request: CreateUserSerializer) -> User:
@@ -200,13 +199,14 @@ class UserService:
         if password != confirm_password:
             raise serializers.ValidationError({'password': 'Passwords must match.'})
 
-        user:User = self.create_user(role,email,password,username=username,first_name=first_name,last_name=last_name)
+        user: User = self.create_user(role, email, password, username=username, first_name=first_name,
+                                      last_name=last_name)
         group = groupRepo.find_by_id(role)
         user.groups.add(group)
         return user
 
     @transaction.atomic
-    def reset_password(self,request: ResetUserPasswordSerializer,  logged_in_user: User) -> None:
+    def reset_password(self, request: ResetUserPasswordSerializer, logged_in_user: User) -> None:
         serialized_data = request.data
         data_dict = dict(serialized_data)
         email = data_dict['email']
@@ -214,13 +214,13 @@ class UserService:
         confirm_password = data_dict['confirmPassword']
 
         user = repo.find_user_by_email(email)
-        is_admin = UserUtil.has_role(user,ADMIN)
+        is_admin = UserUtil.has_role(user, ADMIN)
 
         if not is_admin and (user.id != logged_in_user.id):
-            raise serializers.ValidationError({"not-allowed":"Action not allowed."})
+            raise serializers.ValidationError({"not-allowed": "Action not allowed."})
 
         if new_password != confirm_password:
             raise serializers.ValidationError({'password': 'Passwords must match.'})
 
         user.set_password(new_password)
-        repo.update_user_fields(user,["password"])
+        repo.update_user_fields(user, ["password"])
