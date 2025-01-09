@@ -1,5 +1,6 @@
 import logging
 
+from django.utils.timezone import now
 from rest_framework import serializers
 from django.core.paginator import Paginator
 
@@ -225,19 +226,33 @@ class PaginatedPOSTProductListSerializer:
         self.page_data = {'count': count, 'pages': pages, 'previous': previous, 'next': next, 'data': serializer.data}
 
 
-class CreateProductSerializer(serializers.Serializer):
+class SaveProductSerializer(serializers.Serializer):
     sku = serializers.CharField(validators=[validate_sku])
     title = serializers.CharField(validators=[unique_product_title])
     content = serializers.CharField(required=False, allow_null=True, allow_blank=True)
-    fabricDetails = serializers.CharField(source='fabric_details', required=False, allow_null=True, allow_blank=True)
-    careInstructions = serializers.CharField(source='care_instructions', required=False,
-                                             allow_null=True, allow_blank=True)
+    fabricDetails = serializers.CharField(required=False, allow_null=True, allow_blank=True)
+    careInstructions = serializers.CharField(required=False, allow_null=True, allow_blank=True)
     price = serializers.FloatField(read_only=True)
     inventory = serializers.IntegerField(read_only=True)
     publishStatus = serializers.ChoiceField(choices=PUBLISH_STATUS_CHOICES, required=False)
     availabilityStatus = serializers.ChoiceField(choices=AVAILABILITY_STATUS_CHOICES, required=False)
     publishedDate = serializers.DateTimeField(read_only=True, format="%Y-%m-%d %H:%M")
 
+    def validate(self, data):
+        """
+        Check if Publish Status is 'product.status.scheduled' then the Publish Date is in the future and
+        if the Publish Status is 'product.status.published' then the Publish Date is now.
+        """
+        publishedDate = data['publishedDate']
+        publishStatus = data['publishStatus']
+
+        if publishStatus == "product.status.scheduled" and publishedDate <= now():
+            raise serializers.ValidationError(f" Publish date needs to be a future date if the Publish Status is 'Scheduled'")
+
+        if publishStatus == "product.status.published" and publishedDate != now():
+            raise serializers.ValidationError(f" Publish date needs to be current date if the Publish Status is 'Published'")
+
+        return data
 
     class Meta:
         fields = [

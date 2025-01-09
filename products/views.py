@@ -1,7 +1,7 @@
 import logging
 
 from images.serializers import ImagesSerializer
-from .serializers import ProductSerializer, CreateProductSerializer, PaginatedProductListSerializer, \
+from .serializers import ProductSerializer, SaveProductSerializer, PaginatedProductListSerializer, \
     PostProductComment, ProductSearchRequestSerializer, CategoriesWithTotalsSerializer, BrandsWithTotalsSerializer, \
     SizesWithTotalsSerializer, PaginatedPOSTProductListSerializer, SimilarProductsRequestSerializer, \
     SimilarProductsResponseSerializer, BrandSerializer, CategorySerializer, AttributeOptionSerializer, \
@@ -109,7 +109,7 @@ def create_page_obj(request, queryset):
 @permission_classes([IsAuthenticated])
 def create_product(request):
     logged_in_user = request.user
-    serializer = CreateProductSerializer(data=request.data, context={'logged_in_user': logged_in_user})
+    serializer = SaveProductSerializer(data=request.data, context={'logged_in_user': logged_in_user})
     if serializer.is_valid(raise_exception=True):
         # serializer.save()
         return Response(serializer.data, status=status.HTTP_201_CREATED)

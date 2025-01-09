@@ -9,7 +9,7 @@ from .dtos import CategoriesWithTotals, BrandsWithTotals, SizesWithTotals, Produ
 from .models import Product, ProductAttributeValues, Category, Brand, AttributeOptions
 from .product_repository import ProductRepository
 from .serializers import PostProductComment, ProductSearchRequestSerializer, SimilarProductsRequestSerializer, \
-    CreateProductSerializer
+    SaveProductSerializer
 from comments.comment_repository import CommentRepository
 
 User = settings.AUTH_USER_MODEL
@@ -121,7 +121,7 @@ class ProductService:
         return repo.get_sizes_with_totals()
 
     @transaction.atomic
-    def create_product(self, request: CreateProductSerializer, logged_in_user: User) -> Product:
+    def create_product(self, request: SaveProductSerializer, logged_in_user: User) -> Product:
         serialized_data = request.data
         data_dict = dict(serialized_data)
         sku = data_dict['sku']
