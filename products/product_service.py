@@ -152,43 +152,38 @@ class ProductService:
                        logged_in_user: User) -> Product:
         serialized_data = request.data
         data_dict = dict(serialized_data)
-        logger.info(f'---> ProductService ---> create_product ---> data_dict: {data_dict}')
         new_product = self.initialize_product_from_serializer(data_dict)
         new_product.user = logged_in_user
-        repo.save_product(new_product)
 
         category_ids = data_dict['categories']
-        logger.info(f'---> ProductService ---> create_product ---> category_ids: {category_ids}')
-        brand_ids = data_dict['brand']
-        logger.info(f'---> ProductService ---> create_product ---> brand_ids: {brand_ids}')
+        brand_id = data_dict['brand']
         size_ids = data_dict['sizes']
-        logger.info(f'---> ProductService ---> create_product ---> size_ids: {size_ids}')
-        gender_ids = data_dict['gender']
-        logger.info(f'---> ProductService ---> create_product ---> gender_ids: {gender_ids}')
+        gender_id = data_dict['gender']
         color_ids = data_dict['colors']
-        logger.info(f'---> ProductService ---> create_product ---> color_ids: {color_ids}')
 
         categories = repo.find_categories_by_ids(category_ids)
         if len(categories) == 0:
             raise serializers.ValidationError({'categories': "Supplied Categories don't exist"})
-        brands = repo.find_brands_by_ids(brand_ids)
-        if len(brands) == 0:
+        brand = repo.find_brands_by_id(brand_id)
+        if brand is None:
             raise serializers.ValidationError({'brands': "Supplied Brands don't exist"})
         sizes = repo.find_sizes_by_ids(size_ids)
         if len(sizes) == 0:
             raise serializers.ValidationError({'sizes': "Supplied Sizes don't exist"})
-        genders = repo.find_genders_by_ids(gender_ids)
-        if len(genders) == 0:
+        gender = repo.find_genders_by_id(gender_id)
+        if gender is None:
             raise serializers.ValidationError({'genders': "Supplied Genders don't exist"})
         colors = repo.find_colors_by_ids(color_ids)
         if len(colors) == 0:
             raise serializers.ValidationError({'colors': "Supplied Colors don't exist"})
 
+        new_product.brand = brand
+        repo.save_product(new_product)
+
         new_product.category.add(categories)
         new_product.attributes.add(sizes)
-        new_product.attributes.add(genders)
+        new_product.attributes.add(gender)
         new_product.attributes.add(colors)
-        new_product.brand = brands[0]
 
         if "images" in data_dict:
             images = data_dict['images']

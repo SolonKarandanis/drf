@@ -139,8 +139,8 @@ class ProductRepository:
     def find_all_brands(self) -> List[Brand]:
         return Brand.objects.all()
 
-    def find_brands_by_ids(self, brand_ids: List[int]) -> List[Brand]:
-        return Brand.objects.filter(pk__in=brand_ids)
+    def find_brands_by_id(self, brand_id: int) -> Brand:
+        return Brand.objects.get(pk=brand_id)
 
     def find_all_sizes(self) -> List[AttributeOptions]:
         return AttributeOptions.objects.get_queryset().sizes()
@@ -157,8 +157,8 @@ class ProductRepository:
     def find_all_genders(self) -> List[AttributeOptions]:
         return AttributeOptions.objects.get_queryset().genders()
 
-    def find_genders_by_ids(self, gender_ids: List[int]) -> List[AttributeOptions]:
-        return AttributeOptions.objects.get_queryset().genders().filter(pk__in=gender_ids)
+    def find_genders_by_id(self, gender_id: int) -> AttributeOptions:
+        return AttributeOptions.objects.get_queryset().genders().filter(pk=gender_id)
 
     def save_product(self, product: Product) -> Product:
         product.save()

@@ -249,14 +249,16 @@ class SaveProductSerializer(serializers.Serializer):
         Check if Publish Status is 'product.status.scheduled' then the Publish Date is in the future and
         if the Publish Status is 'product.status.published' then the Publish Date is now.
         """
-        logger.info(f'------>    data: {data}')
+
         publishedDate = data['publishedDate']
         publishStatus = data['publishStatus']
+        current_date = now().date()
 
-        if publishStatus == "product.status.scheduled" and publishedDate <= now():
+        if publishStatus == "product.status.scheduled" and publishedDate <= current_date:
             raise serializers.ValidationError({'scheduled': f" Publish date needs to be a future date if the Publish Status is 'Scheduled'"})
 
-        if publishStatus == "product.status.published" and publishedDate != now():
+
+        if publishStatus == "product.status.published" and publishedDate != current_date:
             raise serializers.ValidationError({'published': f" Publish date needs to be current date if the Publish Status is 'Published'"})
 
         return data
