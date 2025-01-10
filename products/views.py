@@ -111,10 +111,12 @@ def create_page_obj(request, queryset):
 def create_product(request):
     logged_in_user = request.user
     serializer = SaveProductSerializer(data=request.data)
+    logger.info(f'---> Product Views ---> create_product ---> serializer: {serializer}')
     if serializer.is_valid(raise_exception=True):
         images: List[InMemoryUploadedFile] = request.FILES.get('images')
-        # serializer.save()
-        return Response(serializer.data, status=status.HTTP_201_CREATED)
+        logger.info(f'---> Product Views ---> create_product ---> images: {images}')
+        created_product = product_service.create_product(serializer, images, logged_in_user)
+        return Response(status=status.HTTP_201_CREATED)
     return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
 

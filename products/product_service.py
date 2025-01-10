@@ -190,7 +190,8 @@ class ProductService:
         new_product.brand = brands[0]
 
         if "images" in data_dict:
-            pass
+            images = data_dict['images']
+            logger.info(f'---> ProductService ---> create_product ---> images: {images}')
 
         return new_product
 
