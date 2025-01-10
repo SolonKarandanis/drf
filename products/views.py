@@ -116,7 +116,7 @@ def create_product(request):
         images: List[InMemoryUploadedFile] = request.FILES.get('images')
         logger.info(f'---> Product Views ---> create_product ---> images: {images}')
         created_product = product_service.create_product(serializer, images, logged_in_user)
-        return Response(status=status.HTTP_201_CREATED)
+        return Response({'productId': created_product.uuid}, status=status.HTTP_201_CREATED)
     return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
 
