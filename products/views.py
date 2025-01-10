@@ -1,4 +1,5 @@
 import logging
+from typing import List
 
 from images.serializers import ImagesSerializer
 from .serializers import ProductSerializer, SaveProductSerializer, PaginatedProductListSerializer, \
@@ -6,7 +7,7 @@ from .serializers import ProductSerializer, SaveProductSerializer, PaginatedProd
     SizesWithTotalsSerializer, PaginatedPOSTProductListSerializer, SimilarProductsRequestSerializer, \
     SimilarProductsResponseSerializer, BrandSerializer, CategorySerializer, AttributeOptionSerializer, \
     ProductAttributesSerializer, AllAttributeOptionsSerializer
-from .models import Product
+from django.core.files.uploadedfile import InMemoryUploadedFile
 from rest_framework import status
 from rest_framework.decorators import api_view, permission_classes
 from rest_framework.response import Response
@@ -109,8 +110,9 @@ def create_page_obj(request, queryset):
 @permission_classes([IsAuthenticated])
 def create_product(request):
     logged_in_user = request.user
-    serializer = SaveProductSerializer(data=request.data, context={'logged_in_user': logged_in_user})
+    serializer = SaveProductSerializer(data=request.data)
     if serializer.is_valid(raise_exception=True):
+        images: List[InMemoryUploadedFile] = request.FILES.get('images')
         # serializer.save()
         return Response(serializer.data, status=status.HTTP_201_CREATED)
     return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)

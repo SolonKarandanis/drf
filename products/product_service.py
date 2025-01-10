@@ -1,7 +1,9 @@
+import logging
 from typing import List
 from django.db import transaction
 from django.conf import settings
 from django.core.files.uploadedfile import InMemoryUploadedFile
+from rest_framework import serializers
 from images.image_repository import ImageRepository
 from images.models import Images
 from .dtos import CategoriesWithTotals, BrandsWithTotals, SizesWithTotals, ProductWithPreviewImage, ProductAttributes, \
@@ -12,6 +14,7 @@ from .serializers import PostProductComment, ProductSearchRequestSerializer, Sim
     SaveProductSerializer
 from comments.comment_repository import CommentRepository
 
+logger = logging.getLogger('django')
 User = settings.AUTH_USER_MODEL
 repo = ProductRepository()
 comment_repo = CommentRepository()
@@ -120,11 +123,7 @@ class ProductService:
     def get_sizes_with_totals(self) -> List[SizesWithTotals]:
         return repo.get_sizes_with_totals()
 
-    @transaction.atomic
-    def create_product(self, request: SaveProductSerializer, images: List[InMemoryUploadedFile],
-                       logged_in_user: User) -> Product:
-        serialized_data = request.data
-        data_dict = dict(serialized_data)
+    def initialize_product_from_serializer(self, data_dict: dict[str, object]) -> Product:
         sku = data_dict['sku']
         title = data_dict['title']
         price = data_dict['price']
@@ -132,16 +131,10 @@ class ProductService:
         publish_status = data_dict['publishStatus']
         availability_status = data_dict['availabilityStatus']
         published_date = data_dict['publishedDate']
-        categories = data_dict['categories']
-        brands = data_dict['brands']
-        sizes = data_dict['sizes']
-        genders = data_dict['genders']
-        colors = data_dict['colors']
 
-        new_product = Product(sku=sku, user=logged_in_user, title=title, price=price, inventory=inventory,
+        new_product = Product(sku=sku, title=title, price=price, inventory=inventory,
                               publish_status=publish_status, availability_status=availability_status,
                               published_date=published_date)
-
         if "content" in data_dict:
             content = data_dict['content']
             new_product.content = content
@@ -151,7 +144,53 @@ class ProductService:
         if "careInstructions" in data_dict:
             care_instructions = data_dict['careInstructions']
             new_product.care_instructions = care_instructions
+
+        return new_product
+
+    @transaction.atomic
+    def create_product(self, request: SaveProductSerializer, images: List[InMemoryUploadedFile],
+                       logged_in_user: User) -> Product:
+        serialized_data = request.data
+        data_dict = dict(serialized_data)
+        new_product = self.initialize_product_from_serializer(data_dict)
+        new_product.user = logged_in_user
         repo.save_product(new_product)
+
+        category_ids = data_dict['categories']
+        logger.info(f'---> ProductService ---> create_product ---> category_ids: {category_ids}')
+        brand_ids = data_dict['brands']
+        logger.info(f'---> ProductService ---> create_product ---> brand_ids: {brand_ids}')
+        size_ids = data_dict['sizes']
+        logger.info(f'---> ProductService ---> create_product ---> size_ids: {size_ids}')
+        gender_ids = data_dict['genders']
+        logger.info(f'---> ProductService ---> create_product ---> gender_ids: {gender_ids}')
+        color_ids = data_dict['colors']
+        logger.info(f'---> ProductService ---> create_product ---> color_ids: {color_ids}')
+
+        categories = repo.find_categories_by_ids(category_ids)
+        if len(categories) == 0:
+            raise serializers.ValidationError({'categories': "Supplied Categories don't exist"})
+        brands = repo.find_brands_by_ids(brand_ids)
+        if len(brands) == 0:
+            raise serializers.ValidationError({'brands': "Supplied Brands don't exist"})
+        sizes = repo.find_sizes_by_ids(size_ids)
+        if len(sizes) == 0:
+            raise serializers.ValidationError({'sizes': "Supplied Sizes don't exist"})
+        genders = repo.find_genders_by_ids(gender_ids)
+        if len(genders) == 0:
+            raise serializers.ValidationError({'genders': "Supplied Genders don't exist"})
+        colors = repo.find_colors_by_ids(color_ids)
+        if len(colors) == 0:
+            raise serializers.ValidationError({'colors': "Supplied Colors don't exist"})
+
+        new_product.category.add(categories)
+        new_product.attributes.add(sizes)
+        new_product.attributes.add(genders)
+        new_product.attributes.add(colors)
+        new_product.brand = brands[0]
+
+        if "images" in data_dict:
+            pass
 
         return new_product
 

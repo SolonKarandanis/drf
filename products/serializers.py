@@ -242,7 +242,7 @@ class SaveProductSerializer(serializers.Serializer):
     sizes = serializers.ListField(child=serializers.IntegerField(required=True), required=True)
     genders = serializers.ListField(child=serializers.IntegerField(required=True), required=True)
     colors = serializers.ListField(child=serializers.IntegerField(required=True), required=True)
-    images = serializers.ListField(child=serializers.ImageField(required=True), required=True)
+    images = serializers.ListField(child=serializers.ImageField(required=False), required=False)
 
     def validate(self, data):
         """
@@ -253,10 +253,10 @@ class SaveProductSerializer(serializers.Serializer):
         publishStatus = data['publishStatus']
 
         if publishStatus == "product.status.scheduled" and publishedDate <= now():
-            raise serializers.ValidationError(f" Publish date needs to be a future date if the Publish Status is 'Scheduled'")
+            raise serializers.ValidationError({'scheduled': f" Publish date needs to be a future date if the Publish Status is 'Scheduled'"})
 
         if publishStatus == "product.status.published" and publishedDate != now():
-            raise serializers.ValidationError(f" Publish date needs to be current date if the Publish Status is 'Published'")
+            raise serializers.ValidationError({'published': f" Publish date needs to be current date if the Publish Status is 'Published'"})
 
         return data
 

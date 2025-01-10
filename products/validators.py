@@ -8,14 +8,14 @@ repo = ProductRepository()
 def validate_sku(self):
     exists = repo.exists_product_by_sku(self)
     if exists:
-        raise serializers.ValidationError(f"{self} is already a product sku")
+        raise serializers.ValidationError({'Sku': f"{self} is already a product sku"})
     return self
 
 
 def product_exists(self):
     exists = repo.exists_product_by_id(self)
     if not exists:
-        raise serializers.ValidationError(f"Product does not exist")
+        raise serializers.ValidationError({'product': "Product does not exist"})
     return self
 
 
