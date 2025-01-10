@@ -152,17 +152,18 @@ class ProductService:
                        logged_in_user: User) -> Product:
         serialized_data = request.data
         data_dict = dict(serialized_data)
+        logger.info(f'---> ProductService ---> create_product ---> data_dict: {data_dict}')
         new_product = self.initialize_product_from_serializer(data_dict)
         new_product.user = logged_in_user
         repo.save_product(new_product)
 
         category_ids = data_dict['categories']
         logger.info(f'---> ProductService ---> create_product ---> category_ids: {category_ids}')
-        brand_ids = data_dict['brands']
+        brand_ids = data_dict['brand']
         logger.info(f'---> ProductService ---> create_product ---> brand_ids: {brand_ids}')
         size_ids = data_dict['sizes']
         logger.info(f'---> ProductService ---> create_product ---> size_ids: {size_ids}')
-        gender_ids = data_dict['genders']
+        gender_ids = data_dict['gender']
         logger.info(f'---> ProductService ---> create_product ---> gender_ids: {gender_ids}')
         color_ids = data_dict['colors']
         logger.info(f'---> ProductService ---> create_product ---> color_ids: {color_ids}')

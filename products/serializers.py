@@ -232,15 +232,15 @@ class SaveProductSerializer(serializers.Serializer):
     content = serializers.CharField(required=False, allow_null=True, allow_blank=True)
     fabricDetails = serializers.CharField(required=False, allow_null=True, allow_blank=True)
     careInstructions = serializers.CharField(required=False, allow_null=True, allow_blank=True)
-    price = serializers.FloatField(read_only=True)
-    inventory = serializers.IntegerField(read_only=True)
+    price = serializers.FloatField()
+    inventory = serializers.IntegerField()
     publishStatus = serializers.ChoiceField(choices=PUBLISH_STATUS_CHOICES, required=False)
     availabilityStatus = serializers.ChoiceField(choices=AVAILABILITY_STATUS_CHOICES, required=False)
-    publishedDate = serializers.DateTimeField(read_only=True, format="%Y-%m-%d %H:%M")
+    publishedDate = serializers.DateField()
     categories = serializers.ListField(child=serializers.IntegerField(required=True), required=True)
-    brands = serializers.ListField(child=serializers.IntegerField(required=True), required=True)
+    brand = serializers.IntegerField(required=True)
     sizes = serializers.ListField(child=serializers.IntegerField(required=True), required=True)
-    genders = serializers.ListField(child=serializers.IntegerField(required=True), required=True)
+    gender = serializers.IntegerField(required=True)
     colors = serializers.ListField(child=serializers.IntegerField(required=True), required=True)
     images = serializers.ListField(child=serializers.ImageField(required=False), required=False)
 
@@ -249,6 +249,7 @@ class SaveProductSerializer(serializers.Serializer):
         Check if Publish Status is 'product.status.scheduled' then the Publish Date is in the future and
         if the Publish Status is 'product.status.published' then the Publish Date is now.
         """
+        logger.info(f'------>    data: {data}')
         publishedDate = data['publishedDate']
         publishStatus = data['publishStatus']
 
