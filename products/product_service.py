@@ -180,10 +180,10 @@ class ProductService:
         if len(colors) == 0:
             raise serializers.ValidationError({'colors': "Supplied Colors don't exist"})
 
-        product.categories.add(categories)
-        product.attributes.add(sizes)
+        product.categories.add(*categories)
+        product.attributes.add(*sizes)
         product.attributes.add(gender)
-        product.attributes.add(colors)
+        product.attributes.add(*colors)
 
     def create_product(self, request: SaveProductSerializer, images: List[InMemoryUploadedFile],
                        logged_in_user: User) -> Product:
