@@ -161,5 +161,5 @@ class ProductRepository:
         return AttributeOptions.objects.get_queryset().genders().filter(pk=gender_id)
 
     def save_product(self, product: Product) -> Product:
-        product.save()
-        return product
+        saved_product = product.create()
+        return saved_product

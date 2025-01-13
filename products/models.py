@@ -200,7 +200,7 @@ class Product(Model):
     images = GenericRelation("images.Images", related_query_name='product')
     user = ForeignKey(User, default=1, null=True, on_delete=SET_NULL)
     brand = ForeignKey(Brand, on_delete=PROTECT, db_default=1)
-    category = ManyToManyField(Category, db_default=1)
+    category = ManyToManyField(Category, db_default=1, related_name="product")
     attributes = ManyToManyField(Attribute, through="ProductAttributeValues")
     average_rating = FloatField(blank=True, null=True)
     number_of_ratings = IntegerField(blank=True, null=True)
