@@ -123,6 +123,7 @@ class ProductService:
     def get_sizes_with_totals(self) -> List[SizesWithTotals]:
         return repo.get_sizes_with_totals()
 
+    @transaction.atomic
     def save_product(self, data_dict: dict[str, object], logged_in_user: User) -> Product:
         sku = data_dict['sku']
         title = data_dict['title']
@@ -158,6 +159,7 @@ class ProductService:
 
         return new_product
 
+    @transaction.atomic
     def save_product_attributes(self, data_dict: dict[str, object], product: Product):
         category_ids = data_dict['categories']
         size_ids = data_dict['sizes']
@@ -178,7 +180,7 @@ class ProductService:
         if len(colors) == 0:
             raise serializers.ValidationError({'colors': "Supplied Colors don't exist"})
 
-        product.category.add(categories)
+        product.categories.add(categories)
         product.attributes.add(sizes)
         product.attributes.add(gender)
         product.attributes.add(colors)

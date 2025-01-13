@@ -128,7 +128,7 @@ class ProductQuerySet(QuerySet):
         return qs
 
     def fts_search(self, query, categories: List[int],
-                        brands: List[int], sizes: List[int], user=None):
+                   brands: List[int], sizes: List[int], user=None):
         qs = self.is_public()
         if query:
             lookup = Q(title__search=query) | Q(content__search=query) | Q(sku__search=query) | \
@@ -200,11 +200,10 @@ class Product(Model):
     images = GenericRelation("images.Images", related_query_name='product')
     user = ForeignKey(User, default=1, null=True, on_delete=SET_NULL)
     brand = ForeignKey(Brand, on_delete=PROTECT, db_default=1)
-    category = ManyToManyField(Category, db_default=1, related_name="product")
+    categories = ManyToManyField(Category, related_name="product")
     attributes = ManyToManyField(Attribute, through="ProductAttributeValues")
     average_rating = FloatField(blank=True, null=True)
     number_of_ratings = IntegerField(blank=True, null=True)
-
 
     class Meta:
         ordering = ['sku']
@@ -239,10 +238,6 @@ class Product(Model):
         product = product.price = price
         product.save()
         return product
-
-    @classmethod
-    def create(cls):
-        pass
 
 
 class ProductAttributeValuesQuerySet(QuerySet):
