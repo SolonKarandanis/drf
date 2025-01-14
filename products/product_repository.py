@@ -146,20 +146,28 @@ class ProductRepository:
         return AttributeOptions.objects.get_queryset().sizes()
 
     def find_sizes_by_ids(self, size_ids: List[int]) -> List[AttributeOptions]:
-        return AttributeOptions.objects.get_queryset().sizes().filter(pk__in=size_ids)
+        return AttributeOptions.objects.get_queryset().sizes().with_attribute().filter(pk__in=size_ids)
 
     def find_all_colours(self) -> List[AttributeOptions]:
         return AttributeOptions.objects.get_queryset().colours()
 
     def find_colors_by_ids(self, color_ids: List[int]) -> List[AttributeOptions]:
-        return AttributeOptions.objects.get_queryset().colours().filter(pk__in=color_ids)
+        return AttributeOptions.objects.get_queryset().colours().with_attribute().filter(pk__in=color_ids)
 
     def find_all_genders(self) -> List[AttributeOptions]:
         return AttributeOptions.objects.get_queryset().genders()
 
     def find_genders_by_id(self, gender_id: int) -> AttributeOptions:
-        return AttributeOptions.objects.get_queryset().genders().filter(pk=gender_id)
+        return AttributeOptions.objects.get_queryset().genders().with_attribute().get(pk=gender_id)
 
     def save_product(self, product: Product) -> Product:
         saved_product = product.save()
         return saved_product
+
+    def save_product_attribute_value(self, pav: ProductAttributeValues) -> ProductAttributeValues:
+        saved_pav = pav.save()
+        return saved_pav
+
+    def bulk_create_product_attribute_values(self, pav_list: List[ProductAttributeValues]) -> None:
+        ProductAttributeValues.objects.bulk_create(pav_list, batch_size=20)
+

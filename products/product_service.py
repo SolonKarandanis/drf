@@ -181,16 +181,30 @@ class ProductService:
             raise serializers.ValidationError({'colors': "Supplied Colors don't exist"})
 
         product.categories.add(*categories)
-        product.attributes.add(*sizes)
-        product.attributes.add(gender)
-        product.attributes.add(*colors)
+        total_product_attribute_values = []
+        size_product_attribute_values = [
+            ProductAttributeValues(
+                product=product, attribute=size.attribute, attribute_option=size) for size in sizes
+        ]
+        total_product_attribute_values.extend(size_product_attribute_values)
+
+        gender_product_attribute_value = ProductAttributeValues(
+            product=product, attribute=gender.attribute, attribute_option=gender)
+        total_product_attribute_values.append(gender_product_attribute_value)
+
+        colors_product_attribute_values = [
+            ProductAttributeValues(
+                product=product, attribute=color.attribute, attribute_option=color) for color in colors
+        ]
+        total_product_attribute_values.extend(colors_product_attribute_values)
+        repo.bulk_create_product_attribute_values(total_product_attribute_values)
 
     def create_product(self, request: SaveProductSerializer, images: List[InMemoryUploadedFile],
                        logged_in_user: User) -> Product:
         serialized_data = request.data
         data_dict = dict(serialized_data)
         new_product = self.save_product(data_dict, logged_in_user)
-        new_product = self.save_product_attributes(data_dict, new_product)
+        self.save_product_attributes(data_dict, new_product)
 
         if "images" in data_dict:
             images = data_dict['images']
