@@ -159,6 +159,17 @@ class ProductService:
 
         return new_product
 
+    def check_attribute_validity(self, categories: List[Category], sizes: List[AttributeOptions],
+                                 gender: AttributeOptions, colors: List[AttributeOptions]):
+        if len(categories) == 0:
+            raise serializers.ValidationError({'categories': "Supplied Categories don't exist"})
+        if len(sizes) == 0:
+            raise serializers.ValidationError({'sizes': "Supplied Sizes don't exist"})
+        if gender is None:
+            raise serializers.ValidationError({'genders': "Supplied Genders don't exist"})
+        if len(colors) == 0:
+            raise serializers.ValidationError({'colors': "Supplied Colors don't exist"})
+
     @transaction.atomic
     def save_product_attributes(self, data_dict: dict[str, object], product: Product):
         category_ids = data_dict['categories']
@@ -167,18 +178,10 @@ class ProductService:
         color_ids = data_dict['colors']
 
         categories = repo.find_categories_by_ids(category_ids)
-        if len(categories) == 0:
-            raise serializers.ValidationError({'categories': "Supplied Categories don't exist"})
-
         sizes = repo.find_sizes_by_ids(size_ids)
-        if len(sizes) == 0:
-            raise serializers.ValidationError({'sizes': "Supplied Sizes don't exist"})
         gender = repo.find_genders_by_id(gender_id)
-        if gender is None:
-            raise serializers.ValidationError({'genders': "Supplied Genders don't exist"})
         colors = repo.find_colors_by_ids(color_ids)
-        if len(colors) == 0:
-            raise serializers.ValidationError({'colors': "Supplied Colors don't exist"})
+        self.check_attribute_validity(categories, sizes, gender, colors)
 
         product.categories.add(*categories)
         total_product_attribute_values = []

@@ -1,6 +1,8 @@
 import logging
 from typing import List
 
+from cfehome.constants.security_constants import ADD_PRODUCT
+from cfehome.utils.user_util import UserUtil
 from images.serializers import ImagesSerializer
 from .serializers import ProductSerializer, SaveProductSerializer, PaginatedProductListSerializer, \
     PostProductComment, ProductSearchRequestSerializer, CategoriesWithTotalsSerializer, BrandsWithTotalsSerializer, \
@@ -110,6 +112,8 @@ def create_page_obj(request, queryset):
 @permission_classes([IsAuthenticated])
 def create_product(request):
     logged_in_user = request.user
+    can_add_product = UserUtil.has_permission(logged_in_user, ADD_PRODUCT)
+    logger.info(f'---> Product Views ---> create_product ---> can_add_product: {can_add_product}')
     serializer = SaveProductSerializer(data=request.data)
     if serializer.is_valid(raise_exception=True):
         images: List[InMemoryUploadedFile] = request.FILES.get('images')

@@ -41,6 +41,12 @@ class ImageRepository:
                              logged_in_user: User) -> None:
         Images.objects.create(title=title, alt=alt, image=image, content_object=product, uploaded_by=logged_in_user)
 
+    def upload_product_images(self, images: List[InMemoryUploadedFile], logged_in_user: User, product: Product) -> None:
+        image_objects = [
+            Images(title='', image=image, content_object=product, uploaded_by=logged_in_user) for image in images
+        ]
+        Images.objects.bulk_create(image_objects, batch_size=20)
+
     def update_image_is_profile_image(self, image: Images) -> None:
         image.save(update_fields=['is_profile_image'])
 
