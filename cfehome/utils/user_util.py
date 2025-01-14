@@ -8,11 +8,11 @@ from auth.models import User
 class UserUtil:
 
     @staticmethod
-    def get_user_roles( user: User) -> List[Group]:
+    def get_user_roles(user: User) -> List[Group]:
         return user.groups
 
     @staticmethod
-    def get_user_permissions( user: User) -> List[Permission]:
+    def get_user_permissions(user: User) -> List[Permission]:
         return user.groups.permissions
 
     @staticmethod
