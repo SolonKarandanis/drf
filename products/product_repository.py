@@ -21,7 +21,7 @@ class ProductRepository:
         return qs.by_uuid(uuid)
 
     def find_products_by_category_ids(self, category_ids: List[int], limit: int = 7) -> List[Product]:
-        return Product.objects.filter(category__id__in=category_ids)[:limit]
+        return Product.objects.filter(categories__id__in=category_ids)[:limit]
 
     def find_product_attributes(self, product_id: int) -> List[ProductAttributeValues]:
         return ProductAttributeValues.objects.get_queryset().with_attribute().filter(product__id=product_id)
