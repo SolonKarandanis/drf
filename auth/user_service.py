@@ -152,7 +152,7 @@ class UserService:
     def upload_profile_image(self, image: InMemoryUploadedFile, request: UploadProfilePictureSerializer,
                              logged_in_user: User) -> None:
 
-        existing_image: Images = image_repo.find_user_profile_image(logged_in_user.id)
+        existing_image: Images = image_repo.find_profile_image(logged_in_user.id)
         if existing_image is not None:
             existing_image.is_profile_image = False
             image_repo.update_image_is_profile_image(existing_image)

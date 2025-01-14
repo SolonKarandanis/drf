@@ -117,7 +117,6 @@ def create_product(request):
     serializer = SaveProductSerializer(data=request.data)
     if serializer.is_valid(raise_exception=True):
         images: List[InMemoryUploadedFile] = request.FILES.get('images')
-        logger.info(f'---> Product Views ---> create_product ---> images: {images}')
         created_product = product_service.create_product(serializer, images, logged_in_user)
         logger.info(f'---> Product Views ---> create_product ---> created_product uuid: {created_product.uuid}')
         return Response({'productId': created_product.uuid}, status=status.HTTP_201_CREATED)
