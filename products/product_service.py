@@ -159,8 +159,8 @@ class ProductService:
 
         return new_product
 
-    def check_attribute_validity(self, categories: List[Category], sizes: List[AttributeOptions],
-                                 gender: AttributeOptions, colors: List[AttributeOptions]):
+    def check_attribute_input_validity(self, categories: List[Category], sizes: List[AttributeOptions],
+                                       gender: AttributeOptions, colors: List[AttributeOptions]):
         if len(categories) == 0:
             raise serializers.ValidationError({'categories': "Supplied Categories don't exist"})
         if len(sizes) == 0:
@@ -181,7 +181,7 @@ class ProductService:
         sizes = repo.find_sizes_by_ids(size_ids)
         gender = repo.find_genders_by_id(gender_id)
         colors = repo.find_colors_by_ids(color_ids)
-        self.check_attribute_validity(categories, sizes, gender, colors)
+        self.check_attribute_input_validity(categories, sizes, gender, colors)
 
         product.categories.add(*categories)
         total_product_attribute_values = []
