@@ -116,8 +116,8 @@ def create_product(request):
     can_add_product = SecurityUtils.has_permission(request, ADD_PRODUCT)
     logger.info(f'---> Product Views ---> create_product ---> can_add_product: {can_add_product}')
     serializer = SaveProductSerializer(data=request.data)
+    images = request.data.getlist("images")
     if serializer.is_valid(raise_exception=True):
-        images: List[InMemoryUploadedFile] = request.FILES.get('images')
         created_product = product_service.create_product(serializer, images, logged_in_user)
         logger.info(f'---> Product Views ---> create_product ---> created_product uuid: {created_product.uuid}')
         return Response({'productId': created_product.uuid}, status=status.HTTP_201_CREATED)

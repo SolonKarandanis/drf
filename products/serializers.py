@@ -242,7 +242,6 @@ class SaveProductSerializer(serializers.Serializer):
     sizes = serializers.ListField(child=serializers.IntegerField(required=True), required=True)
     gender = serializers.IntegerField(required=True)
     colors = serializers.ListField(child=serializers.IntegerField(required=True), required=True)
-    images = serializers.ListField(child=serializers.ImageField(required=False), required=False)
 
     def validate(self, data):
         """
