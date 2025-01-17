@@ -27,6 +27,7 @@ logger = logging.getLogger('django')
 @permission_classes([IsAuthenticated])
 def get_product(request, uuid: str, *args, **kwargs):
     product = product_service.find_by_uuid(uuid)
+    logger.info(f'---> Product Views ---> product: {product}')
     data = ProductSerializer(product, many=False).data
     return Response(data)
 

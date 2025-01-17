@@ -95,7 +95,7 @@ class ProductSerializer(serializers.ModelSerializer):
     averageRating = serializers.FloatField(source='average_rating', read_only=True)
     numberOfRatings = serializers.IntegerField(source='number_of_ratings', read_only=True)
     brand = BrandSerializer(read_only=True)
-    categories = CategorySerializer(source='category', many=True, read_only=True)
+    categories = CategorySerializer(many=True, read_only=True)
 
     def _get_availability_status_label(self, product_object) -> str:
         availability_status = getattr(product_object, 'availability_status')
