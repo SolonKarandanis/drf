@@ -13,7 +13,7 @@ class UserUtil:
 
     @staticmethod
     def get_user_permissions(user: User) -> List[Permission]:
-        return user.groups.permissions
+        return user.user_permissions
 
     @staticmethod
     def has_role(user: User, role: str) -> bool:
@@ -24,7 +24,6 @@ class UserUtil:
 
     @staticmethod
     def has_permission(user: User, permission: str) -> bool:
-        user_permissions = UserUtil.get_user_permissions(user)
-        if user_permissions.filter(name=permission).exists():
+        if user.has_perm(permission):
             return True
         return False

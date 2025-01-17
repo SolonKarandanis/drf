@@ -1,12 +1,15 @@
 import logging
 
 from django.core.files.uploadedfile import InMemoryUploadedFile
+from django.contrib.auth import authenticate
 from rest_framework import status
 from rest_framework import serializers
 from rest_framework.response import Response
 from rest_framework.decorators import api_view, permission_classes
 from rest_framework.permissions import IsAuthenticated, IsAdminUser, AllowAny
 from rest_framework_simplejwt.views import TokenObtainPairView
+from rest_framework_simplejwt.tokens import RefreshToken
+from rest_framework import exceptions
 from celery.result import AsyncResult
 
 from images.serializers import ImagesSerializer
@@ -30,6 +33,29 @@ group_service = GroupService()
 # Create your views here.
 class LoginView(TokenObtainPairView):
     serializer_class = LoginSerializer
+
+
+@api_view(['POST'])
+@permission_classes([AllowAny])
+def perform_login(request):
+    username = request.data.get("username")
+    password = request.data.get("password")
+    user_to_login = user_service.find_active_user(username)
+    logger.info(f'----> Auth views ----> perform_login ----> user_to_login: {user_to_login}')
+    if user_to_login is None:
+        error_message = "This User Profile is not active"
+        error_name = "not_active_profile"
+        raise exceptions.AuthenticationFailed(error_message, error_name)
+
+    authenticated_user = authenticate(username=username, password=password)
+    if authenticated_user is None:
+        error_message = "Authentication Failure"
+        error_name = "error.auth"
+        raise exceptions.AuthenticationFailed(error_message, error_name)
+
+    refresh = RefreshToken.for_user(user_to_login)
+    access = refresh.access_token
+    return Response({refresh, access})
 
 
 @api_view(['GET'])
@@ -57,7 +83,7 @@ def search_users(request):
 def register_user(request):
     serializer = CreateUserSerializer(data=request.data)
     if serializer.is_valid(raise_exception=True):
-        created_user =user_service.register_user(serializer)
+        created_user = user_service.register_user(serializer)
         logger.info(f'----> Auth views ----> register_user ----> created_user: {created_user}')
         data = UseInfoSerializer(created_user).data
         return Response(data)
@@ -112,9 +138,10 @@ def reset_user_password(request):
     logged_in_user = get_user_from_request(request)
     serializer = ResetUserPasswordSerializer(data=request.data)
     if serializer.is_valid(raise_exception=True):
-        user_service.reset_password(serializer,logged_in_user)
+        user_service.reset_password(serializer, logged_in_user)
         return Response(status=status.HTTP_204_NO_CONTENT)
     return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+
 
 def email_check(user):
     # security service checks
@@ -230,7 +257,7 @@ def is_user_me(logged_in_user: User, uuid: str):
     request_uuid = str(uuid)
     logged_in__user_uuid = str(logged_in_user.uuid)
     if request_uuid != logged_in__user_uuid:
-        raise serializers.ValidationError({"not-allowed":"Action not allowed."})
+        raise serializers.ValidationError({"not-allowed": "Action not allowed."})
 
 
 @api_view(['POST'])

@@ -112,7 +112,9 @@ def create_page_obj(request, queryset):
 @permission_classes([IsAuthenticated])
 def create_product(request):
     logged_in_user = request.user
+    logger.info(f'---> Product Views ---> create_product ---> permissions: {logged_in_user.user_permissions}')
     can_add_product = UserUtil.has_permission(logged_in_user, ADD_PRODUCT)
+
     logger.info(f'---> Product Views ---> create_product ---> can_add_product: {can_add_product}')
     serializer = SaveProductSerializer(data=request.data)
     if serializer.is_valid(raise_exception=True):

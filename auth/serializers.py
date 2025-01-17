@@ -25,6 +25,12 @@ USER_STATUS_LABEL_OPTIONS = {
 }
 
 
+class GroupSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = Group
+        fields = ('id', 'name')
+
+
 class LoginSerializer(TokenObtainPairSerializer):
     def validate(self, attrs):
         try:
@@ -40,7 +46,18 @@ class LoginSerializer(TokenObtainPairSerializer):
                 error_message = "This User Profile is not active"
                 error_name = "not_active_profile"
                 raise exceptions.AuthenticationFailed(error_message, error_name)
-            return super().validate(attrs)
+            data = super().validate(attrs)
+            return data
+
+    @classmethod
+    def get_token(cls, user):
+        token = super().get_token(user)
+        token["email"] = user.email
+        token["username"] = user.username
+        groups = user.groups
+        logger.info(f'------>LoginSerializer ------>groups: {groups}')
+
+        return token
 
 
 class UserProductInlineSerializer(serializers.Serializer):
@@ -141,12 +158,6 @@ class PaginatedPOSTUserSerializer:
         next = None if not data.has_next() else data.next_page_number()
         serializer = UserSerializer(data, many=True)
         self.page_data = {'count': count, 'pages': pages, 'previous': previous, 'next': next, 'data': serializer.data}
-
-
-class GroupSerializer(serializers.ModelSerializer):
-    class Meta:
-        model = Group
-        fields = ('id', 'name')
 
 
 class UserDetailSerializer(serializers.ModelSerializer):

@@ -202,18 +202,19 @@ class ProductService:
         total_product_attribute_values.extend(colors_product_attribute_values)
         repo.bulk_create_product_attribute_values(total_product_attribute_values)
 
-    def create_product(self, request: SaveProductSerializer, images: List[InMemoryUploadedFile],
+    def create_product(self, request: SaveProductSerializer, imageFiles: List[InMemoryUploadedFile],
                        logged_in_user: User) -> Product:
         serialized_data = request.data
         data_dict = dict(serialized_data)
-        new_product = self.save_product(data_dict, logged_in_user)
-        self.save_product_attributes(data_dict, new_product)
+        # new_product = self.save_product(data_dict, logged_in_user)
+        # self.save_product_attributes(data_dict, new_product)
 
         if "images" in data_dict:
             images = data_dict['images']
             logger.info(f'---> ProductService ---> create_product ---> images: {images}')
+            logger.info(f'---> ProductService ---> create_product ---> imageFiles: {imageFiles}')
 
-        return new_product
+        return None
 
     def find_product_categories(self, product_uuid: str) -> List[Category]:
         return repo.find_product_categories(product_uuid)
