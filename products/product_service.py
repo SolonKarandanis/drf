@@ -10,7 +10,7 @@ from .dtos import CategoriesWithTotals, BrandsWithTotals, SizesWithTotals, Produ
     AllAttributeOptions
 from .models import Product, ProductAttributeValues, Category, Brand, AttributeOptions
 from .product_repository import ProductRepository
-from .serializers import PostProductComment, ProductSearchRequestSerializer, SimilarProductsRequestSerializer, \
+from .serializers import PostProductComment, ProductSearchRequestSerializer, \
     SaveProductSerializer
 from comments.comment_repository import CommentRepository
 
