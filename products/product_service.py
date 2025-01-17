@@ -206,11 +206,12 @@ class ProductService:
                        logged_in_user: User) -> Product:
         serialized_data = request.data
         data_dict = dict(serialized_data)
-        # new_product = self.save_product(data_dict, logged_in_user)
-        # self.save_product_attributes(data_dict, new_product)
+        new_product = self.save_product(data_dict, logged_in_user)
+        self.save_product_attributes(data_dict, new_product)
         logger.info(f'---> ProductService ---> create_product ---> imageFiles: {image_files}')
-
-        return None
+        if len(image_files) > 0:
+            image_repo.upload_product_images(image_files,logged_in_user,new_product)
+        return new_product
 
     def find_product_categories(self, product_uuid: str) -> List[Category]:
         return repo.find_product_categories(product_uuid)
