@@ -2,6 +2,7 @@ import logging
 from typing import List
 
 from cfehome.constants.security_constants import ADD_PRODUCT
+from cfehome.utils.security_utils import SecurityUtils
 from cfehome.utils.user_util import UserUtil
 from images.serializers import ImagesSerializer
 from .serializers import ProductSerializer, SaveProductSerializer, PaginatedProductListSerializer, \
@@ -111,11 +112,10 @@ def create_page_obj(request, queryset):
 @api_view(['POST'])
 @permission_classes([IsAuthenticated])
 def create_product(request):
-    logged_in_user = request.user
-    logger.info(f'---> Product Views ---> create_product ---> permissions: {logged_in_user.user_permissions}')
-    can_add_product = UserUtil.has_permission(logged_in_user, ADD_PRODUCT)
-
-    logger.info(f'---> Product Views ---> create_product ---> can_add_product: {can_add_product}')
+    logged_in_user = SecurityUtils.get_user_from_request(request)
+    claims = SecurityUtils.get_claims_from_request(request)
+    # can_add_product = UserUtil.has_permission(logged_in_user, ADD_PRODUCT)
+    logger.info(f'---> Product Views ---> create_product ---> claims: {claims}')
     serializer = SaveProductSerializer(data=request.data)
     if serializer.is_valid(raise_exception=True):
         images: List[InMemoryUploadedFile] = request.FILES.get('images')
@@ -146,7 +146,7 @@ def post_product_comment(request):
 @api_view(['POST'])
 @permission_classes([IsAuthenticated])
 def search_products(request):
-    logged_in_user = get_user_from_request(request)
+    logged_in_user = SecurityUtils.get_user_from_request(request)
     search_request = ProductSearchRequestSerializer(data=request.data)
     if search_request.is_valid(raise_exception=True):
         serialized_data = search_request.data
@@ -228,8 +228,3 @@ def get_all_genders(request):
     data = AttributeOptionSerializer(result, many=True).data
     return Response(data, status=status.HTTP_200_OK)
 
-
-def get_user_from_request(request):
-    logged_in_user = request.user
-    logger.info(f'---> Product Views ---> logged_in_user: {logged_in_user}')
-    return logged_in_user
