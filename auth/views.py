@@ -1,13 +1,14 @@
 import logging
 
+import jwt
 from django.core.files.uploadedfile import InMemoryUploadedFile
 from django.contrib.auth import authenticate
+from django.conf import settings
 from rest_framework import status
 from rest_framework import serializers
 from rest_framework.response import Response
 from rest_framework.decorators import api_view, permission_classes
 from rest_framework.permissions import IsAuthenticated, IsAdminUser, AllowAny
-from rest_framework_simplejwt.views import TokenObtainPairView
 from rest_framework_simplejwt.tokens import RefreshToken
 from rest_framework import exceptions
 from celery.result import AsyncResult
@@ -19,7 +20,7 @@ from .models import User
 from .serializers import PaginatedUserSerializer, CreateUserSerializer, UseInfoSerializer, GroupSerializer, \
     UserAccountSerializer, SearchUsersRequestSerializer, PaginatedPOSTUserSerializer, ChangeUserStatusSerializer, \
     UploadCVSerializer, UploadProfilePictureSerializer, UpldateUserContactInfoSerializer, UpdateBioSerializer, \
-    LoginSerializer, ResetUserPasswordSerializer
+    ResetUserPasswordSerializer
 from .tasks import create_task
 from .user_service import UserService
 
@@ -28,11 +29,6 @@ logger = logging.getLogger('django')
 user_service = UserService()
 social_service = SocialService()
 group_service = GroupService()
-
-
-# Create your views here.
-class LoginView(TokenObtainPairView):
-    serializer_class = LoginSerializer
 
 
 @api_view(['POST'])
@@ -53,9 +49,24 @@ def perform_login(request):
         error_name = "error.auth"
         raise exceptions.AuthenticationFailed(error_message, error_name)
 
-    refresh = RefreshToken.for_user(user_to_login)
-    access = refresh.access_token
-    return Response({refresh, access})
+    refresh_token = RefreshToken.for_user(user_to_login)
+    access_token = refresh_token.access_token
+
+    decode_jwt = jwt.decode(str(access_token), settings.SECRET_KEY, algorithms=["HS256"])
+
+    decode_jwt["email"] = user_to_login.email
+    decode_jwt["username"] = user_to_login.username
+    groups = user_service.find_user_groups(user_to_login)
+    decode_jwt["groups"] = [group.name for group in groups]
+    perm_list = user_to_login.get_group_permissions()
+    decode_jwt["permissions"] = [perm for perm in perm_list]
+
+    encoded = jwt.encode(decode_jwt, settings.SECRET_KEY, algorithm="HS256")
+
+    return Response({
+        'refresh': str(refresh_token),
+        'access': str(encoded),
+    })
 
 
 @api_view(['GET'])

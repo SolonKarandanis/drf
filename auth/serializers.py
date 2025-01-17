@@ -2,10 +2,6 @@ import logging
 from rest_framework import serializers
 from django.contrib.auth.models import Group
 from django.core.paginator import Paginator, PageNotAnInteger, EmptyPage
-
-from rest_framework_simplejwt.serializers import TokenObtainPairSerializer
-from rest_framework import exceptions
-
 from .group_repository import GroupRepository
 from .user_repository import UserRepository
 from .validators import validate_username, validate_email, validate_role
@@ -29,35 +25,6 @@ class GroupSerializer(serializers.ModelSerializer):
     class Meta:
         model = Group
         fields = ('id', 'name')
-
-
-class LoginSerializer(TokenObtainPairSerializer):
-    def validate(self, attrs):
-        try:
-            request = self.context["request"]
-        except KeyError:
-            logger.info(f'------>LoginSerializer ------>KeyError')
-        finally:
-            username = attrs.get("username")
-            logger.info(f'------>LoginSerializer ------>username: {username}')
-            user_to_login = userRepo.find_active_user(username)
-            logger.info(f'------>LoginSerializer ------> user_to_login: {user_to_login}')
-            if user_to_login is None:
-                error_message = "This User Profile is not active"
-                error_name = "not_active_profile"
-                raise exceptions.AuthenticationFailed(error_message, error_name)
-            data = super().validate(attrs)
-            return data
-
-    @classmethod
-    def get_token(cls, user):
-        token = super().get_token(user)
-        token["email"] = user.email
-        token["username"] = user.username
-        groups = user.groups
-        logger.info(f'------>LoginSerializer ------>groups: {groups}')
-
-        return token
 
 
 class UserProductInlineSerializer(serializers.Serializer):

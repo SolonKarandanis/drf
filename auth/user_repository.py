@@ -3,6 +3,7 @@ from datetime import timedelta, date
 from django.db.models import Q
 from django.core.exceptions import ObjectDoesNotExist
 from .models import User, UserDetails
+from django.contrib.auth.models import Group, Permission
 import logging
 
 logger = logging.getLogger('django')
@@ -18,6 +19,9 @@ class UserRepository:
             return User.objects.get_queryset().is_verified().is_active().get(username=username)
         except ObjectDoesNotExist:
             return None
+
+    def find_user_groups(self, user: User) -> List[Group]:
+        return user.groups.all()
 
     def user_email_exists(self, email: str) -> bool:
         exists = User.objects.filter(email=email).exists()
@@ -38,7 +42,6 @@ class UserRepository:
         return exists
 
     def find_user_by_id(self, user_id: int) -> User:
-        # socials = Prefetch('socialuser_set', queryset=Social.objects.filter(social__socialuser__user=advisor))
         return User.objects.get_queryset().with_details().with_groups().get(pk=user_id)
 
     def find_user_by_uuid_with_relations(self, uuid: str) -> User:

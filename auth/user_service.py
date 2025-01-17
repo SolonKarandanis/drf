@@ -4,6 +4,7 @@ from rest_framework import serializers
 from django.core.files.uploadedfile import InMemoryUploadedFile
 from django.db import transaction
 from django.utils import timezone
+from django.contrib.auth.models import Group
 
 from cfehome.constants.security_constants import ADMIN_ID, ADMIN
 from cfehome.utils.user_util import UserUtil
@@ -29,6 +30,9 @@ class UserService:
 
     def find_active_user(self, username: str) -> User:
         return repo.find_active_user(username)
+
+    def find_user_groups(self, user: User) -> List[Group]:
+        return repo.find_user_groups(user)
 
     def user_username_exists(self, username: str) -> bool:
         return repo.user_username_exists(username)
