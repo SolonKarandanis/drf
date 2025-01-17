@@ -42,9 +42,12 @@ class ImageRepository:
         Images.objects.create(title=title, alt=alt, image=image, content_object=product, uploaded_by=logged_in_user)
 
     def upload_product_images(self, images: List[InMemoryUploadedFile], logged_in_user: User, product: Product) -> None:
+        title = product.sku
         image_objects = [
-            Images(title='', image=image, content_object=product, uploaded_by=logged_in_user) for image in images
+            Images(title=f"{title}-{index}", alt=f"{title}-{index}", image=image, content_object=product, uploaded_by=logged_in_user)
+            for index, image in enumerate(images)
         ]
+        image_objects[0].is_profile_image = True
         Images.objects.bulk_create(image_objects, batch_size=20)
 
     def update_image_is_profile_image(self, image: Images) -> None:
