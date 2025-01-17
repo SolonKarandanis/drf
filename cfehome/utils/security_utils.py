@@ -4,6 +4,7 @@ import logging
 
 logger = logging.getLogger('django')
 
+
 class SecurityUtils:
 
     @staticmethod
@@ -21,3 +22,19 @@ class SecurityUtils:
         logged_in_user = request.user
         logger.info(f'---> Product Views ---> logged_in_user: {logged_in_user}')
         return logged_in_user
+
+    @staticmethod
+    def has_permission(request, permission: str) -> bool:
+        decoded_jwt = SecurityUtils.get_claims_from_request(request)
+        permissions = decoded_jwt['permissions']
+        if permission in permissions:
+            return True
+        return False
+
+    @staticmethod
+    def has_role(request, role: str) -> bool:
+        decoded_jwt = SecurityUtils.get_claims_from_request(request)
+        roles = decoded_jwt['groups']
+        if role in roles:
+            return True
+        return False

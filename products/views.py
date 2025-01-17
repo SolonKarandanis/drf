@@ -113,9 +113,8 @@ def create_page_obj(request, queryset):
 @permission_classes([IsAuthenticated])
 def create_product(request):
     logged_in_user = SecurityUtils.get_user_from_request(request)
-    claims = SecurityUtils.get_claims_from_request(request)
-    # can_add_product = UserUtil.has_permission(logged_in_user, ADD_PRODUCT)
-    logger.info(f'---> Product Views ---> create_product ---> claims: {claims}')
+    can_add_product = SecurityUtils.has_permission(request, ADD_PRODUCT)
+    logger.info(f'---> Product Views ---> create_product ---> can_add_product: {can_add_product}')
     serializer = SaveProductSerializer(data=request.data)
     if serializer.is_valid(raise_exception=True):
         images: List[InMemoryUploadedFile] = request.FILES.get('images')
