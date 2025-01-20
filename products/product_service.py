@@ -123,17 +123,6 @@ class ProductService:
     def get_sizes_with_totals(self) -> List[SizesWithTotals]:
         return repo.get_sizes_with_totals()
 
-    def update_product(self, product_uuid: str, request: SaveProductSerializer,
-                       image_files: List[InMemoryUploadedFile], logged_in_user: User) -> Product:
-        serialized_data = request.data
-        data_dict = dict(serialized_data)
-        existing_product = repo.find_by_uuid(product_uuid, False)
-        if existing_product is None:
-            raise serializers.ValidationError({'product': "Product does not exist"})
-        existing_product = self.save_product(data_dict, logged_in_user, existing_product)
-
-        return existing_product
-
     @transaction.atomic
     def save_product(self, data_dict: dict[str, object], logged_in_user: User, existing_product: Product | None) \
             -> Product:
@@ -225,15 +214,31 @@ class ProductService:
         total_product_attribute_values.extend(colors_product_attribute_values)
         repo.bulk_create_product_attribute_values(total_product_attribute_values)
 
+    def update_product(self, product_uuid: str, request: SaveProductSerializer,
+                       image_files: List[InMemoryUploadedFile], logged_in_user: User) -> Product:
+        serialized_data = request.data
+        data_dict = dict(serialized_data)
+        existing_product = repo.find_by_uuid(product_uuid, False)
+        if existing_product is None:
+            raise serializers.ValidationError({'product': "Product does not exist"})
+        existing_product = self.save_product(data_dict, logged_in_user, existing_product)
+        self.save_product_attributes(data_dict, existing_product)
+        has_image_files = len(image_files) > 0
+        logger.info(f'---> ProductService ---> create_product ---> has_image_files: {has_image_files}')
+
+        return existing_product
+
     def create_product(self, request: SaveProductSerializer, image_files: List[InMemoryUploadedFile],
                        logged_in_user: User) -> Product:
         serialized_data = request.data
         data_dict = dict(serialized_data)
         new_product = self.save_product(data_dict, logged_in_user, None)
         self.save_product_attributes(data_dict, new_product)
-        logger.info(f'---> ProductService ---> create_product ---> imageFiles: {image_files}')
-        if len(image_files) > 0:
+        has_image_files = len(image_files) > 0
+        logger.info(f'---> ProductService ---> create_product ---> has_image_files: {has_image_files}')
+        if has_image_files:
             image_repo.upload_product_images(image_files, logged_in_user, new_product)
+
         return new_product
 
     def find_product_categories(self, product_uuid: str) -> List[Category]:
