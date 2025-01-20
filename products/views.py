@@ -127,7 +127,10 @@ def create_product(request):
 @api_view(['PUT'])
 @permission_classes([IsAuthenticated])
 def update_product(request):
-    logged_in_user = request.user
+    logged_in_user = SecurityUtils.get_user_from_request(request)
+    is_product_mine = False
+    serializer = SaveProductSerializer(data=request.data)
+    images = request.data.getlist("images")
 
 
 @api_view(['PUT'])
