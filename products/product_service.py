@@ -139,7 +139,6 @@ class ProductService:
             product_to_be_saved = Product(sku=sku, title=title, price=price, inventory=inventory,
                                           publish_status=publish_status, availability_status=availability_status,
                                           published_date=published_date)
-            product_to_be_saved.user = logged_in_user
         else:
             product_to_be_saved = existing_product
             product_to_be_saved.sku = sku
@@ -149,6 +148,8 @@ class ProductService:
             product_to_be_saved.publish_status = publish_status
             product_to_be_saved.availability_status = availability_status
             product_to_be_saved.published_date = published_date
+
+        product_to_be_saved.user = logged_in_user
 
         if "content" in data_dict:
             content = data_dict['content']
@@ -183,17 +184,32 @@ class ProductService:
             raise serializers.ValidationError({'colors': "Supplied Colors don't exist"})
 
     @transaction.atomic
-    def save_product_attributes(self, data_dict: dict[str, object], product: Product):
-        category_ids = data_dict['categories']
-        size_ids = data_dict['sizes']
-        gender_id = data_dict['gender']
-        color_ids = data_dict['colors']
+    def save_product_attributes(self, data_dict: dict[str, object], product: Product, is_edit: bool):
+        category_ids: List[int] = data_dict['categories']
+        size_ids: List[int] = data_dict['sizes']
+        gender_id: int = data_dict['gender']
+        color_ids: List[int] = data_dict['colors']
 
         categories = repo.find_categories_by_ids(category_ids)
         sizes = repo.find_sizes_by_ids(size_ids)
         gender = repo.find_genders_by_id(gender_id)
         colors = repo.find_colors_by_ids(color_ids)
         self.check_attribute_input_validity(categories, sizes, gender, colors)
+
+        existing_product_categories = repo.find_product_categories(product.uuid)
+        existing_product_colors = repo.find_product_colors(product.uuid)
+        existing_product_sizes = repo.find_product_sizes(product.uuid)
+        existing_product_genders = repo.find_product_genders(product.uuid)
+
+        cat_ids = [category.id for category in existing_product_categories]
+        s_ids = [size.id for size in existing_product_sizes]
+        clr_ids = [color.id for color in existing_product_colors]
+
+        categories_changed = all(x == y for x, y in zip(cat_ids, category_ids))
+        sizes_changed = all(x == y for x, y in zip(s_ids, size_ids))
+        colors_changed = all(x == y for x, y in zip(clr_ids, color_ids))
+
+        # if is_edit and
 
         product.categories.add(*categories)
         total_product_attribute_values = []
@@ -222,7 +238,7 @@ class ProductService:
         if existing_product is None:
             raise serializers.ValidationError({'product': "Product does not exist"})
         existing_product = self.save_product(data_dict, logged_in_user, existing_product)
-        self.save_product_attributes(data_dict, existing_product)
+        self.save_product_attributes(data_dict, existing_product, True)
         has_image_files = len(image_files) > 0
         logger.info(f'---> ProductService ---> create_product ---> has_image_files: {has_image_files}')
 
@@ -233,7 +249,7 @@ class ProductService:
         serialized_data = request.data
         data_dict = dict(serialized_data)
         new_product = self.save_product(data_dict, logged_in_user, None)
-        self.save_product_attributes(data_dict, new_product)
+        self.save_product_attributes(data_dict, new_product, False)
         has_image_files = len(image_files) > 0
         logger.info(f'---> ProductService ---> create_product ---> has_image_files: {has_image_files}')
         if has_image_files:
