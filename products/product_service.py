@@ -210,21 +210,21 @@ class ProductService:
             existing_product_gender = repo.find_product_genders(product.uuid)
 
             existing_cat_ids = [category.id for category in existing_product_categories]
-            existing_s_ids = [size.attribute_option_id for size in existing_product_sizes]
-            existing_clr_ids = [color.attribute_option_id for color in existing_product_colors]
+            existing_s_ids = {size.id: size.attribute_option_id for size in existing_product_sizes}
+            existing_clr_ids = {color.id: color.attribute_option_id for color in existing_product_colors}
 
             categories_changed = True if len(category_ids) != len(existing_cat_ids) or \
                                          (len(category_ids) == len(existing_cat_ids) and sorted(category_ids) != sorted(
                                              existing_cat_ids)) else False
             sizes_changed = True if len(size_ids) != len(existing_s_ids) or \
                                     (len(size_ids) == len(existing_s_ids) and sorted(size_ids) != sorted(
-                                        existing_s_ids)) else False
+                                        list(existing_s_ids.values()))) else False
             colors_changed = True if len(color_ids) != len(existing_clr_ids) or \
                                      (len(color_ids) == len(existing_clr_ids) and sorted(color_ids) != sorted(
-                                         existing_clr_ids)) else False
+                                         existing_clr_ids.values())) else False
 
             gender_changed = False if len(existing_product_gender) > 0 and \
-                                      existing_product_gender[0].id == gender.id else True
+                                      existing_product_gender[0].attribute_option_id == gender.id else True
             logger.info(
                 f'---> ProductService ---> save_product_attributes ---> categories_changed: {categories_changed}')
             logger.info(
@@ -241,20 +241,18 @@ class ProductService:
                 repo.delete_product_attribute_value(existing_product_gender[0].id)
 
             if sizes_changed:
-                ids_missing_in_existing = [x for x in found_size_ids if x not in existing_s_ids]
+                ids_missing_in_existing = [x for x in found_size_ids if x not in list(existing_s_ids.keys())]
                 logger.info(
                     f'---> ProductService ---> save_product_attributes ---> ids_missing_in_existing: {ids_missing_in_existing}')
                 product_attribute_value_ids_to_be_deleted.extend(ids_missing_in_existing)
 
             if colors_changed:
-                ids_missing_in_existing = [x for x in found_color_ids if x not in existing_clr_ids]
+                ids_missing_in_existing = [x for x in found_color_ids if x not in list(existing_clr_ids.keys())]
                 logger.info(
                     f'---> ProductService ---> save_product_attributes ---> ids_missing_in_existing: {ids_missing_in_existing}')
                 product_attribute_value_ids_to_be_deleted.extend(ids_missing_in_existing)
 
             if len(product_attribute_value_ids_to_be_deleted) > 0:
-                logger.info(
-                    f'---> ProductService ---> save_product_attributes ---> product_attribute_value_ids_to_be_deleted: {product_attribute_value_ids_to_be_deleted}')
                 repo.delete_product_attribute_values(product_attribute_value_ids_to_be_deleted)
 
         if not is_edit or (is_edit and categories_changed):
@@ -292,7 +290,7 @@ class ProductService:
         existing_product = self.save_product(data_dict, logged_in_user, existing_product)
         self.save_product_attributes(data_dict, existing_product, True)
         has_image_files = len(image_files) > 0
-        logger.info(f'---> ProductService ---> create_product ---> has_image_files: {has_image_files}')
+        logger.info(f'---> ProductService ---> update_product ---> has_image_files: {has_image_files}')
 
         return existing_product
 

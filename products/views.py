@@ -1,10 +1,9 @@
 import logging
-from typing import List
 
 from cfehome.constants.security_constants import ADD_PRODUCT
 from cfehome.utils.security_utils import SecurityUtils
-from cfehome.utils.user_util import UserUtil
 from images.serializers import ImagesSerializer
+from .permissions import IsProductMine
 from .serializers import ProductSerializer, SaveProductSerializer, PaginatedProductListSerializer, \
     PostProductComment, ProductSearchRequestSerializer, CategoriesWithTotalsSerializer, BrandsWithTotalsSerializer, \
     SizesWithTotalsSerializer, PaginatedPOSTProductListSerializer, SimilarProductsRequestSerializer, \
@@ -125,10 +124,9 @@ def create_product(request):
 
 
 @api_view(['PUT'])
-@permission_classes([IsAuthenticated])
+@permission_classes([IsAuthenticated, IsProductMine])
 def update_product(request, uuid: str):
     logged_in_user = SecurityUtils.get_user_from_request(request)
-    is_product_mine = False
     serializer = UpdateProductSerializer(data=request.data)
     images = request.data.getlist("images")
     if serializer.is_valid(raise_exception=True):
