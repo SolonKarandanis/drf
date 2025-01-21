@@ -176,4 +176,3 @@ class ProductRepository:
 
     def delete_product_attribute_values(self,  product_attribute_value_ids: List[int]) -> None:
         ProductAttributeValues.objects.filter(pk__in=product_attribute_value_ids).delete()
-        

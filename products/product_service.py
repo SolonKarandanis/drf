@@ -186,64 +186,84 @@ class ProductService:
     @transaction.atomic
     def save_product_attributes(self, data_dict: dict[str, object], product: Product, is_edit: bool):
         total_product_attribute_values = []
+        categories_changed = False
+        gender_changed = False
+        sizes_changed = False
+        colors_changed = False
         category_ids: List[int] = data_dict['categories']
         size_ids: List[int] = data_dict['sizes']
         gender_id: int = data_dict['gender']
         color_ids: List[int] = data_dict['colors']
 
         categories = repo.find_categories_by_ids(category_ids)
+
         sizes = repo.find_sizes_by_ids(size_ids)
+        found_size_ids = [size.id for size in sizes]
+
         gender = repo.find_genders_by_id(gender_id)
+
         colors = repo.find_colors_by_ids(color_ids)
+        found_color_ids = [color.id for color in colors]
+
         self.check_attribute_input_validity(categories, sizes, gender, colors)
 
         if is_edit:
+            product_attribute_value_ids_to_be_deleted: List[int] = []
             existing_product_categories = repo.find_product_categories(product.uuid)
             existing_product_colors = repo.find_product_colors(product.uuid)
             existing_product_sizes = repo.find_product_sizes(product.uuid)
             existing_product_gender = repo.find_product_genders(product.uuid)[0]
 
-            cat_ids = [category.id for category in existing_product_categories]
-            s_ids = [size.id for size in existing_product_sizes]
-            clr_ids = [color.id for color in existing_product_colors]
+            existing_cat_ids = [category.id for category in existing_product_categories]
+            existing_s_ids = [size.id for size in existing_product_sizes]
+            existing_clr_ids = [color.id for color in existing_product_colors]
 
-            categories_changed = all(x == y for x, y in zip(cat_ids, category_ids))
-            sizes_changed = all(x == y for x, y in zip(s_ids, size_ids))
-            colors_changed = all(x == y for x, y in zip(clr_ids, color_ids))
+            categories_changed = all(x == y for x, y in zip(existing_cat_ids, category_ids))
+            sizes_changed = all(x == y for x, y in zip(existing_s_ids, size_ids))
+            colors_changed = all(x == y for x, y in zip(existing_clr_ids, color_ids))
             gender_changed = True if existing_product_gender.id == gender.id else False
 
             if categories_changed:
                 product.categories.clear()
-                product.categories.add(*categories)
 
             if gender_changed:
-                pass
+                repo.delete_product_attribute_value(existing_product_gender.id)
 
             if sizes_changed:
-                pass
+                ids_missing_in_existing = [x for x in found_size_ids if x not in existing_s_ids]
+                product_attribute_value_ids_to_be_deleted.extend(ids_missing_in_existing)
 
             if colors_changed:
-                pass
+                ids_missing_in_existing = [x for x in found_color_ids if x not in existing_clr_ids]
+                product_attribute_value_ids_to_be_deleted.extend(ids_missing_in_existing)
 
+            if len(product_attribute_value_ids_to_be_deleted) > 0:
+                repo.delete_product_attribute_values(product_attribute_value_ids_to_be_deleted)
 
-        product.categories.add(*categories)
+        if not is_edit or (is_edit and categories_changed):
+            product.categories.add(*categories)
 
-        size_product_attribute_values = [
-            ProductAttributeValues(
-                product=product, attribute=size.attribute, attribute_option=size) for size in sizes
-        ]
-        total_product_attribute_values.extend(size_product_attribute_values)
+        if not is_edit or (is_edit and sizes_changed):
+            size_product_attribute_values = [
+                ProductAttributeValues(
+                    product=product, attribute=size.attribute, attribute_option=size) for size in sizes
+            ]
+            total_product_attribute_values.extend(size_product_attribute_values)
 
-        gender_product_attribute_value = ProductAttributeValues(
-            product=product, attribute=gender.attribute, attribute_option=gender)
-        total_product_attribute_values.append(gender_product_attribute_value)
+        if not is_edit or (is_edit and gender_changed):
+            gender_product_attribute_value = ProductAttributeValues(
+                product=product, attribute=gender.attribute, attribute_option=gender)
+            total_product_attribute_values.append(gender_product_attribute_value)
 
-        colors_product_attribute_values = [
-            ProductAttributeValues(
-                product=product, attribute=color.attribute, attribute_option=color) for color in colors
-        ]
-        total_product_attribute_values.extend(colors_product_attribute_values)
-        repo.bulk_create_product_attribute_values(total_product_attribute_values)
+        if not is_edit or (is_edit and colors_changed):
+            colors_product_attribute_values = [
+                ProductAttributeValues(
+                    product=product, attribute=color.attribute, attribute_option=color) for color in colors
+            ]
+            total_product_attribute_values.extend(colors_product_attribute_values)
+
+        if len(total_product_attribute_values) > 0:
+            repo.bulk_create_product_attribute_values(total_product_attribute_values)
 
     def update_product(self, product_uuid: str, request: SaveProductSerializer,
                        image_files: List[InMemoryUploadedFile], logged_in_user: User) -> Product:
