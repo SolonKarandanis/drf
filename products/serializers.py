@@ -226,9 +226,7 @@ class PaginatedPOSTProductListSerializer:
         self.page_data = {'count': count, 'pages': pages, 'previous': previous, 'next': next, 'data': serializer.data}
 
 
-class SaveProductSerializer(serializers.Serializer):
-    sku = serializers.CharField(validators=[validate_sku])
-    title = serializers.CharField(validators=[unique_product_title])
+class BasicProductMutationSerializer(serializers.Serializer):
     content = serializers.CharField(required=False, allow_null=True, allow_blank=True)
     fabricDetails = serializers.CharField(required=False, allow_null=True, allow_blank=True)
     careInstructions = serializers.CharField(required=False, allow_null=True, allow_blank=True)
@@ -254,18 +252,17 @@ class SaveProductSerializer(serializers.Serializer):
         current_date = now().date()
 
         if publishStatus == "product.status.scheduled" and publishedDate <= current_date:
-            raise serializers.ValidationError({'scheduled': f" Publish date needs to be a future date if the Publish Status is 'Scheduled'"})
-
+            raise serializers.ValidationError(
+                {'scheduled': f" Publish date needs to be a future date if the Publish Status is 'Scheduled'"})
 
         if publishStatus == "product.status.published" and publishedDate != current_date:
-            raise serializers.ValidationError({'published': f" Publish date needs to be current date if the Publish Status is 'Published'"})
+            raise serializers.ValidationError(
+                {'published': f" Publish date needs to be current date if the Publish Status is 'Published'"})
 
         return data
 
     class Meta:
         fields = [
-            'sku',
-            'title',
             'content',
             'fabricDetails',
             'careInstructions',
@@ -281,6 +278,22 @@ class SaveProductSerializer(serializers.Serializer):
             'colors',
             'images',
         ]
+
+
+class SaveProductSerializer(BasicProductMutationSerializer):
+    sku = serializers.CharField(validators=[validate_sku])
+    title = serializers.CharField(validators=[unique_product_title])
+
+    class Meta:
+        fields = BasicProductMutationSerializer.Meta.fields + ['sku', 'title']
+
+
+class UpdateProductSerializer(BasicProductMutationSerializer):
+    class Meta:
+        fields = BasicProductMutationSerializer.Meta.fields
+
+    def validate(self, data):
+        return data
 
 
 class PostProductComment(serializers.Serializer):

@@ -11,7 +11,7 @@ from .dtos import CategoriesWithTotals, BrandsWithTotals, SizesWithTotals, Produ
 from .models import Product, ProductAttributeValues, Category, Brand, AttributeOptions
 from .product_repository import ProductRepository
 from .serializers import PostProductComment, ProductSearchRequestSerializer, \
-    SaveProductSerializer
+    SaveProductSerializer, UpdateProductSerializer
 from comments.comment_repository import CommentRepository
 
 logger = logging.getLogger('django')
@@ -127,8 +127,6 @@ class ProductService:
     def save_product(self, data_dict: dict[str, object], logged_in_user: User, existing_product: Product | None) \
             -> Product:
         product_to_be_saved = None
-        sku = data_dict['sku']
-        title = data_dict['title']
         price = data_dict['price']
         inventory = data_dict['inventory']
         publish_status = data_dict['publishStatus']
@@ -136,13 +134,13 @@ class ProductService:
         published_date = data_dict['publishedDate']
 
         if existing_product is None:
+            sku = data_dict['sku']
+            title = data_dict['title']
             product_to_be_saved = Product(sku=sku, title=title, price=price, inventory=inventory,
                                           publish_status=publish_status, availability_status=availability_status,
                                           published_date=published_date)
         else:
             product_to_be_saved = existing_product
-            product_to_be_saved.sku = sku
-            product_to_be_saved.title = title
             product_to_be_saved.price = price
             product_to_be_saved.inventory = inventory
             product_to_be_saved.publish_status = publish_status
@@ -209,7 +207,7 @@ class ProductService:
             existing_product_categories = repo.find_product_categories(product.uuid)
             existing_product_colors = repo.find_product_colors(product.uuid)
             existing_product_sizes = repo.find_product_sizes(product.uuid)
-            existing_product_gender = repo.find_product_genders(product.uuid)[0]
+            existing_product_gender = repo.find_product_genders(product.uuid)
 
             existing_cat_ids = [category.id for category in existing_product_categories]
             existing_s_ids = [size.id for size in existing_product_sizes]
@@ -218,7 +216,8 @@ class ProductService:
             categories_changed = all(x == y for x, y in zip(existing_cat_ids, category_ids))
             sizes_changed = all(x == y for x, y in zip(existing_s_ids, size_ids))
             colors_changed = all(x == y for x, y in zip(existing_clr_ids, color_ids))
-            gender_changed = True if existing_product_gender.id == gender.id else False
+            gender_changed = True if len(existing_product_gender) > 0 and \
+                                     existing_product_gender.id == gender.id else False
 
             if categories_changed:
                 product.categories.clear()
@@ -262,7 +261,7 @@ class ProductService:
         if len(total_product_attribute_values) > 0:
             repo.bulk_create_product_attribute_values(total_product_attribute_values)
 
-    def update_product(self, product_uuid: str, request: SaveProductSerializer,
+    def update_product(self, product_uuid: str, request: UpdateProductSerializer,
                        image_files: List[InMemoryUploadedFile], logged_in_user: User) -> Product:
         serialized_data = request.data
         data_dict = dict(serialized_data)

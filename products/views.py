@@ -9,7 +9,7 @@ from .serializers import ProductSerializer, SaveProductSerializer, PaginatedProd
     PostProductComment, ProductSearchRequestSerializer, CategoriesWithTotalsSerializer, BrandsWithTotalsSerializer, \
     SizesWithTotalsSerializer, PaginatedPOSTProductListSerializer, SimilarProductsRequestSerializer, \
     SimilarProductsResponseSerializer, BrandSerializer, CategorySerializer, AttributeOptionSerializer, \
-    ProductAttributesSerializer, AllAttributeOptionsSerializer
+    ProductAttributesSerializer, AllAttributeOptionsSerializer, UpdateProductSerializer
 from rest_framework import status
 from rest_framework.decorators import api_view, permission_classes
 from rest_framework.response import Response
@@ -129,8 +129,7 @@ def create_product(request):
 def update_product(request, uuid: str):
     logged_in_user = SecurityUtils.get_user_from_request(request)
     is_product_mine = False
-    serializer = SaveProductSerializer(data=request.data)
-    logger.info(f'---> Product Views ---> create_product ---> data: {request.data}')
+    serializer = UpdateProductSerializer(data=request.data)
     images = request.data.getlist("images")
     if serializer.is_valid(raise_exception=True):
         updated_product = product_service.update_product(uuid, serializer, images, logged_in_user)
