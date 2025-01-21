@@ -171,3 +171,9 @@ class ProductRepository:
     def bulk_create_product_attribute_values(self, pav_list: List[ProductAttributeValues]) -> None:
         ProductAttributeValues.objects.bulk_create(pav_list, batch_size=20)
 
+    def delete_product_attribute_value(self, product_attribute_value_id: int) -> None:
+        ProductAttributeValues.objects.get(pk=product_attribute_value_id).delete()
+
+    def delete_product_attribute_values(self,  product_attribute_value_ids: List[int]) -> None:
+        ProductAttributeValues.objects.filter(pk__in=product_attribute_value_ids).delete()
+        

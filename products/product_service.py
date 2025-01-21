@@ -185,6 +185,7 @@ class ProductService:
 
     @transaction.atomic
     def save_product_attributes(self, data_dict: dict[str, object], product: Product, is_edit: bool):
+        total_product_attribute_values = []
         category_ids: List[int] = data_dict['categories']
         size_ids: List[int] = data_dict['sizes']
         gender_id: int = data_dict['gender']
@@ -196,23 +197,37 @@ class ProductService:
         colors = repo.find_colors_by_ids(color_ids)
         self.check_attribute_input_validity(categories, sizes, gender, colors)
 
-        existing_product_categories = repo.find_product_categories(product.uuid)
-        existing_product_colors = repo.find_product_colors(product.uuid)
-        existing_product_sizes = repo.find_product_sizes(product.uuid)
-        existing_product_genders = repo.find_product_genders(product.uuid)
+        if is_edit:
+            existing_product_categories = repo.find_product_categories(product.uuid)
+            existing_product_colors = repo.find_product_colors(product.uuid)
+            existing_product_sizes = repo.find_product_sizes(product.uuid)
+            existing_product_gender = repo.find_product_genders(product.uuid)[0]
 
-        cat_ids = [category.id for category in existing_product_categories]
-        s_ids = [size.id for size in existing_product_sizes]
-        clr_ids = [color.id for color in existing_product_colors]
+            cat_ids = [category.id for category in existing_product_categories]
+            s_ids = [size.id for size in existing_product_sizes]
+            clr_ids = [color.id for color in existing_product_colors]
 
-        categories_changed = all(x == y for x, y in zip(cat_ids, category_ids))
-        sizes_changed = all(x == y for x, y in zip(s_ids, size_ids))
-        colors_changed = all(x == y for x, y in zip(clr_ids, color_ids))
+            categories_changed = all(x == y for x, y in zip(cat_ids, category_ids))
+            sizes_changed = all(x == y for x, y in zip(s_ids, size_ids))
+            colors_changed = all(x == y for x, y in zip(clr_ids, color_ids))
+            gender_changed = True if existing_product_gender.id == gender.id else False
 
-        # if is_edit and
+            if categories_changed:
+                product.categories.clear()
+                product.categories.add(*categories)
+
+            if gender_changed:
+                pass
+
+            if sizes_changed:
+                pass
+
+            if colors_changed:
+                pass
+
 
         product.categories.add(*categories)
-        total_product_attribute_values = []
+
         size_product_attribute_values = [
             ProductAttributeValues(
                 product=product, attribute=size.attribute, attribute_option=size) for size in sizes
