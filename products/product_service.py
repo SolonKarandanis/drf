@@ -241,13 +241,17 @@ class ProductService:
                 repo.delete_product_attribute_value(existing_product_gender[0].id)
 
             if sizes_changed:
-                ids_missing_in_existing = [x for x in found_size_ids if x not in list(existing_s_ids.keys())]
+                ids_missing_in_existing = []
                 logger.info(
                     f'---> ProductService ---> save_product_attributes ---> ids_missing_in_existing: {ids_missing_in_existing}')
                 product_attribute_value_ids_to_be_deleted.extend(ids_missing_in_existing)
 
             if colors_changed:
-                ids_missing_in_existing = [x for x in found_color_ids if x not in list(existing_clr_ids.keys())]
+                ids_missing_in_existing = []
+                for found in found_color_ids:
+                    if found in existing_clr_ids.values():
+                        keys = [key for key, val in existing_clr_ids.items() if val == found]
+                        ids_missing_in_existing.extend(keys)
                 logger.info(
                     f'---> ProductService ---> save_product_attributes ---> ids_missing_in_existing: {ids_missing_in_existing}')
                 product_attribute_value_ids_to_be_deleted.extend(ids_missing_in_existing)
