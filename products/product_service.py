@@ -210,18 +210,18 @@ class ProductService:
             existing_product_gender = repo.find_product_genders(product.uuid)
 
             existing_cat_ids = [category.id for category in existing_product_categories]
-            existing_s_ids = {size.id: size.attribute_option_id for size in existing_product_sizes}
-            existing_clr_ids = {color.id: color.attribute_option_id for color in existing_product_colors}
+            existing_s_ids = [size.attribute_option_id for size in existing_product_sizes]
+            existing_clr_ids = [color.attribute_option_id for color in existing_product_colors]
 
             categories_changed = True if len(category_ids) != len(existing_cat_ids) or \
                                          (len(category_ids) == len(existing_cat_ids) and sorted(category_ids) != sorted(
                                              existing_cat_ids)) else False
             sizes_changed = True if len(size_ids) != len(existing_s_ids) or \
                                     (len(size_ids) == len(existing_s_ids) and sorted(size_ids) != sorted(
-                                        list(existing_s_ids.values()))) else False
+                                        existing_s_ids)) else False
             colors_changed = True if len(color_ids) != len(existing_clr_ids) or \
                                      (len(color_ids) == len(existing_clr_ids) and sorted(color_ids) != sorted(
-                                         existing_clr_ids.values())) else False
+                                         existing_clr_ids)) else False
 
             gender_changed = False if len(existing_product_gender) > 0 and \
                                       existing_product_gender[0].attribute_option_id == gender.id else True
@@ -241,23 +241,14 @@ class ProductService:
                 repo.delete_product_attribute_value(existing_product_gender[0].id)
 
             if sizes_changed:
-                ids_missing_in_existing = []
-                logger.info(
-                    f'---> ProductService ---> save_product_attributes ---> ids_missing_in_existing: {ids_missing_in_existing}')
-                product_attribute_value_ids_to_be_deleted.extend(ids_missing_in_existing)
+                product_attribute_value_ids_to_be_deleted.append(existing_product_sizes[0].attribute_id)
 
             if colors_changed:
-                ids_missing_in_existing = []
-                for found in found_color_ids:
-                    if found in existing_clr_ids.values():
-                        keys = [key for key, val in existing_clr_ids.items() if val == found]
-                        ids_missing_in_existing.extend(keys)
-                logger.info(
-                    f'---> ProductService ---> save_product_attributes ---> ids_missing_in_existing: {ids_missing_in_existing}')
-                product_attribute_value_ids_to_be_deleted.extend(ids_missing_in_existing)
+                product_attribute_value_ids_to_be_deleted.append(existing_product_colors[0].attribute_id)
 
             if len(product_attribute_value_ids_to_be_deleted) > 0:
-                repo.delete_product_attribute_values(product_attribute_value_ids_to_be_deleted)
+                repo.delete_product_attribute_values_by_attribute_ids(product.id,
+                                                                      product_attribute_value_ids_to_be_deleted)
 
         if not is_edit or (is_edit and categories_changed):
             product.categories.add(*categories)
