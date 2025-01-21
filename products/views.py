@@ -126,11 +126,17 @@ def create_product(request):
 
 @api_view(['PUT'])
 @permission_classes([IsAuthenticated])
-def update_product(request):
+def update_product(request, uuid: str):
     logged_in_user = SecurityUtils.get_user_from_request(request)
     is_product_mine = False
     serializer = SaveProductSerializer(data=request.data)
+    logger.info(f'---> Product Views ---> create_product ---> data: {request.data}')
     images = request.data.getlist("images")
+    if serializer.is_valid(raise_exception=True):
+        updated_product = product_service.update_product(uuid, serializer, images, logged_in_user)
+        data = ProductSerializer(updated_product, many=False).data
+        return Response(data)
+    return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
 
 @api_view(['PUT'])
