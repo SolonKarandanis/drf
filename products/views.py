@@ -124,7 +124,7 @@ def create_product(request):
 
 
 @api_view(['PUT'])
-@permission_classes([IsAuthenticated, IsProductMine])
+@permission_classes([IsAuthenticated])
 def update_product(request, uuid: str):
     logged_in_user = SecurityUtils.get_user_from_request(request)
     serializer = UpdateProductSerializer(data=request.data)
