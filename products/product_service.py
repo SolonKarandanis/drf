@@ -196,16 +196,13 @@ class ProductService:
         color_ids: List[int] = data_dict['colors']
 
         categories = repo.find_categories_by_ids(category_ids)
-
         sizes = repo.find_sizes_by_ids(size_ids)
-        found_size_ids = [size.id for size in sizes]
-
         gender = repo.find_genders_by_id(gender_id)
-
         colors = repo.find_colors_by_ids(color_ids)
-        found_color_ids = [color.id for color in colors]
 
         self.check_attribute_input_validity(categories, sizes, gender, colors)
+        found_size_ids = [size.id for size in sizes]
+        found_color_ids = [color.id for color in colors]
 
         if is_edit:
             product_attribute_value_ids_to_be_deleted: List[int] = []
