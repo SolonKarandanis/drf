@@ -210,8 +210,8 @@ class ProductService:
             existing_product_gender = repo.find_product_genders(product.uuid)
 
             existing_cat_ids = [category.id for category in existing_product_categories]
-            existing_s_ids = [size.id for size in existing_product_sizes]
-            existing_clr_ids = [color.id for color in existing_product_colors]
+            existing_s_ids = [size.attribute_option_id for size in existing_product_sizes]
+            existing_clr_ids = [color.attribute_option_id for color in existing_product_colors]
 
             categories_changed = True if len(category_ids) != len(existing_cat_ids) or \
                                          (len(category_ids) == len(existing_cat_ids) and sorted(category_ids) != sorted(
@@ -237,8 +237,8 @@ class ProductService:
             if categories_changed:
                 product.categories.clear()
 
-            if existing_product_gender and gender_changed:
-                repo.delete_product_attribute_value(existing_product_gender.id)
+            if len(existing_product_gender) > 0 and gender_changed:
+                repo.delete_product_attribute_value(existing_product_gender[0].id)
 
             if sizes_changed:
                 ids_missing_in_existing = [x for x in found_size_ids if x not in existing_s_ids]
