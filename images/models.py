@@ -6,6 +6,8 @@ from django.conf import settings
 from django.db.models.signals import pre_delete, pre_save
 from django.dispatch import receiver
 
+from cfehome.constants.constants import image_save_folder
+
 User = settings.AUTH_USER_MODEL
 
 
@@ -32,7 +34,7 @@ class Images(Model):
     content_object = GenericForeignKey('content_type', 'object_id')
     date_created = DateTimeField(auto_now_add=True, null=False)
     image = ImageField(
-        upload_to='images/', default='posts/default.jpg')
+        upload_to=image_save_folder, default='posts/default.jpg')
     uploaded_by = ForeignKey(User, on_delete=CASCADE)
     uploaded_at = DateTimeField(auto_now=True, null=True)
     is_profile_image = BooleanField(default=False)
@@ -55,14 +57,14 @@ class Images(Model):
 
 
 # delete previous profile image before saving new one
-@receiver(pre_save, sender=Images, dispatch_uid='profile_image_deleted')
-def profile_image_deleted_handler(sender, instance, **kwargs):
-    if instance.id is not None and instance.is_profile_image:
-        for field in instance._meta.fields:
-            if field.name == "icon":
-                file = getattr(instance, field.name)
-                if file:
-                    file.delete(save=False)
+# @receiver(pre_save, sender=Images, dispatch_uid='profile_image_deleted')
+# def profile_image_deleted_handler(sender, instance, **kwargs):
+#     if instance.id is not None and instance.is_profile_image:
+#         for field in instance._meta.fields:
+#             if field.name == "icon":
+#                 file = getattr(instance, field.name)
+#                 if file:
+#                     file.delete(save=False)
 
 
 # delete file from server
