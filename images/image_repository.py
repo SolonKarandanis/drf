@@ -34,8 +34,8 @@ class ImageRepository:
         return Images.objects.get_queryset().is_profile_image().filter(object_id__in=object_ids, content_type_id=18)
 
     def find_product_profile_image(self, object_id: int) -> Images:
-        return Images.objects.get_queryset().is_profile_image()\
-            .filter(object_id=object_id, content_type_id=18)\
+        return Images.objects.get_queryset().is_profile_image() \
+            .filter(object_id=object_id, content_type_id=18) \
             .first()
 
     def upload_profile_image(self, image: InMemoryUploadedFile, title: str, alt: str, user: User,
@@ -52,15 +52,19 @@ class ImageRepository:
     def upload_product_images(self, images: List[InMemoryUploadedFile], logged_in_user: User, product: Product,
                               is_edit: bool) -> None:
         if is_edit:
-            profile_image = self.find_product_profile_image(product.id)
+            existing_product_images = self.find_product_images(product.id)
+            current_profile_image = next(filter(lambda pi: pi.is_profile_image, existing_product_images), None)
+            logger.info(
+                f'---> ImageRepository ---> upload_product_images ---> current_profile_image: {current_profile_image}')
             delimiter = f"{MEDIA_URL}{image_save_folder}"
-            array_string = profile_image.image.url.split(delimiter)
+            array_string = current_profile_image.image.url.split(delimiter)
             image_name = array_string[1]
-            is_profile_image_changed = images[0].name != image_name
-            logger.info(f'---> ImageRepository ---> upload_product_images ---> is_profile_image_changed: {is_profile_image_changed}')
-            if is_profile_image_changed:
-                profile_image.is_profile_image = False
-                self.update_image_is_profile_image(profile_image)
+            has_profile_image_changed = images[0].name != image_name
+            logger.info(
+                f'---> ImageRepository ---> upload_product_images ---> has_profile_image_changed: {has_profile_image_changed}')
+            if has_profile_image_changed:
+                current_profile_image.is_profile_image = False
+                self.update_image_is_profile_image(current_profile_image)
 
         for image in images:
             logger.info(f'---> ImageRepository ---> upload_product_images ---> image name: {image.name}')

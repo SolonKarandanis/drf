@@ -44,6 +44,8 @@ class Images(Model):
     objects = ImagesManager()
 
     class Meta:
+        ordering = ['-is_profile_image']
+
         constraints = [
             UniqueConstraint(
                 name='one_user_profile_image',
@@ -52,8 +54,8 @@ class Images(Model):
             )
         ]
 
-    def __repr__(self):
-        return f"<Images id:{self.id} , title: {self.title}>"
+    def __str__(self):
+        return f"<Images id:{self.id} title:{self.title} object_id:{self.object_id}>"
 
 
 # delete previous profile image before saving new one
