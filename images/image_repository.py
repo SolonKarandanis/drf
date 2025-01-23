@@ -56,12 +56,16 @@ class ImageRepository:
             delimiter = f"{MEDIA_URL}{image_save_folder}"
             array_string = profile_image.image.url.split(delimiter)
             image_name = array_string[1]
-            logger.info(f'---> ProductService ---> create_product ---> profile_image x: {image_name}')
+            is_profile_image_changed = images[0].name != image_name
+            logger.info(f'---> ImageRepository ---> upload_product_images ---> is_profile_image_changed: {is_profile_image_changed}')
+            if is_profile_image_changed:
+                profile_image.is_profile_image = False
+                self.update_image_is_profile_image(profile_image)
 
         for image in images:
-            logger.info(f'---> ProductService ---> create_product ---> image name: {image.name}')
-            logger.info(f'---> ProductService ---> create_product ---> image type: {image.content_type}')
-            logger.info(f'---> ProductService ---> create_product ---> iamge size: {image.size}')
+            logger.info(f'---> ImageRepository ---> upload_product_images ---> image name: {image.name}')
+            logger.info(f'---> ImageRepository ---> upload_product_images ---> image type: {image.content_type}')
+            logger.info(f'---> ImageRepository ---> upload_product_images ---> iamge size: {image.size}')
             logger.info(f'------------------------------------------------------------------------')
         title = product.sku
         image_objects = [
