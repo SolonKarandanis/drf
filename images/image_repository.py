@@ -54,16 +54,17 @@ class ImageRepository:
             .filter(object_id=object_id, content_type_id=18) \
             .delete()
 
-    def bulk_create_images(self, product: Product, logged_in_user: User, images: List[InMemoryUploadedFile]) -> None:
+    def bulk_create_images(self, product: Product, logged_in_user: User, images: List[InMemoryUploadedFile],
+                           has_profile_image_changed: bool) -> None:
         title = product.sku
         image_objects = [
             Images(title=f"{title}-{index}", alt=f"{title}-{index}", image=image, content_object=product,
                    uploaded_by=logged_in_user, image_type=image.content_type, size=image.size)
             for index, image in enumerate(images)
         ]
-        image_objects[0].is_profile_image = True
+        if has_profile_image_changed:
+            image_objects[0].is_profile_image = True
         Images.objects.bulk_create(image_objects, batch_size=20)
-
 
     def update_image_is_profile_image(self, image: Images) -> None:
         image.save(update_fields=['is_profile_image'])

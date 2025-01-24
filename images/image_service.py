@@ -48,12 +48,15 @@ class ImageService:
     def delete_product_images(self, image_names: List[str], object_id: int) -> None:
         image_repo.delete_product_images(image_names, object_id)
 
-    def bulk_create_images(self, product: Product, logged_in_user: User, images: List[InMemoryUploadedFile]) -> None:
-        image_repo.bulk_create_images(product, logged_in_user, images)
-
     @transaction.atomic
     def upload_product_images(self, images: List[InMemoryUploadedFile], logged_in_user: User, product: Product,
                               is_edit: bool) -> None:
+        for image in images:
+            logger.info(f'---> ImageRepository ---> upload_product_images ---> image name: {image.name}')
+            logger.info(f'---> ImageRepository ---> upload_product_images ---> image type: {image.content_type}')
+            logger.info(f'---> ImageRepository ---> upload_product_images ---> image size: {image.size}')
+            logger.info(f'------------------------------------------------------------------------')
+
         if is_edit:
             existing_product_images = self.find_product_images(product.id)
             current_profile_image = next(filter(lambda pi: pi.is_profile_image, existing_product_images), None)
@@ -80,20 +83,20 @@ class ImageService:
                 f'---> ImageRepository ---> upload_product_images ---> images_changed: {images_changed}')
             if images_changed:
                 images_to_be_deleted = list(set(existing_images) - set(incoming_images))
+                logger.info(
+                    f'---> ImageRepository ---> upload_product_images ---> images_to_be_deleted: {len(images_to_be_deleted)}')
                 if len(images_to_be_deleted) > 0:
                     images_to_be_deleted = [image_save_folder + image for image in images_to_be_deleted]
                     self.delete_product_images(images_to_be_deleted, product.id)
                 images_to_be_added = list(set(incoming_images) - set(existing_images))
                 logger.info(
                     f'---> ImageRepository ---> upload_product_images ---> images_to_be_added: {images_to_be_added}')
+                logger.info(
+                    f'---> ImageRepository ---> upload_product_images ---> images_to_be_added: {len(images_to_be_added)}')
                 if len(images_to_be_added) > 0:
-                    pass
-
-        for image in images:
-            logger.info(f'---> ImageRepository ---> upload_product_images ---> image name: {image.name}')
-            logger.info(f'---> ImageRepository ---> upload_product_images ---> image type: {image.content_type}')
-            logger.info(f'---> ImageRepository ---> upload_product_images ---> iamge size: {image.size}')
-            logger.info(f'------------------------------------------------------------------------')
+                    image_repo.bulk_create_images(product, logged_in_user, images, has_profile_image_changed)
+        else:
+            image_repo.bulk_create_images(product, logged_in_user, images, True)
 
     def update_image_is_profile_image(self, image: Images) -> None:
         image_repo.update_image_is_profile_image(image)
