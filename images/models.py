@@ -70,7 +70,7 @@ class Images(Model):
 
 
 # delete file from server
-@receiver(pre_delete, sender=Images, dispatch_uid='image_deleted')
-def image_deleted_handler(sender, instance, **kwargs):
-    file = getattr(instance, "image")
-    file.delete(save=False)
+# @receiver(pre_delete, sender=Images, dispatch_uid='image_deleted')
+# def image_deleted_handler(sender, instance, **kwargs):
+#     file = getattr(instance, "image")
+#     file.delete(save=False)

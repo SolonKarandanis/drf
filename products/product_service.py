@@ -273,12 +273,11 @@ class ProductService:
         if len(total_product_attribute_values) > 0:
             repo.bulk_create_product_attribute_values(total_product_attribute_values)
 
-    def save_product_images(self, image_files: List[InMemoryUploadedFile], logged_in_user: User, product: Product,
-                            is_edit: bool):
+    def save_product_images(self, image_files: List[InMemoryUploadedFile], logged_in_user: User, product: Product):
         has_image_files = len(image_files) > 0
         logger.info(f'---> ProductService ---> create_product ---> has_image_files: {has_image_files}')
         if has_image_files:
-            image_service.upload_product_images(image_files, logged_in_user, product, is_edit)
+            image_service.upload_product_images(image_files, logged_in_user, product)
 
     def update_product(self, product_uuid: str, request: UpdateProductSerializer,
                        image_files: List[InMemoryUploadedFile], logged_in_user: User) -> Product:
@@ -289,7 +288,7 @@ class ProductService:
             raise serializers.ValidationError({'product': "Product does not exist"})
         existing_product = self.save_product(data_dict, logged_in_user, existing_product)
         self.save_product_attributes(data_dict, existing_product, True)
-        self.save_product_images(image_files, logged_in_user, existing_product, True)
+        self.save_product_images(image_files, logged_in_user, existing_product)
         return existing_product
 
     def create_product(self, request: SaveProductSerializer, image_files: List[InMemoryUploadedFile],
@@ -298,7 +297,7 @@ class ProductService:
         data_dict = dict(serialized_data)
         new_product = self.save_product(data_dict, logged_in_user, None)
         self.save_product_attributes(data_dict, new_product, False)
-        self.save_product_images(image_files, logged_in_user, new_product, False)
+        self.save_product_images(image_files, logged_in_user, new_product)
         return new_product
 
     def find_product_categories(self, product_uuid: str) -> List[Category]:
