@@ -8,7 +8,7 @@ from django.contrib.auth.models import Group
 
 from cfehome.constants.security_constants import ADMIN_ID, ADMIN
 from cfehome.utils.user_util import UserUtil
-from images.image_repository import ImageRepository
+from images.image_service import ImageService
 from images.models import Images
 from .group_repository import GroupRepository
 from .serializers import UploadProfilePictureSerializer, UpdateBioSerializer, UpldateUserContactInfoSerializer, \
@@ -17,7 +17,7 @@ from .user_repository import UserRepository
 from .models import User, UserStatus, UserDetails
 
 repo = UserRepository()
-image_repo = ImageRepository()
+image_service = ImageService()
 groupRepo = GroupRepository()
 
 logger = logging.getLogger('django')
@@ -156,16 +156,16 @@ class UserService:
     def upload_profile_image(self, image: InMemoryUploadedFile, request: UploadProfilePictureSerializer,
                              logged_in_user: User) -> None:
 
-        existing_image: Images = image_repo.find_profile_image(logged_in_user.id)
+        existing_image: Images = image_service.find_profile_image(logged_in_user.id)
         if existing_image is not None:
             existing_image.is_profile_image = False
-            image_repo.update_image_is_profile_image(existing_image)
+            image_service.update_image_is_profile_image(existing_image)
 
         serialized_data = request.data
         data_dict = dict(serialized_data)
         title = data_dict['title']
         alt = data_dict['alt']
-        image_repo.upload_profile_image(image, title, alt, logged_in_user, logged_in_user)
+        image_service.upload_profile_image(image, title, alt, logged_in_user, logged_in_user)
 
     def get_user_statuses(self) -> Dict[str, str]:
         user_statuses = {
@@ -179,7 +179,7 @@ class UserService:
     @transaction.atomic
     def get_user_image(self, uuid: str) -> Images:
         user: User = repo.find_user_by_uuid(uuid)
-        user_image = image_repo.find_profile_image(user.id)
+        user_image = image_service.find_profile_image(user.id)
         logger.info(f'user_image: {user_image}')
         return user_image
 

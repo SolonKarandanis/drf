@@ -3,7 +3,6 @@ from typing import List
 
 from django.core.files.uploadedfile import InMemoryUploadedFile
 
-from cfehome.constants.constants import image_save_folder
 from images.models import Images
 from django.conf import settings
 from products.models import Product
@@ -55,7 +54,7 @@ class ImageRepository:
             .filter(object_id=object_id, content_type_id=18) \
             .delete()
 
-    def bulk_create_images(self, product: Product, logged_in_user: User, images: List[InMemoryUploadedFile]):
+    def bulk_create_images(self, product: Product, logged_in_user: User, images: List[InMemoryUploadedFile]) -> None:
         title = product.sku
         image_objects = [
             Images(title=f"{title}-{index}", alt=f"{title}-{index}", image=image, content_object=product,
@@ -65,48 +64,6 @@ class ImageRepository:
         image_objects[0].is_profile_image = True
         Images.objects.bulk_create(image_objects, batch_size=20)
 
-    def upload_product_images(self, images: List[InMemoryUploadedFile], logged_in_user: User, product: Product,
-                              is_edit: bool) -> None:
-        if is_edit:
-            existing_product_images = self.find_product_images(product.id)
-            current_profile_image = next(filter(lambda pi: pi.is_profile_image, existing_product_images), None)
-            delimiter = f"{MEDIA_URL}{image_save_folder}"
-            array_string = current_profile_image.image.url.split(delimiter)
-            image_name = array_string[1]
-            has_profile_image_changed = images[0].name != image_name
-            logger.info(
-                f'---> ImageRepository ---> upload_product_images ---> has_profile_image_changed: {has_profile_image_changed}')
-            if has_profile_image_changed:
-                current_profile_image.is_profile_image = False
-                self.update_image_is_profile_image(current_profile_image)
-            existing_images = []
-            for existing_image in existing_product_images:
-                array_string = existing_image.image.url.split(delimiter)
-                image_name = array_string[1]
-                existing_images.append(image_name)
-            incoming_images = [image.name for image in images]
-            images_changed = True if len(incoming_images) != len(existing_images) or \
-                                     (len(incoming_images) == len(existing_images) and sorted(
-                                         incoming_images) != sorted(
-                                         existing_images)) else False
-            logger.info(
-                f'---> ImageRepository ---> upload_product_images ---> images_changed: {images_changed}')
-            if images_changed:
-                images_to_be_deleted = list(set(existing_images) - set(incoming_images))
-                if len(images_to_be_deleted) > 0:
-                    images_to_be_deleted = [image_save_folder + image for image in images_to_be_deleted]
-                    self.delete_product_images(images_to_be_deleted, product.id)
-                images_to_be_added = list(set(incoming_images) - set(existing_images))
-                logger.info(
-                    f'---> ImageRepository ---> upload_product_images ---> images_to_be_added: {images_to_be_added}')
-                if len(images_to_be_added) > 0:
-                    pass
-
-        for image in images:
-            logger.info(f'---> ImageRepository ---> upload_product_images ---> image name: {image.name}')
-            logger.info(f'---> ImageRepository ---> upload_product_images ---> image type: {image.content_type}')
-            logger.info(f'---> ImageRepository ---> upload_product_images ---> iamge size: {image.size}')
-            logger.info(f'------------------------------------------------------------------------')
 
     def update_image_is_profile_image(self, image: Images) -> None:
         image.save(update_fields=['is_profile_image'])

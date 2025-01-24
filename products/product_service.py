@@ -4,7 +4,7 @@ from django.db import transaction
 from django.conf import settings
 from django.core.files.uploadedfile import InMemoryUploadedFile
 from rest_framework import serializers
-from images.image_repository import ImageRepository
+from images.image_service import ImageService
 from images.models import Images
 from .dtos import CategoriesWithTotals, BrandsWithTotals, SizesWithTotals, ProductWithPreviewImage, ProductAttributes, \
     AllAttributeOptions
@@ -18,7 +18,7 @@ logger = logging.getLogger('django')
 User = settings.AUTH_USER_MODEL
 repo = ProductRepository()
 comment_repo = CommentRepository()
-image_repo = ImageRepository()
+image_service = ImageService()
 
 
 class ProductService:
@@ -29,7 +29,7 @@ class ProductService:
     @transaction.atomic
     def find_product_images_by_uuid(self, uuid: str) -> List[Images]:
         product = repo.find_by_uuid(uuid, False)
-        return image_repo.find_product_images(product.id)
+        return image_service.find_product_images(product.id)
 
     @transaction.atomic
     def find_similar_products(self, category_ids: List[int], limit: int) -> List[ProductWithPreviewImage]:
@@ -103,7 +103,7 @@ class ProductService:
 
     def products_to_products_with_preview_images(self, product_results: List[Product]) -> List[ProductWithPreviewImage]:
         product_ids = [product.id for product in product_results]
-        product_preview_images = image_repo.find_product_profile_images(product_ids)
+        product_preview_images = image_service.find_product_profile_images(product_ids)
         product_preview_images_dict = {image.object_id: image for image in product_preview_images}
         products_with_preview_images: List[ProductWithPreviewImage] = [
             ProductWithPreviewImage(product=product, preview_image=product_preview_images_dict.get(product.id))
@@ -273,13 +273,12 @@ class ProductService:
         if len(total_product_attribute_values) > 0:
             repo.bulk_create_product_attribute_values(total_product_attribute_values)
 
-    @transaction.atomic
     def save_product_images(self, image_files: List[InMemoryUploadedFile], logged_in_user: User, product: Product,
                             is_edit: bool):
         has_image_files = len(image_files) > 0
         logger.info(f'---> ProductService ---> create_product ---> has_image_files: {has_image_files}')
         if has_image_files:
-            image_repo.upload_product_images(image_files, logged_in_user, product, is_edit)
+            image_service.upload_product_images(image_files, logged_in_user, product, is_edit)
 
     def update_product(self, product_uuid: str, request: UpdateProductSerializer,
                        image_files: List[InMemoryUploadedFile], logged_in_user: User) -> Product:
