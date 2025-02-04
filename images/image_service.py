@@ -98,10 +98,15 @@ class ImageService:
                     logger.info(
                         f'---> ImageRepository ---> upload_product_images ---> images_to_be_added: len>0')
                     # image_repo.bulk_create_images(product, logged_in_user, removed_duplicate_images, has_profile_image_changed)
+                if has_profile_image_changed:
+                    existing_product_images = self.find_product_images(product.id)
+                    new_profile_image = self.find_and_set_new_profile_image(removed_duplicate_images[0].name,
+                                                                            existing_product_images)
+                    self.update_image_is_profile_image(new_profile_image)
+
             if not images_changed and has_profile_image_changed:
-                new_profile_image = next(filter(lambda pi: self.get_image_name(pi) == removed_duplicate_images[0].name,
-                                                existing_product_images), None)
-                new_profile_image.is_profile_image = True
+                new_profile_image = self.find_and_set_new_profile_image(removed_duplicate_images[0].name,
+                                                                        existing_product_images)
                 self.update_image_is_profile_image(new_profile_image)
         else:
             image_repo.bulk_create_images(product, logged_in_user, removed_duplicate_images, True)
@@ -111,6 +116,12 @@ class ImageService:
         array_string = image.image.url.split(delimiter)
         image_name = array_string[1]
         return image_name
+
+    def find_and_set_new_profile_image(self, image_name: str, existing_product_images: List[Images]) -> Images:
+        new_profile_image = next(filter(lambda pi: self.get_image_name(pi) == image_name,
+                                        existing_product_images), None)
+        new_profile_image.is_profile_image = True
+        return new_profile_image
 
     def update_image_is_profile_image(self, image: Images) -> None:
         image_repo.update_image_is_profile_image(image)
