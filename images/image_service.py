@@ -62,10 +62,8 @@ class ImageService:
 
         if is_edit:
             current_profile_image = next(filter(lambda pi: pi.is_profile_image, existing_product_images), None)
-            delimiter = f"{MEDIA_URL}{image_save_folder}"
-            array_string = current_profile_image.image.url.split(delimiter)
-            image_name = array_string[1]
-            has_profile_image_changed = images[0].name != image_name
+            image_name = self.get_image_name(current_profile_image)
+            has_profile_image_changed = removed_duplicate_images[0].name != image_name
             logger.info(
                 f'---> ImageRepository ---> upload_product_images ---> has_profile_image_changed: {has_profile_image_changed}')
             if has_profile_image_changed:
@@ -73,10 +71,9 @@ class ImageService:
                 self.update_image_is_profile_image(current_profile_image)
             existing_images = []
             for existing_image in existing_product_images:
-                array_string = existing_image.image.url.split(delimiter)
-                image_name = array_string[1]
+                image_name = self.get_image_name(existing_image)
                 existing_images.append(image_name)
-            incoming_images = [image.name for image in images]
+            incoming_images = [image.name for image in removed_duplicate_images]
             images_changed = True if len(incoming_images) != len(existing_images) or \
                                      (len(incoming_images) == len(existing_images) and sorted(
                                          incoming_images) != sorted(
@@ -101,8 +98,19 @@ class ImageService:
                     logger.info(
                         f'---> ImageRepository ---> upload_product_images ---> images_to_be_added: len>0')
                     # image_repo.bulk_create_images(product, logged_in_user, removed_duplicate_images, has_profile_image_changed)
+            if not images_changed and has_profile_image_changed:
+                new_profile_image = next(filter(lambda pi: self.get_image_name(pi) == removed_duplicate_images[0].name,
+                                                existing_product_images), None)
+                new_profile_image.is_profile_image = True
+                self.update_image_is_profile_image(new_profile_image)
         else:
             image_repo.bulk_create_images(product, logged_in_user, removed_duplicate_images, True)
+
+    def get_image_name(self,  image: Images) -> str:
+        delimiter = f"{MEDIA_URL}{image_save_folder}"
+        array_string = image.image.url.split(delimiter)
+        image_name = array_string[1]
+        return image_name
 
     def update_image_is_profile_image(self, image: Images) -> None:
         image_repo.update_image_is_profile_image(image)
