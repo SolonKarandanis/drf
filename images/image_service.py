@@ -57,48 +57,52 @@ class ImageService:
             logger.info(f'------------------------------------------------------------------------')
         existing_product_images = self.find_product_images(product.id)
         is_edit = len(existing_product_images) > 0
+        image_dict = {x.name: x for x in images}
+        removed_duplicate_images = list(image_dict.values())
 
-        # if is_edit:
-        #     current_profile_image = next(filter(lambda pi: pi.is_profile_image, existing_product_images), None)
-        #     delimiter = f"{MEDIA_URL}{image_save_folder}"
-        #     array_string = current_profile_image.image.url.split(delimiter)
-        #     image_name = array_string[1]
-        #     has_profile_image_changed = images[0].name != image_name
-        #     logger.info(
-        #         f'---> ImageRepository ---> upload_product_images ---> has_profile_image_changed: {has_profile_image_changed}')
-        #     if has_profile_image_changed:
-        #         current_profile_image.is_profile_image = False
-        #         self.update_image_is_profile_image(current_profile_image)
-        #     existing_images = []
-        #     for existing_image in existing_product_images:
-        #         array_string = existing_image.image.url.split(delimiter)
-        #         image_name = array_string[1]
-        #         existing_images.append(image_name)
-        #     incoming_images = [image.name for image in images]
-        #     images_changed = True if len(incoming_images) != len(existing_images) or \
-        #                              (len(incoming_images) == len(existing_images) and sorted(
-        #                                  incoming_images) != sorted(
-        #                                  existing_images)) else False
-        #     logger.info(
-        #         f'---> ImageRepository ---> upload_product_images ---> images_changed: {images_changed}')
-        #     if images_changed:
-        #         images_to_be_deleted = list(set(existing_images) - set(incoming_images))
-        #         logger.info(
-        #             f'---> ImageRepository ---> upload_product_images ---> images_to_be_deleted: {images_to_be_deleted}')
-        #         logger.info(
-        #             f'---> ImageRepository ---> upload_product_images ---> images_to_be_deleted: {len(images_to_be_deleted)}')
-        #         if len(images_to_be_deleted) > 0:
-        #             images_to_be_deleted = [image_save_folder + image for image in images_to_be_deleted]
-        #             self.delete_product_images(images_to_be_deleted, product.id)
-        #         images_to_be_added = list(set(incoming_images) - set(existing_images))
-        #         logger.info(
-        #             f'---> ImageRepository ---> upload_product_images ---> images_to_be_added: {images_to_be_added}')
-        #         logger.info(
-        #             f'---> ImageRepository ---> upload_product_images ---> images_to_be_added: {len(images_to_be_added)}')
-        #         if len(images_to_be_added) > 0:
-        #             image_repo.bulk_create_images(product, logged_in_user, images, has_profile_image_changed)
-        # else:
-        #     image_repo.bulk_create_images(product, logged_in_user, images, True)
+        if is_edit:
+            current_profile_image = next(filter(lambda pi: pi.is_profile_image, existing_product_images), None)
+            delimiter = f"{MEDIA_URL}{image_save_folder}"
+            array_string = current_profile_image.image.url.split(delimiter)
+            image_name = array_string[1]
+            has_profile_image_changed = images[0].name != image_name
+            logger.info(
+                f'---> ImageRepository ---> upload_product_images ---> has_profile_image_changed: {has_profile_image_changed}')
+            if has_profile_image_changed:
+                current_profile_image.is_profile_image = False
+                self.update_image_is_profile_image(current_profile_image)
+            existing_images = []
+            for existing_image in existing_product_images:
+                array_string = existing_image.image.url.split(delimiter)
+                image_name = array_string[1]
+                existing_images.append(image_name)
+            incoming_images = [image.name for image in images]
+            images_changed = True if len(incoming_images) != len(existing_images) or \
+                                     (len(incoming_images) == len(existing_images) and sorted(
+                                         incoming_images) != sorted(
+                                         existing_images)) else False
+            logger.info(
+                f'---> ImageRepository ---> upload_product_images ---> images_changed: {images_changed}')
+            if images_changed:
+                images_to_be_deleted = list(set(existing_images) - set(incoming_images))
+                logger.info(
+                    f'---> ImageRepository ---> upload_product_images ---> images_to_be_deleted: {images_to_be_deleted}')
+                logger.info(
+                    f'---> ImageRepository ---> upload_product_images ---> images_to_be_deleted: {len(images_to_be_deleted)}')
+                if len(images_to_be_deleted) > 0:
+                    images_to_be_deleted = [image_save_folder + image for image in images_to_be_deleted]
+                    # self.delete_product_images(images_to_be_deleted, product.id)
+                images_to_be_added = list(set(incoming_images) - set(existing_images))
+                logger.info(
+                    f'---> ImageRepository ---> upload_product_images ---> images_to_be_added: {images_to_be_added}')
+                logger.info(
+                    f'---> ImageRepository ---> upload_product_images ---> images_to_be_added: {len(images_to_be_added)}')
+                if len(images_to_be_added) > 0:
+                    logger.info(
+                        f'---> ImageRepository ---> upload_product_images ---> images_to_be_added: len>0')
+                    # image_repo.bulk_create_images(product, logged_in_user, removed_duplicate_images, has_profile_image_changed)
+        else:
+            image_repo.bulk_create_images(product, logged_in_user, removed_duplicate_images, True)
 
     def update_image_is_profile_image(self, image: Images) -> None:
         image_repo.update_image_is_profile_image(image)
