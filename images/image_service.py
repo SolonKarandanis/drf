@@ -62,7 +62,7 @@ class ImageService:
 
         if is_edit:
             current_profile_image = next(filter(lambda pi: pi.is_profile_image, existing_product_images), None)
-            image_name = self.get_image_name(current_profile_image)
+            image_name = self._get_image_name(current_profile_image)
             has_profile_image_changed = removed_duplicate_images[0].name != image_name
             logger.info(
                 f'---> ImageRepository ---> upload_product_images ---> has_profile_image_changed: {has_profile_image_changed}')
@@ -71,7 +71,7 @@ class ImageService:
                 self.update_image_is_profile_image(current_profile_image)
             existing_images = []
             for existing_image in existing_product_images:
-                image_name = self.get_image_name(existing_image)
+                image_name = self._get_image_name(existing_image)
                 existing_images.append(image_name)
             incoming_images = [image.name for image in removed_duplicate_images]
             images_changed = True if len(incoming_images) != len(existing_images) or \
@@ -85,7 +85,7 @@ class ImageService:
                 logger.info(
                     f'---> ImageRepository ---> upload_product_images ---> images_to_be_deleted: {len(images_to_be_deleted)}')
                 if len(images_to_be_deleted) > 0:
-                    images_to_be_deleted = [image_save_folder + image for image in images_to_be_deleted]
+                    images_to_be_deleted = ["".join([image_save_folder, image]) for image in images_to_be_deleted]
                     self.delete_product_images(images_to_be_deleted, product.id)
                 images_to_be_added = list(set(incoming_images) - set(existing_images))
                 logger.info(
@@ -95,25 +95,26 @@ class ImageService:
                     image_repo.bulk_create_images(product, logged_in_user, images_to_be_created, False)
                 if has_profile_image_changed:
                     existing_product_images = self.find_product_images(product.id)
-                    new_profile_image = self.find_and_set_new_profile_image(removed_duplicate_images[0].name,
+                    new_profile_image = self._find_and_set_new_profile_image(removed_duplicate_images[0].name,
                                                                             existing_product_images)
                     self.update_image_is_profile_image(new_profile_image)
 
             if not images_changed and has_profile_image_changed:
-                new_profile_image = self.find_and_set_new_profile_image(removed_duplicate_images[0].name,
+                new_profile_image = self._find_and_set_new_profile_image(removed_duplicate_images[0].name,
                                                                         existing_product_images)
                 self.update_image_is_profile_image(new_profile_image)
         else:
             image_repo.bulk_create_images(product, logged_in_user, removed_duplicate_images, True)
 
-    def get_image_name(self,  image: Images) -> str:
+    def _get_image_name(self,  image: Images) -> str:
+        """Get name of the user in lower case"""
         delimiter = f"{MEDIA_URL}{image_save_folder}"
         array_string = image.image.url.split(delimiter)
         image_name = array_string[1]
         return image_name
 
-    def find_and_set_new_profile_image(self, image_name: str, existing_product_images: List[Images]) -> Images:
-        new_profile_image = next(filter(lambda pi: self.get_image_name(pi) == image_name,
+    def _find_and_set_new_profile_image(self, image_name: str, existing_product_images: List[Images]) -> Images:
+        new_profile_image = next(filter(lambda pi: self._get_image_name(pi) == image_name,
                                         existing_product_images), None)
         new_profile_image.is_profile_image = True
         return new_profile_image
