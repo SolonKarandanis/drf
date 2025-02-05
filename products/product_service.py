@@ -23,8 +23,8 @@ image_service = ImageService()
 
 class ProductService:
 
-    def find_by_uuid(self, uuid: str) -> Product:
-        return repo.find_by_uuid(uuid)
+    def find_by_uuid(self, uuid: str, fetch_children: bool = True) -> Product:
+        return repo.find_by_uuid(uuid, fetch_children)
 
     @transaction.atomic
     def find_product_images_by_uuid(self, uuid: str) -> List[Images]:
@@ -279,13 +279,10 @@ class ProductService:
         if has_image_files:
             image_service.upload_product_images(image_files, logged_in_user, product)
 
-    def update_product(self, product_uuid: str, request: UpdateProductSerializer,
+    def update_product(self, existing_product: Product, request: UpdateProductSerializer,
                        image_files: List[InMemoryUploadedFile], logged_in_user: User) -> Product:
         serialized_data = request.data
         data_dict = dict(serialized_data)
-        existing_product = repo.find_by_uuid(product_uuid, False)
-        if existing_product is None:
-            raise serializers.ValidationError({'product': "Product does not exist"})
         existing_product = self.save_product(data_dict, logged_in_user, existing_product)
         self.save_product_attributes(data_dict, existing_product, True)
         self.save_product_images(image_files, logged_in_user, existing_product)

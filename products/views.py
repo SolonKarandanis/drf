@@ -1,6 +1,6 @@
 import logging
-
-from cfehome.constants.security_constants import ADD_PRODUCT
+from rest_framework import serializers
+from cfehome.constants.security_constants import ADD_PRODUCT, CHANGE_PRODUCT
 from cfehome.utils.security_utils import SecurityUtils
 from images.serializers import ImagesSerializer
 from .permissions import IsProductMine
@@ -24,7 +24,7 @@ logger = logging.getLogger('django')
 @api_view(['GET'])
 @permission_classes([IsAuthenticated])
 def get_product(request, uuid: str, *args, **kwargs):
-    product = product_service.find_by_uuid(uuid)
+    product = product_service.find_by_uuid(uuid, True)
     logger.info(f'---> Product Views ---> product: {product}')
     data = ProductSerializer(product, many=False).data
     return Response(data)
@@ -114,6 +114,8 @@ def create_product(request):
     logged_in_user = SecurityUtils.get_user_from_request(request)
     can_add_product = SecurityUtils.has_permission(request, ADD_PRODUCT)
     logger.info(f'---> Product Views ---> create_product ---> can_add_product: {can_add_product}')
+    if not can_add_product:
+        raise serializers.ValidationError({'error.product.add': "User does not have the permission to add product"})
     serializer = SaveProductSerializer(data=request.data)
     images = request.data.getlist("images")
     if serializer.is_valid(raise_exception=True):
@@ -127,10 +129,17 @@ def create_product(request):
 @permission_classes([IsAuthenticated])
 def update_product(request, uuid: str):
     logged_in_user = SecurityUtils.get_user_from_request(request)
+    can_update_product = SecurityUtils.has_permission(request, CHANGE_PRODUCT)
+    existing_product = product_service.find_by_uuid(uuid, False)
+    if existing_product is None:
+        raise serializers.ValidationError({'error.product': "Product does not exist"})
+    is_product_mine = existing_product.user == logged_in_user
+    if not is_product_mine and not can_update_product:
+        raise serializers.ValidationError({'error.product.update': "Only the owner can update this product"})
     serializer = UpdateProductSerializer(data=request.data)
     images = request.data.getlist("images")
     if serializer.is_valid(raise_exception=True):
-        updated_product = product_service.update_product(uuid, serializer, images, logged_in_user)
+        updated_product = product_service.update_product(existing_product, serializer, images, logged_in_user)
         data = ProductSerializer(updated_product, many=False).data
         return Response(data)
     return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
