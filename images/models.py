@@ -1,3 +1,4 @@
+import logging
 from django.db.models import Model, CharField, TextField, ForeignKey, PositiveSmallIntegerField, DateTimeField, CASCADE, \
     ImageField, BooleanField, UniqueConstraint, Q, IntegerField, QuerySet, Manager
 from django.contrib.contenttypes.fields import GenericForeignKey
@@ -9,6 +10,7 @@ from django.dispatch import receiver
 from cfehome.constants.constants import image_save_folder
 
 User = settings.AUTH_USER_MODEL
+logger = logging.getLogger('django')
 
 
 def user_directory_path(instance, filename):
@@ -70,7 +72,8 @@ class Images(Model):
 
 
 # delete file from server
-# @receiver(pre_delete, sender=Images, dispatch_uid='image_deleted')
-# def image_deleted_handler(sender, instance, **kwargs):
-#     file = getattr(instance, "image")
-#     file.delete(save=False)
+@receiver(pre_delete, sender=Images, dispatch_uid='image_deleted')
+def image_deleted_handler(sender, instance, **kwargs):
+    logger.info(f'---> Image Signal ---> image_deleted_handler ---> deleting form filesystem: {instance}')
+    file = getattr(instance, "image")
+    file.delete(save=False)

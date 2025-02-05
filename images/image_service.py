@@ -83,21 +83,15 @@ class ImageService:
             if images_changed:
                 images_to_be_deleted = list(set(existing_images) - set(incoming_images))
                 logger.info(
-                    f'---> ImageRepository ---> upload_product_images ---> images_to_be_deleted: {images_to_be_deleted}')
-                logger.info(
                     f'---> ImageRepository ---> upload_product_images ---> images_to_be_deleted: {len(images_to_be_deleted)}')
                 if len(images_to_be_deleted) > 0:
                     images_to_be_deleted = [image_save_folder + image for image in images_to_be_deleted]
-                    # self.delete_product_images(images_to_be_deleted, product.id)
+                    self.delete_product_images(images_to_be_deleted, product.id)
                 images_to_be_added = list(set(incoming_images) - set(existing_images))
-                logger.info(
-                    f'---> ImageRepository ---> upload_product_images ---> images_to_be_added: {images_to_be_added}')
                 logger.info(
                     f'---> ImageRepository ---> upload_product_images ---> images_to_be_added: {len(images_to_be_added)}')
                 if len(images_to_be_added) > 0:
                     images_to_be_created = [image for image in removed_duplicate_images if image.name in images_to_be_added]
-                    logger.info(
-                        f'---> ImageRepository ---> upload_product_images ---> images_to_be_created: {images_to_be_created}')
                     image_repo.bulk_create_images(product, logged_in_user, images_to_be_created, False)
                 if has_profile_image_changed:
                     existing_product_images = self.find_product_images(product.id)
