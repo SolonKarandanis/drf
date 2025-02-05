@@ -238,10 +238,10 @@ class ProductService:
             if len(existing_product_gender) > 0 and gender_changed:
                 repo.delete_product_attribute_value(existing_product_gender[0].id)
 
-            if sizes_changed:
+            if sizes_changed and len(existing_product_sizes) > 0:
                 product_attribute_value_ids_to_be_deleted.append(existing_product_sizes[0].attribute_id)
 
-            if colors_changed:
+            if colors_changed and len(existing_product_colors) > 0:
                 product_attribute_value_ids_to_be_deleted.append(existing_product_colors[0].attribute_id)
 
             if len(product_attribute_value_ids_to_be_deleted) > 0:
