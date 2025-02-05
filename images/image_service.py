@@ -95,9 +95,10 @@ class ImageService:
                 logger.info(
                     f'---> ImageRepository ---> upload_product_images ---> images_to_be_added: {len(images_to_be_added)}')
                 if len(images_to_be_added) > 0:
+                    images_to_be_created = [image for image in removed_duplicate_images if image.name in images_to_be_added]
                     logger.info(
-                        f'---> ImageRepository ---> upload_product_images ---> images_to_be_added: len>0')
-                    # image_repo.bulk_create_images(product, logged_in_user, removed_duplicate_images, has_profile_image_changed)
+                        f'---> ImageRepository ---> upload_product_images ---> images_to_be_created: {images_to_be_created}')
+                    image_repo.bulk_create_images(product, logged_in_user, images_to_be_created, False)
                 if has_profile_image_changed:
                     existing_product_images = self.find_product_images(product.id)
                     new_profile_image = self.find_and_set_new_profile_image(removed_duplicate_images[0].name,
