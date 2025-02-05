@@ -1,4 +1,5 @@
 import logging
+import random
 from typing import List
 
 from django.core.files.uploadedfile import InMemoryUploadedFile
@@ -58,7 +59,7 @@ class ImageRepository:
                            has_profile_image_changed: bool) -> None:
         title = product.sku
         image_objects = [
-            Images(title=f"{title}-{index}", alt=f"{title}-{index}", image=image, content_object=product,
+            Images(title=f"{title}-{random.random()}", alt=f"{title}-{random.random()}", image=image, content_object=product,
                    uploaded_by=logged_in_user, image_type=image.content_type, size=image.size)
             for index, image in enumerate(images)
         ]
