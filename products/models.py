@@ -135,7 +135,7 @@ class ProductQuerySet(QuerySet):
                      Q(fabric_details__search=query) | Q(care_instructions__search=query)
             qs = self.filter(lookup)
         if categories and len(categories) > 0:
-            lookup = Q(category__in=categories)
+            lookup = Q(categories__in=categories)
             qs = self.filter(lookup)
 
         if brands and len(brands) > 0:
