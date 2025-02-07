@@ -88,9 +88,10 @@ class CartItemQuerySet(QuerySet):
 
 class CartItemManager(Manager):
 
-    def create_cart_item(self, quantity: int, unit_price: float, total_price: float, product_id: int, cart: Cart):
+    def create_cart_item(self, quantity: int, unit_price: float, total_price: float, product_id: int, cart: Cart,
+                         attributes: str):
         cart_item = self.create(quantity=quantity, unit_price=unit_price, total_price=total_price,
-                                product_id=product_id, cart=cart, uuid=uuid.uuid4())
+                                attributes=attributes, product_id=product_id, cart=cart, uuid=uuid.uuid4())
         return cart_item
 
     def update_cart_item(self, cart_item):

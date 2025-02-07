@@ -49,10 +49,13 @@ class CartService:
             product_id = product.id
             quantity = product_quantities_dict[product_id]
             price = product.price
+            product_attributes = product_attributes_dict[product_id]
+            # if product_attributes is None get default attribute values for product
             existing_cart_item = self._find_existing_cart_item(product_id, cart.cart_items.all(),
-                                                               product_attributes_dict)
+                                                               product_attributes)
             if existing_cart_item is None:
-                cart_item = cart_repo.initialize_cart_item(quantity, price, quantity * price, product_id, cart)
+                cart_item = cart_repo.initialize_cart_item(quantity, price, quantity * price, product_id, cart,
+                                                           product_attributes)
                 items.append(cart_item)
             else:
                 new_quantity = existing_cart_item.quantity + quantity
@@ -67,19 +70,13 @@ class CartService:
         return cart
 
     def _find_existing_cart_item(self, product_id: int, cart_items: List[CartItem],
-                                 product_attributes_dict: dict[int, str]) -> CartItem | None:
+                                 product_attributes: str) -> CartItem | None:
         if len(cart_items) == 0:
             return None
-        product_attributes = product_attributes_dict[product_id]
         logger.info(
             f'---> CartService ---> add_to_cart ---> product_attributes: {product_attributes}')
         for cart_item in cart_items:
-            if cart_item.attributes is None and cart_item.product_id == product_id:
-                logger.info(
-                    f'---> CartService ---> add_to_cart ---> cart_item1: {cart_item}')
-                return cart_item
-            if cart_item.attributes is not None and cart_item.attributes == product_attributes \
-                    and cart_item.product_id == product_id:
+            if cart_item.attributes == product_attributes and cart_item.product_id == product_id:
                 logger.info(
                     f'---> CartService ---> add_to_cart ---> cart_item2: {cart_item}')
                 return cart_item
