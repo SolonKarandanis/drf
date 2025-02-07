@@ -1,7 +1,7 @@
 import logging
 from django.core.exceptions import ObjectDoesNotExist
 from django.db.models import QuerySet, DateTimeField, Manager, Model, OneToOneField, FloatField, BooleanField, CASCADE, \
-    UniqueConstraint, Index, IntegerField, ForeignKey, PROTECT, UUIDField, Prefetch
+    UniqueConstraint, Index, IntegerField, ForeignKey, PROTECT, UUIDField, Prefetch, JSONField
 from django.conf import settings
 import uuid
 
@@ -109,6 +109,7 @@ class CartItem(Model):
     cart = ForeignKey(Cart, on_delete=CASCADE, related_name='cart_items', null=True)
     product = ForeignKey(Product, on_delete=PROTECT)
     uuid = UUIDField(default=uuid.uuid4())
+    attributes = JSONField(null=True)
 
     objects = CartItemManager()
 
