@@ -111,6 +111,10 @@ class CartItem(Model):
     uuid = UUIDField(default=uuid.uuid4())
     attributes = JSONField(null=True)
 
+    @property
+    def _attributes(self):
+        return self.attributes
+
     objects = CartItemManager()
 
     def __repr__(self):
