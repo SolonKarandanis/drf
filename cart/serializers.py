@@ -36,8 +36,8 @@ class CartSerializer(serializers.ModelSerializer):
     cartItems = CartItemSerializer(many=True, read_only=True)
     modificationAlert = serializers.BooleanField(source='modification_alert', read_only=True)
     totalPrice = serializers.IntegerField(source='total_price', read_only=True)
-    dateCreated = serializers.DateField(source='date_created', read_only=True)
-    dateModified = serializers.DateField(source='date_modified', read_only=True)
+    dateCreated = serializers.DateTimeField(source='date_created', read_only=True)
+    dateModified = serializers.DateTimeField(source='date_modified', read_only=True)
 
     class Meta:
         model = Cart

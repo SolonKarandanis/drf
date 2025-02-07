@@ -49,7 +49,7 @@ class CartService:
             product_id = product.id
             quantity = product_quantities_dict[product_id]
             price = product.price
-            existing_cart_item = self._find_existing_cart_item(product_id, cart.cart_items, product_attributes_dict)
+            existing_cart_item = self._find_existing_cart_item(product_id, cart.cart_items.all(), product_attributes_dict)
             if existing_cart_item is None:
                 cart_item = cart_repo.initialize_cart_item(quantity, price, quantity * price, product_id, cart)
                 items.append(cart_item)
@@ -61,8 +61,8 @@ class CartService:
         cart.cart_items.add(*items, bulk=False)
         logger.info(
             f'---> CartService ---> add_to_cart ---> items: {items}')
-        # cart.recalculate_cart_total_price()
-        # self.update_cart(cart)
+        cart.recalculate_cart_total_price()
+        self.update_cart(cart)
         return cart
 
     def _find_existing_cart_item(self, product_id: int, cart_items: List[CartItem],
