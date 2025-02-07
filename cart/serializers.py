@@ -53,7 +53,7 @@ class CartSerializer(serializers.ModelSerializer):
 
 
 class AddToCart(serializers.Serializer):
-    productId = serializers.IntegerField(source='product_id', read_only=True)
+    productId = serializers.IntegerField()
     quantity = serializers.IntegerField(validators=[is_quantity_valid])
     attributes = serializers.SerializerMethodField(required=False)
 
@@ -65,6 +65,8 @@ class AddToCart(serializers.Serializer):
         ]
 
     def get_attributes(self, obj):
+        if "attributes" not in obj:
+            return None
         return obj.attributes
 
     def __repr__(self):

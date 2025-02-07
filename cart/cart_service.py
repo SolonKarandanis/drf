@@ -2,7 +2,7 @@ from typing import List
 
 from django.conf import settings
 from django.db import transaction
-from .models import Cart
+from .models import Cart, CartItem
 from products.models import Product
 from .cart_repository import CartRepository
 from products.product_repository import ProductRepository
@@ -36,18 +36,20 @@ class CartService:
     @transaction.atomic
     def add_to_cart(self, request: AddToCart, logged_in_user: User) -> Cart:
         cart: Cart = self.fetch_user_cart(logged_in_user)
+        logger.info(
+            f'---> CartService ---> add_to_cart ---> cart_items: {cart.cart_items}')
         serialized_data = request.data
         data_list = [dict(item) for item in serialized_data]
-        product_ids = [d['product_id'] for d in data_list]
+        product_ids = [d['productId'] for d in data_list]
         products_to_be_added: List[Product] = product_repo.find_products_by_ids(product_ids)
-        product_quantities_dict = {d['product_id']: d['quantity'] for d in data_list}
+        product_quantities_dict = {d['productId']: d['quantity'] for d in data_list}
+        product_attributes_dict = {d['productId']: d['attributes'] for d in data_list}
         items = []
         for product in products_to_be_added:
             product_id = product.id
             quantity = product_quantities_dict[product_id]
             price = product.price
-            existing_cart_item = next(filter(lambda ci: ci.product_id == product_id, cart.cart_items.all()), None)
-            logger.info(f'existing_cart_item: {existing_cart_item}')
+            existing_cart_item = self._find_existing_cart_item(product_id, cart.cart_items, product_attributes_dict)
             if existing_cart_item is None:
                 cart_item = cart_repo.initialize_cart_item(quantity, price, quantity * price, product_id, cart)
                 items.append(cart_item)
@@ -57,9 +59,31 @@ class CartService:
                 existing_cart_item.total_price = new_quantity * price
                 items.append(existing_cart_item)
         cart.cart_items.add(*items, bulk=False)
-        cart.recalculate_cart_total_price()
-        self.update_cart(cart)
+        logger.info(
+            f'---> CartService ---> add_to_cart ---> items: {items}')
+        # cart.recalculate_cart_total_price()
+        # self.update_cart(cart)
         return cart
+
+    def _find_existing_cart_item(self, product_id: int, cart_items: List[CartItem],
+                                 product_attributes_dict: dict[int, str]) -> CartItem | None:
+        if len(cart_items) == 0:
+            return None
+        product_attributes = product_attributes_dict[product_id]
+        logger.info(
+            f'---> CartService ---> add_to_cart ---> product_attributes: {product_attributes}')
+        for cart_item in cart_items:
+            if cart_item.attributes is None and cart_item.product_id == product_id:
+                logger.info(
+                    f'---> CartService ---> add_to_cart ---> cart_item1: {cart_item}')
+                return cart_item
+            if cart_item.attributes is not None and cart_item.attributes == product_attributes \
+                    and cart_item.product_id == product_id:
+                logger.info(
+                    f'---> CartService ---> add_to_cart ---> cart_item2: {cart_item}')
+                return cart_item
+        return None
+
 
     @transaction.atomic
     def update_item_quantities(self, request: UpdateQuantity, logged_in_user: User) -> Cart:
