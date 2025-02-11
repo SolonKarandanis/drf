@@ -38,8 +38,6 @@ class CartService:
     @transaction.atomic
     def add_to_cart(self, request: AddToCart, logged_in_user: User) -> None:
         cart: Cart = self.fetch_user_cart(logged_in_user)
-        logger.info(
-            f'---> CartService ---> add_to_cart ---> cart_items: {cart.cart_items}')
         serialized_data = request.data
         data_list = [dict(item) for item in serialized_data]
         product_ids = [d['productId'] for d in data_list]
@@ -71,8 +69,6 @@ class CartService:
                 existing_cart_item.total_price = new_quantity * price
                 items.append(existing_cart_item)
         cart.cart_items.add(*items, bulk=False)
-        logger.info(
-            f'---> CartService ---> add_to_cart ---> items: {items}')
         cart.recalculate_cart_total_price()
         self._update_cart(cart)
 

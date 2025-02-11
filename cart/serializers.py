@@ -62,7 +62,7 @@ class CartSerializer(serializers.ModelSerializer):
 class AddToCart(serializers.Serializer):
     productId = serializers.IntegerField()
     quantity = serializers.IntegerField(validators=[is_quantity_valid])
-    attributes = serializers.SerializerMethodField(required=False)
+    attributes = serializers.CharField(required=False)
 
     class Meta:
         fields = [
@@ -70,11 +70,6 @@ class AddToCart(serializers.Serializer):
             'quantity',
             'attributes',
         ]
-
-    def get_attributes(self, obj):
-        if "attributes" not in obj:
-            return None
-        return obj.attributes
 
     def __repr__(self):
         return f"<AddOrUpdateCart ProductId:{self.product_id},  Quantity:{self.quantity}>"
