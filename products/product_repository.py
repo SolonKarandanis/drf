@@ -127,6 +127,13 @@ class ProductRepository:
             .filter(product__uuid=product_uuid)\
             .filter(attribute__id=SIZE_ATTRIBUTE_OPTION_ID)
 
+    def find_first_product_attribute_value_by_product_id_and_attribute_id(self, product_id: int, attribute_id: int)\
+            -> ProductAttributeValues:
+        return ProductAttributeValues.objects\
+            .filter(product__id = product_id)\
+            .filter(attribute__id=attribute_id)\
+            .first()
+
     def find_product_categories(self, product_uuid: str) -> List[Category]:
         return Category.objects.filter(product__uuid=product_uuid)
 
