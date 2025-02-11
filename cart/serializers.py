@@ -1,20 +1,24 @@
 from rest_framework import serializers
 from cfehome.serializers import ModelPaginationSerializer
+from images.serializers import ImagesSerializer
 
 from .models import CartItem, Cart
 from .validators import is_quantity_valid
 import json
 
 
-class CartItemSerializer(serializers.ModelSerializer):
-    modificationAlert = serializers.BooleanField(source='modification_alert', read_only=True)
-    unitPrice = serializers.IntegerField(source='unit_price', read_only=True)
-    totalPrice = serializers.IntegerField(source='total_price', read_only=True)
-    productId = serializers.IntegerField(source='product_id', read_only=True)
+class CartItemSerializer(serializers.Serializer):
+    id = serializers.IntegerField(source='cart_item.id', read_only=True)
+    modificationAlert = serializers.BooleanField(source='cart_item.modification_alert', read_only=True)
+    unitPrice = serializers.IntegerField(source='cart_item.unit_price', read_only=True)
+    totalPrice = serializers.IntegerField(source='cart_item.total_price', read_only=True)
+    productId = serializers.IntegerField(source='cart_item.product_id', read_only=True)
+    uuid = serializers.CharField(source='cart_item.uuid', read_only=True)
     attributes = serializers.SerializerMethodField('_get_attributes_as_json')
+    previewImage = ImagesSerializer(source='preview_image', read_only=True)
 
     def _get_attributes_as_json(self, cart_item):
-        attributes = getattr(cart_item, 'attributes')
+        attributes = getattr(cart_item, 'cart_item.attributes')
         return json.loads(attributes)
 
     class Meta:
@@ -27,7 +31,8 @@ class CartItemSerializer(serializers.ModelSerializer):
             'totalPrice',
             'uuid',
             'productId',
-            'attributes'
+            'attributes',
+            'previewImage'
         ]
 
 
@@ -42,7 +47,7 @@ class PaginatedCartItemListSerializer(ModelPaginationSerializer):
 class CartSerializer(serializers.ModelSerializer):
     cartItems = CartItemSerializer(source='cart_items', many=True, read_only=True)
     modificationAlert = serializers.BooleanField(source='modification_alert', read_only=True)
-    totalPrice = serializers.IntegerField(source='total_price', read_only=True)
+    totalPrice = serializers.FloatField(source='total_price', read_only=True)
     dateCreated = serializers.DateTimeField(source='date_created', read_only=True)
     dateModified = serializers.DateTimeField(source='date_modified', read_only=True)
 

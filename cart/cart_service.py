@@ -4,7 +4,10 @@ import json
 from django.conf import settings
 from django.db import transaction
 
+from images.image_service import ImageService
 from products.constants import SIZE_ATTRIBUTE_OPTION_ID, COLOR_ATTRIBUTE_OPTION_ID
+from products.product_service import ProductService
+from .dtos import CartDto
 from .models import Cart, CartItem
 from products.models import Product
 from .cart_repository import CartRepository
@@ -16,8 +19,9 @@ import logging
 from .serializers import AddToCart, UpdateQuantity, DeleteCartItems
 
 cart_repo = CartRepository()
-product_repo = ProductRepository()
 order_repo = OrderRepository()
+product_service = ProductService()
+image_service = ImageService()
 
 User = settings.AUTH_USER_MODEL
 key_prefix = settings.CACHES.get('default').get('KEY_PREFIX')
@@ -26,6 +30,13 @@ logger = logging.getLogger('django')
 
 
 class CartService:
+
+    @transaction.atomic
+    def to_cart_dto(self, cart: Cart) -> CartDto:
+        cart_items: List[CartItem] = cart.cart_items
+        product_ids = [cart_item.product_id for cart_item in cart_items]
+        product_preview_images = image_service.find_product_profile_images(product_ids)
+        product_preview_images_dict = {image.object_id: image for image in product_preview_images}
 
     def fetch_user_cart(self, logged_in_user: User) -> Cart:
         cart = cart_repo.fetch_user_cart(logged_in_user)
@@ -41,7 +52,7 @@ class CartService:
         serialized_data = request.data
         data_list = [dict(item) for item in serialized_data]
         product_ids = [d['productId'] for d in data_list]
-        products_to_be_added: List[Product] = product_repo.find_products_by_ids(product_ids)
+        products_to_be_added: List[Product] = product_service.find_products_by_ids(product_ids)
         product_quantities_dict = {d['productId']: d['quantity'] for d in data_list}
         product_attributes_dict = {d['productId']: d['attributes'] for d in data_list}
         items = []
@@ -51,8 +62,8 @@ class CartService:
             price = product.price
             product_attributes = product_attributes_dict[product_id]
             if product_attributes is None:
-                size_product_attribute = product_repo.find_first_product_attribute_value_size_by_product_id(product_id)
-                color_product_attribute = product_repo.find_first_product_attribute_value_color_by_product_id(
+                size_product_attribute = product_service.find_first_product_attribute_value_size_by_product_id(product_id)
+                color_product_attribute = product_service.find_first_product_attribute_value_color_by_product_id(
                     product_id)
                 default_attributes = {SIZE_ATTRIBUTE_OPTION_ID: size_product_attribute.attribute_option_id,
                                       COLOR_ATTRIBUTE_OPTION_ID: color_product_attribute.attribute_option_id}
