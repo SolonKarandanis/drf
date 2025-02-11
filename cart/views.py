@@ -28,7 +28,8 @@ def add_cart_items(request):
     logged_in_user = get_user_from_request(request)
     serializer = AddToCart(data=request.data, many=True)
     if serializer.is_valid(raise_exception=True):
-        cart = cart_service.add_to_cart(serializer, logged_in_user)
+        cart_service.add_to_cart(serializer, logged_in_user)
+        cart = cart_service.fetch_user_cart(logged_in_user)
         response = CartSerializer(cart).data
         return Response(response, status=status.HTTP_201_CREATED)
     return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)

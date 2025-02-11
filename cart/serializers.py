@@ -33,7 +33,7 @@ class PaginatedCartItemListSerializer(ModelPaginationSerializer):
 
 
 class CartSerializer(serializers.ModelSerializer):
-    cartItems = CartItemSerializer(many=True, read_only=True)
+    cartItems = CartItemSerializer(source='cart_items' ,many=True, read_only=True)
     modificationAlert = serializers.BooleanField(source='modification_alert', read_only=True)
     totalPrice = serializers.IntegerField(source='total_price', read_only=True)
     dateCreated = serializers.DateTimeField(source='date_created', read_only=True)

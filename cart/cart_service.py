@@ -1,7 +1,10 @@
 from typing import List
+import json
 
 from django.conf import settings
 from django.db import transaction
+
+from products.constants import SIZE_ATTRIBUTE_OPTION_ID, COLOR_ATTRIBUTE_OPTION_ID
 from .models import Cart, CartItem
 from products.models import Product
 from .cart_repository import CartRepository
@@ -25,8 +28,7 @@ logger = logging.getLogger('django')
 class CartService:
 
     def fetch_user_cart(self, logged_in_user: User) -> Cart:
-        user_id = logged_in_user.id
-        cart =cart_repo.fetch_user_cart(logged_in_user)
+        cart = cart_repo.fetch_user_cart(logged_in_user)
         logger.info(f'cart: {cart}')
         return cart
 
@@ -34,7 +36,7 @@ class CartService:
         return cart_repo.fetch_user_cart_with_products_and_users(logged_in_user)
 
     @transaction.atomic
-    def add_to_cart(self, request: AddToCart, logged_in_user: User) -> Cart:
+    def add_to_cart(self, request: AddToCart, logged_in_user: User) -> None:
         cart: Cart = self.fetch_user_cart(logged_in_user)
         logger.info(
             f'---> CartService ---> add_to_cart ---> cart_items: {cart.cart_items}')
@@ -50,7 +52,13 @@ class CartService:
             quantity = product_quantities_dict[product_id]
             price = product.price
             product_attributes = product_attributes_dict[product_id]
-            # if product_attributes is None get default attribute values for product
+            if product_attributes is None:
+                size_product_attribute = product_repo.find_first_product_attribute_value_size_by_product_id(product_id)
+                color_product_attribute = product_repo.find_first_product_attribute_value_color_by_product_id(
+                    product_id)
+                default_attributes = {SIZE_ATTRIBUTE_OPTION_ID: size_product_attribute.attribute_option_id,
+                                      COLOR_ATTRIBUTE_OPTION_ID: color_product_attribute.attribute_option_id}
+                product_attributes = json.dumps(default_attributes)
             existing_cart_item = self._find_existing_cart_item(product_id, cart.cart_items.all(),
                                                                product_attributes)
             if existing_cart_item is None:
@@ -67,7 +75,6 @@ class CartService:
             f'---> CartService ---> add_to_cart ---> items: {items}')
         cart.recalculate_cart_total_price()
         self._update_cart(cart)
-        return cart
 
     def _find_existing_cart_item(self, product_id: int, cart_items: List[CartItem],
                                  product_attributes: str) -> CartItem | None:
@@ -81,7 +88,6 @@ class CartService:
                     f'---> CartService ---> add_to_cart ---> cart_item2: {cart_item}')
                 return cart_item
         return None
-
 
     @transaction.atomic
     def update_item_quantities(self, request: UpdateQuantity, logged_in_user: User) -> Cart:

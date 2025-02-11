@@ -127,10 +127,18 @@ class ProductRepository:
             .filter(product__uuid=product_uuid)\
             .filter(attribute__id=SIZE_ATTRIBUTE_OPTION_ID)
 
+    def find_first_product_attribute_value_size_by_product_id(self, product_id: int) -> ProductAttributeValues:
+        return self.find_first_product_attribute_value_by_product_id_and_attribute_id(product_id,
+                                                                                      SIZE_ATTRIBUTE_OPTION_ID)
+
+    def find_first_product_attribute_value_color_by_product_id(self, product_id: int) -> ProductAttributeValues:
+        return self.find_first_product_attribute_value_by_product_id_and_attribute_id(product_id,
+                                                                                      COLOR_ATTRIBUTE_OPTION_ID)
+
     def find_first_product_attribute_value_by_product_id_and_attribute_id(self, product_id: int, attribute_id: int)\
             -> ProductAttributeValues:
         return ProductAttributeValues.objects\
-            .filter(product__id = product_id)\
+            .filter(product__id=product_id)\
             .filter(attribute__id=attribute_id)\
             .first()
 
