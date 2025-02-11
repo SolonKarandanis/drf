@@ -3,6 +3,7 @@ from cfehome.serializers import ModelPaginationSerializer
 
 from .models import CartItem, Cart
 from .validators import is_quantity_valid
+import json
 
 
 class CartItemSerializer(serializers.ModelSerializer):
@@ -10,6 +11,11 @@ class CartItemSerializer(serializers.ModelSerializer):
     unitPrice = serializers.IntegerField(source='unit_price', read_only=True)
     totalPrice = serializers.IntegerField(source='total_price', read_only=True)
     productId = serializers.IntegerField(source='product_id', read_only=True)
+    attributes = serializers.SerializerMethodField('_get_attributes_as_json')
+
+    def _get_attributes_as_json(self, cart_item):
+        attributes = getattr(cart_item, 'attributes')
+        return json.loads(attributes)
 
     class Meta:
         model = CartItem
@@ -21,6 +27,7 @@ class CartItemSerializer(serializers.ModelSerializer):
             'totalPrice',
             'uuid',
             'productId',
+            'attributes'
         ]
 
 
@@ -33,7 +40,7 @@ class PaginatedCartItemListSerializer(ModelPaginationSerializer):
 
 
 class CartSerializer(serializers.ModelSerializer):
-    cartItems = CartItemSerializer(source='cart_items' ,many=True, read_only=True)
+    cartItems = CartItemSerializer(source='cart_items', many=True, read_only=True)
     modificationAlert = serializers.BooleanField(source='modification_alert', read_only=True)
     totalPrice = serializers.IntegerField(source='total_price', read_only=True)
     dateCreated = serializers.DateTimeField(source='date_created', read_only=True)
