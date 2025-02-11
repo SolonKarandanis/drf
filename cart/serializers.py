@@ -17,8 +17,9 @@ class CartItemSerializer(serializers.Serializer):
     attributes = serializers.SerializerMethodField('_get_attributes_as_json')
     previewImage = ImagesSerializer(source='preview_image', read_only=True)
 
-    def _get_attributes_as_json(self, cart_item):
-        attributes = getattr(cart_item, 'cart_item.attributes')
+    def _get_attributes_as_json(self, obj):
+        cart_item = getattr(obj, 'cart_item')
+        attributes = getattr(cart_item, 'attributes')
         return json.loads(attributes)
 
     class Meta:
@@ -44,12 +45,14 @@ class PaginatedCartItemListSerializer(ModelPaginationSerializer):
                      'next': self.page_data.get('next'), 'data': serializer.data}
 
 
-class CartSerializer(serializers.ModelSerializer):
+class CartSerializer(serializers.Serializer):
+    id = serializers.IntegerField(source='cart.id', read_only=True)
+    modificationAlert = serializers.BooleanField(source='cart.modification_alert', read_only=True)
+    totalPrice = serializers.FloatField(source='cart.total_price', read_only=True)
+    dateCreated = serializers.DateTimeField(source='cart.date_created', read_only=True)
+    dateModified = serializers.DateTimeField(source='cart.date_modified', read_only=True)
+    uuid = serializers.CharField(source='cart.uuid', read_only=True)
     cartItems = CartItemSerializer(source='cart_items', many=True, read_only=True)
-    modificationAlert = serializers.BooleanField(source='modification_alert', read_only=True)
-    totalPrice = serializers.FloatField(source='total_price', read_only=True)
-    dateCreated = serializers.DateTimeField(source='date_created', read_only=True)
-    dateModified = serializers.DateTimeField(source='date_modified', read_only=True)
 
     class Meta:
         model = Cart

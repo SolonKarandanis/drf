@@ -7,7 +7,7 @@ from django.db import transaction
 from images.image_service import ImageService
 from products.constants import SIZE_ATTRIBUTE_OPTION_ID, COLOR_ATTRIBUTE_OPTION_ID
 from products.product_service import ProductService
-from .dtos import CartDto
+from .dtos import CartDto, CartItemWithPreviewImage
 from .models import Cart, CartItem
 from products.models import Product
 from .cart_repository import CartRepository
@@ -33,10 +33,16 @@ class CartService:
 
     @transaction.atomic
     def to_cart_dto(self, cart: Cart) -> CartDto:
-        cart_items: List[CartItem] = cart.cart_items
+        cart_items: List[CartItem] = cart.cart_items.all()
         product_ids = [cart_item.product_id for cart_item in cart_items]
         product_preview_images = image_service.find_product_profile_images(product_ids)
         product_preview_images_dict = {image.object_id: image for image in product_preview_images}
+        cart_items_with_preview_images: List[CartItemWithPreviewImage] = [
+            CartItemWithPreviewImage(cart_item=cart_item, preview_image=product_preview_images_dict.get(cart_item.product_id))
+            for cart_item in cart_items
+        ]
+        cart_dto = CartDto(cart=cart,cart_items=cart_items_with_preview_images)
+        return cart_dto
 
     def fetch_user_cart(self, logged_in_user: User) -> Cart:
         cart = cart_repo.fetch_user_cart(logged_in_user)
