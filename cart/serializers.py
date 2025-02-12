@@ -10,12 +10,14 @@ import json
 class CartItemProductSerializer(serializers.Serializer):
     sku = serializers.CharField(read_only=True)
     title = serializers.CharField(read_only=True)
+    uuid = serializers.CharField(read_only=True)
 
 class CartItemSerializer(serializers.Serializer):
     id = serializers.IntegerField(source='cart_item.id', read_only=True)
     modificationAlert = serializers.BooleanField(source='cart_item.modification_alert', read_only=True)
-    unitPrice = serializers.IntegerField(source='cart_item.unit_price', read_only=True)
-    totalPrice = serializers.IntegerField(source='cart_item.total_price', read_only=True)
+    unitPrice = serializers.FloatField(source='cart_item.unit_price', read_only=True)
+    quantity = serializers.IntegerField(source='cart_item.quantity', read_only=True)
+    totalPrice = serializers.FloatField(source='cart_item.total_price', read_only=True)
     productId = serializers.IntegerField(source='cart_item.product_id', read_only=True)
     uuid = serializers.CharField(source='cart_item.uuid', read_only=True)
     attributes = serializers.SerializerMethodField('_get_attributes_as_json')

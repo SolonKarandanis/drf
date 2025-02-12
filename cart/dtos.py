@@ -9,6 +9,7 @@ from images.models import Images
 class CartItemProduct:
     sku: str
     title: str
+    uuid:str
 
 
 @dataclass

@@ -45,7 +45,7 @@ class CartService:
         for cart_item in cart_items:
             product_id = cart_item.product_id
             product = product_dict.get(product_id)
-            cart_item_product = CartItemProduct(sku=product.sku, title=product.title)
+            cart_item_product = CartItemProduct(sku=product.sku, title=product.title, uuid=product.uuid)
             cart_item_with_preview_image = CartItemWithPreviewImage(
                 cart_item=cart_item,
                 preview_image=product_preview_images_dict.get(product_id),
