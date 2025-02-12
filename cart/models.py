@@ -1,7 +1,7 @@
 import logging
 from django.core.exceptions import ObjectDoesNotExist
 from django.db.models import QuerySet, DateTimeField, Manager, Model, OneToOneField, FloatField, BooleanField, CASCADE, \
-    UniqueConstraint, Index, IntegerField, ForeignKey, PROTECT, UUIDField, Prefetch
+    UniqueConstraint, Index, IntegerField, ForeignKey, PROTECT, UUIDField, Prefetch, JSONField
 from django.conf import settings
 import uuid
 
@@ -88,9 +88,10 @@ class CartItemQuerySet(QuerySet):
 
 class CartItemManager(Manager):
 
-    def create_cart_item(self, quantity: int, unit_price: float, total_price: float, product_id: int, cart: Cart):
+    def create_cart_item(self, quantity: int, unit_price: float, total_price: float, product_id: int, cart: Cart,
+                         attributes: str):
         cart_item = self.create(quantity=quantity, unit_price=unit_price, total_price=total_price,
-                                product_id=product_id, cart=cart, uuid=uuid.uuid4())
+                                attributes=attributes, product_id=product_id, cart=cart, uuid=uuid.uuid4())
         return cart_item
 
     def update_cart_item(self, cart_item):
@@ -109,6 +110,11 @@ class CartItem(Model):
     cart = ForeignKey(Cart, on_delete=CASCADE, related_name='cart_items', null=True)
     product = ForeignKey(Product, on_delete=PROTECT)
     uuid = UUIDField(default=uuid.uuid4())
+    attributes = JSONField(null=True)
+
+    @property
+    def _attributes(self):
+        return self.attributes
 
     objects = CartItemManager()
 

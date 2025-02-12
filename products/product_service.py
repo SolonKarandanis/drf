@@ -330,3 +330,9 @@ class ProductService:
 
     def find_all_genders(self) -> List[AttributeOptions]:
         return repo.find_all_genders()
+
+    def find_first_product_attribute_value_size_by_product_id(self, product_id: int) -> ProductAttributeValues:
+        return repo.find_first_product_attribute_value_size_by_product_id(product_id)
+
+    def find_first_product_attribute_value_color_by_product_id(self, product_id: int) -> ProductAttributeValues:
+        return repo.find_first_product_attribute_value_color_by_product_id(product_id)
