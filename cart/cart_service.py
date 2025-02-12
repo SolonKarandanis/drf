@@ -7,11 +7,10 @@ from django.db import transaction
 from images.image_service import ImageService
 from products.constants import SIZE_ATTRIBUTE_OPTION_ID, COLOR_ATTRIBUTE_OPTION_ID
 from products.product_service import ProductService
-from .dtos import CartDto, CartItemWithPreviewImage
+from .dtos import CartDto, CartItemWithPreviewImage, CartItemProduct
 from .models import Cart, CartItem
 from products.models import Product
 from .cart_repository import CartRepository
-from products.product_repository import ProductRepository
 from orders.order_repository import OrderRepository
 
 import logging
@@ -37,12 +36,24 @@ class CartService:
         cart_items: List[CartItem] = cart.cart_items.all()
         product_ids = [cart_item.product_id for cart_item in cart_items]
         product_preview_images = image_service.find_product_profile_images(product_ids)
+        products = product_service.find_products_by_ids(product_ids)
+
+        product_dict = {product.id: product for product in products}
         product_preview_images_dict = {image.object_id: image for image in product_preview_images}
-        cart_items_with_preview_images: List[CartItemWithPreviewImage] = [
-            CartItemWithPreviewImage(cart_item=cart_item, preview_image=product_preview_images_dict.get(cart_item.product_id))
-            for cart_item in cart_items
-        ]
-        cart_dto = CartDto(cart=cart,cart_items=cart_items_with_preview_images)
+
+        cart_items_with_preview_images = []
+        for cart_item in cart_items:
+            product_id = cart_item.product_id
+            product = product_dict.get(product_id)
+            cart_item_product = CartItemProduct(sku=product.sku, title=product.title)
+            cart_item_with_preview_image = CartItemWithPreviewImage(
+                cart_item=cart_item,
+                preview_image=product_preview_images_dict.get(product_id),
+                product_details=cart_item_product
+            )
+            cart_items_with_preview_images.append(cart_item_with_preview_image)
+
+        cart_dto = CartDto(cart=cart, cart_items=cart_items_with_preview_images)
         return cart_dto
 
     def fetch_user_cart(self, logged_in_user: User) -> Cart:
@@ -69,7 +80,8 @@ class CartService:
             price = product.price
             product_attributes = product_attributes_dict[product_id]
             if product_attributes is None:
-                size_product_attribute = product_service.find_first_product_attribute_value_size_by_product_id(product_id)
+                size_product_attribute = product_service.find_first_product_attribute_value_size_by_product_id(
+                    product_id)
                 color_product_attribute = product_service.find_first_product_attribute_value_color_by_product_id(
                     product_id)
                 default_attributes = {SIZE_ATTRIBUTE_OPTION_ID: size_product_attribute.attribute_option_id,

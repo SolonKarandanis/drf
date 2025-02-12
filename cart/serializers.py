@@ -7,6 +7,10 @@ from .validators import is_quantity_valid
 import json
 
 
+class CartItemProductSerializer(serializers.Serializer):
+    sku = serializers.CharField(read_only=True)
+    title = serializers.CharField(read_only=True)
+
 class CartItemSerializer(serializers.Serializer):
     id = serializers.IntegerField(source='cart_item.id', read_only=True)
     modificationAlert = serializers.BooleanField(source='cart_item.modification_alert', read_only=True)
@@ -16,6 +20,7 @@ class CartItemSerializer(serializers.Serializer):
     uuid = serializers.CharField(source='cart_item.uuid', read_only=True)
     attributes = serializers.SerializerMethodField('_get_attributes_as_json')
     previewImage = ImagesSerializer(source='preview_image', read_only=True)
+    productDetails = CartItemProductSerializer(source='product_details', read_only=True)
 
     def _get_attributes_as_json(self, obj):
         cart_item = getattr(obj, 'cart_item')
@@ -32,6 +37,7 @@ class CartItemSerializer(serializers.Serializer):
             'totalPrice',
             'uuid',
             'productId',
+            'productDetails',
             'attributes',
             'previewImage'
         ]
