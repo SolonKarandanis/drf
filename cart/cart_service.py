@@ -32,7 +32,8 @@ logger = logging.getLogger('django')
 class CartService:
 
     @transaction.atomic
-    def to_cart_dto(self, cart: Cart) -> CartDto:
+    def fetch_user_cart_dto(self, logged_in_user: User) -> CartDto:
+        cart = self.fetch_user_cart(logged_in_user)
         cart_items: List[CartItem] = cart.cart_items.all()
         product_ids = [cart_item.product_id for cart_item in cart_items]
         product_preview_images = image_service.find_product_profile_images(product_ids)

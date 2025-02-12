@@ -17,8 +17,7 @@ logger = logging.getLogger('django')
 @permission_classes([IsAuthenticated])
 def get_user_cart(request):
     logged_in_user = get_user_from_request(request)
-    cart = cart_service.fetch_user_cart(logged_in_user)
-    cart_dto = cart_service.to_cart_dto(cart)
+    cart_dto = cart_service.fetch_user_cart_dto(logged_in_user)
     data = CartSerializer(cart_dto).data
     return Response(data)
 
@@ -30,8 +29,7 @@ def add_cart_items(request):
     serializer = AddToCart(data=request.data, many=True)
     if serializer.is_valid(raise_exception=True):
         cart_service.add_to_cart(serializer, logged_in_user)
-        cart = cart_service.fetch_user_cart(logged_in_user)
-        cart_dto = cart_service.to_cart_dto(cart)
+        cart_dto = cart_service.fetch_user_cart_dto(logged_in_user)
         response = CartSerializer(cart_dto).data
         return Response(response, status=status.HTTP_201_CREATED)
     return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
