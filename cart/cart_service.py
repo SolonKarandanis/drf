@@ -72,7 +72,7 @@ class CartService:
         product_ids = [d['productId'] for d in data_list]
         products_to_be_added: List[Product] = product_service.find_products_by_ids(product_ids)
         product_quantities_dict = {d['productId']: d['quantity'] for d in data_list}
-        product_attributes_dict = {d['productId']: d['attributes'] for d in data_list}
+        product_attributes_dict = {d['productId']: d['attributes'] if "attributes" in d else None for d in data_list}
         items = []
         for product in products_to_be_added:
             product_id = product.id
