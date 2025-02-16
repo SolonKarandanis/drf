@@ -124,7 +124,7 @@ class ProductService:
         return repo.get_sizes_with_totals()
 
     @transaction.atomic
-    def save_product(self, data_dict: dict[str, object], logged_in_user: User, existing_product: Product | None) \
+    def _save_product(self, data_dict: dict[str, object], logged_in_user: User, existing_product: Product | None) \
             -> Product:
         product_to_be_saved = None
         price = data_dict['price']
@@ -170,8 +170,8 @@ class ProductService:
 
         return product_to_be_saved
 
-    def check_attribute_input_validity(self, categories: List[Category], sizes: List[AttributeOptions],
-                                       gender: AttributeOptions, colors: List[AttributeOptions]):
+    def _check_attribute_input_validity(self, categories: List[Category], sizes: List[AttributeOptions],
+                                        gender: AttributeOptions, colors: List[AttributeOptions]):
         if len(categories) == 0:
             raise serializers.ValidationError({'categories': "Supplied Categories don't exist"})
         if len(sizes) == 0:
@@ -182,7 +182,7 @@ class ProductService:
             raise serializers.ValidationError({'colors': "Supplied Colors don't exist"})
 
     @transaction.atomic
-    def save_product_attributes(self, data_dict: dict[str, object], product: Product, is_edit: bool):
+    def _save_product_attributes(self, data_dict: dict[str, object], product: Product, is_edit: bool):
         total_product_attribute_values = []
         categories_changed = False
         gender_changed = False
@@ -198,7 +198,7 @@ class ProductService:
         gender = repo.find_genders_by_id(gender_id)
         colors = repo.find_colors_by_ids(color_ids)
 
-        self.check_attribute_input_validity(categories, sizes, gender, colors)
+        self._check_attribute_input_validity(categories, sizes, gender, colors)
 
         if is_edit:
             product_attribute_value_ids_to_be_deleted: List[int] = []
@@ -273,7 +273,7 @@ class ProductService:
         if len(total_product_attribute_values) > 0:
             repo.bulk_create_product_attribute_values(total_product_attribute_values)
 
-    def save_product_images(self, image_files: List[InMemoryUploadedFile], logged_in_user: User, product: Product):
+    def _save_product_images(self, image_files: List[InMemoryUploadedFile], logged_in_user: User, product: Product):
         has_image_files = len(image_files) > 0
         logger.info(f'---> ProductService ---> create_product ---> has_image_files: {has_image_files}')
         if has_image_files:
@@ -283,18 +283,18 @@ class ProductService:
                        image_files: List[InMemoryUploadedFile], logged_in_user: User) -> Product:
         serialized_data = request.data
         data_dict = dict(serialized_data)
-        existing_product = self.save_product(data_dict, logged_in_user, existing_product)
-        self.save_product_attributes(data_dict, existing_product, True)
-        self.save_product_images(image_files, logged_in_user, existing_product)
+        existing_product = self._save_product(data_dict, logged_in_user, existing_product)
+        self._save_product_attributes(data_dict, existing_product, True)
+        self._save_product_images(image_files, logged_in_user, existing_product)
         return existing_product
 
     def create_product(self, request: SaveProductSerializer, image_files: List[InMemoryUploadedFile],
                        logged_in_user: User) -> Product:
         serialized_data = request.data
         data_dict = dict(serialized_data)
-        new_product = self.save_product(data_dict, logged_in_user, None)
-        self.save_product_attributes(data_dict, new_product, False)
-        self.save_product_images(image_files, logged_in_user, new_product)
+        new_product = self._save_product(data_dict, logged_in_user, None)
+        self._save_product_attributes(data_dict, new_product, False)
+        self._save_product_images(image_files, logged_in_user, new_product)
         return new_product
 
     def find_product_categories(self, product_uuid: str) -> List[Category]:
