@@ -116,7 +116,7 @@ class CartService:
         return None
 
     @transaction.atomic
-    def update_item_quantities(self, request: UpdateQuantity, logged_in_user: User) -> Cart:
+    def update_item_quantities(self, request: UpdateQuantity, logged_in_user: User) -> None:
         cart: Cart = self.fetch_user_cart(logged_in_user)
         serialized_data = request.data
         data_list = [dict(item) for item in serialized_data]
@@ -131,10 +131,9 @@ class CartService:
         cart = self.fetch_user_cart(logged_in_user)
         cart.recalculate_cart_total_price()
         self._update_cart(cart)
-        return cart
 
     @transaction.atomic
-    def delete_cart_items(self, request: DeleteCartItems, logged_in_user: User) -> Cart:
+    def delete_cart_items(self, request: DeleteCartItems, logged_in_user: User) -> None:
         cart: Cart = self.fetch_user_cart(logged_in_user)
         serialized_data = request.data
         data_list = [dict(item) for item in serialized_data]
@@ -145,17 +144,14 @@ class CartService:
             cart.cart_items.remove(*existing_cart_items)
             cart.recalculate_cart_total_price()
             self._update_cart(cart)
-            return self.fetch_user_cart(logged_in_user)
-        return cart
 
     @transaction.atomic
-    def clear_cart(self, logged_in_user: User) -> Cart:
+    def clear_cart(self, logged_in_user: User) -> None:
         cart: Cart = self.fetch_user_cart(logged_in_user)
         cart_repo.delete_cart_items(cart)
         cart.cart_items.clear()
         cart.recalculate_cart_total_price()
         self._update_cart(cart)
-        return cart
 
     @transaction.atomic
     def add_order_to_cart(self, logged_in_user: User, order_uuid: str) -> None:
