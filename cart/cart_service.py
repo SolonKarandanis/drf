@@ -122,7 +122,7 @@ class CartService:
         data_list = [dict(item) for item in serialized_data]
         for data in data_list:
             quantity = data['quantity']
-            cart_item_id = data['cart_item_id']
+            cart_item_id = data['cartItemId']
             existing_cart_item = next(filter(lambda ci: ci.id == cart_item_id, cart.cart_items.all()), None)
             if existing_cart_item is not None:
                 existing_cart_item.quantity = quantity
@@ -137,7 +137,7 @@ class CartService:
         cart: Cart = self.fetch_user_cart(logged_in_user)
         serialized_data = request.data
         data_list = [dict(item) for item in serialized_data]
-        cart_item_ids = [d['cart_item_id'] for d in data_list]
+        cart_item_ids = [d['cartItemId'] for d in data_list]
         existing_cart_items = list(filter(lambda ci: ci.id in cart_item_ids, cart.cart_items.all()))
         logger.info(f'items: {existing_cart_items}')
         if existing_cart_items is not None:

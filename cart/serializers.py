@@ -92,7 +92,7 @@ class AddToCart(serializers.Serializer):
 
 
 class UpdateQuantity(serializers.Serializer):
-    cartItemId = serializers.IntegerField(source='cart_item_id', read_only=True)
+    cartItemId = serializers.IntegerField(source='cart_item_id')
     quantity = serializers.IntegerField(validators=[is_quantity_valid])
 
     class Meta:
@@ -106,7 +106,7 @@ class UpdateQuantity(serializers.Serializer):
 
 
 class DeleteCartItems(serializers.Serializer):
-    cartItemId = serializers.IntegerField(source='cart_item_id', read_only=True)
+    cartItemId = serializers.IntegerField(source='cart_item_id')
 
     class Meta:
         fields = [
