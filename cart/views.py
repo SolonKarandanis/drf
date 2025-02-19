@@ -76,8 +76,8 @@ def clear_cart(request):
 def add_order_to_cart(request, order_uuid: str):
     logged_in_user = get_user_from_request(request)
     cart_service.add_order_to_cart(logged_in_user, order_uuid)
-    cart = cart_service.fetch_user_cart(logged_in_user)
-    response = CartSerializer(cart).data
+    cart_dto = cart_service.fetch_user_cart_dto(logged_in_user)
+    response = CartSerializer(cart_dto).data
     return Response(response, status=status.HTTP_201_CREATED)
 
 
@@ -86,8 +86,8 @@ def add_order_to_cart(request, order_uuid: str):
 def add_order_item_to_cart(request, order_item_uuid: str):
     logged_in_user = get_user_from_request(request)
     cart_service.add_order_item_to_cart(logged_in_user, order_item_uuid)
-    cart = cart_service.fetch_user_cart(logged_in_user)
-    response = CartSerializer(cart).data
+    cart_dto = cart_service.fetch_user_cart_dto(logged_in_user)
+    response = CartSerializer(cart_dto).data
     return Response(response, status=status.HTTP_201_CREATED)
 
 

@@ -32,7 +32,7 @@ class CartService:
 
     @transaction.atomic
     def fetch_user_cart_dto(self, logged_in_user: User) -> CartDto:
-        cart = self.fetch_user_cart(logged_in_user)
+        cart = self._fetch_user_cart(logged_in_user)
         cart_items: List[CartItem] = cart.cart_items.all()
         product_ids = [cart_item.product_id for cart_item in cart_items]
         product_preview_images = image_service.find_product_profile_images(product_ids)
@@ -56,7 +56,7 @@ class CartService:
         cart_dto = CartDto(cart=cart, cart_items=cart_items_with_preview_images)
         return cart_dto
 
-    def fetch_user_cart(self, logged_in_user: User) -> Cart:
+    def _fetch_user_cart(self, logged_in_user: User) -> Cart:
         cart = cart_repo.fetch_user_cart(logged_in_user)
         logger.info(f'cart: {cart}')
         return cart
@@ -66,7 +66,7 @@ class CartService:
 
     @transaction.atomic
     def add_to_cart(self, request: AddToCart, logged_in_user: User) -> None:
-        cart: Cart = self.fetch_user_cart(logged_in_user)
+        cart: Cart = self._fetch_user_cart(logged_in_user)
         serialized_data = request.data
         data_list = [dict(item) for item in serialized_data]
         product_ids = [d['productId'] for d in data_list]
@@ -115,7 +115,7 @@ class CartService:
 
     @transaction.atomic
     def update_item_quantities(self, request: UpdateQuantity, logged_in_user: User) -> None:
-        cart: Cart = self.fetch_user_cart(logged_in_user)
+        cart: Cart = self._fetch_user_cart(logged_in_user)
         serialized_data = request.data
         data_list = [dict(item) for item in serialized_data]
         for data in data_list:
@@ -126,13 +126,13 @@ class CartService:
                 existing_cart_item.quantity = quantity
                 existing_cart_item.total_price = quantity * existing_cart_item.unit_price
                 cart_repo.update_cart_item(existing_cart_item)
-        cart = self.fetch_user_cart(logged_in_user)
+        cart = self._fetch_user_cart(logged_in_user)
         cart.recalculate_cart_total_price()
         self._update_cart(cart)
 
     @transaction.atomic
     def delete_cart_items(self, request: DeleteCartItems, logged_in_user: User) -> None:
-        cart: Cart = self.fetch_user_cart(logged_in_user)
+        cart: Cart = self._fetch_user_cart(logged_in_user)
         serialized_data = request.data
         data_list = [dict(item) for item in serialized_data]
         cart_item_ids = [d['cartItemId'] for d in data_list]
@@ -145,7 +145,7 @@ class CartService:
 
     @transaction.atomic
     def clear_cart(self, logged_in_user: User) -> None:
-        cart: Cart = self.fetch_user_cart(logged_in_user)
+        cart: Cart = self._fetch_user_cart(logged_in_user)
         cart_repo.delete_cart_items(cart)
         cart.cart_items.clear()
         cart.recalculate_cart_total_price()
@@ -155,7 +155,7 @@ class CartService:
     def add_order_to_cart(self, logged_in_user: User, order_uuid: str) -> None:
         self.clear_cart(logged_in_user)
         order = order_repo.find_order_by_uuid_with_products(order_uuid)
-        cart: Cart = self.fetch_user_cart(logged_in_user)
+        cart: Cart = self._fetch_user_cart(logged_in_user)
         items = []
         for order_item in order.order_items.all():
             product_id = order_item.product.id
@@ -170,7 +170,7 @@ class CartService:
     @transaction.atomic
     def add_order_item_to_cart(self, logged_in_user: User, order_item_uuid: str) -> None:
         order_item = order_repo.find_order_item_by_uuid(order_item_uuid)
-        cart: Cart = self.fetch_user_cart(logged_in_user)
+        cart: Cart = self._fetch_user_cart(logged_in_user)
         product_id = order_item.product.id
         quantity = order_item.quantity
         price = order_item.price
