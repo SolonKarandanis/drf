@@ -110,8 +110,6 @@ class CartService:
             f'---> CartService ---> add_to_cart ---> product_attributes: {product_attributes}')
         for cart_item in cart_items:
             if cart_item.attributes == product_attributes and cart_item.product_id == product_id:
-                logger.info(
-                    f'---> CartService ---> add_to_cart ---> cart_item2: {cart_item}')
                 return cart_item
         return None
 
