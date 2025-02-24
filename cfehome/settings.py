@@ -233,7 +233,7 @@ REST_FRAMEWORK = {
 
 SIMPLE_JWT = {
     "AUTH_HEADER_TYPES": ["Bearer"],
-    "ACCESS_TOKEN_LIFETIME": datetime.timedelta(hours=3),
+    "ACCESS_TOKEN_LIFETIME": datetime.timedelta(hours=2, minutes=30),
 }
 INTERNAL_IPS = [
     "127.0.0.1",
