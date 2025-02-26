@@ -46,8 +46,6 @@ class CartService:
             product_id = cart_item.product_id
             product = product_dict.get(product_id)
             product_attributes = product_service.find_product_attributes(product.uuid)
-            logger.info(
-                f'---> CartService ---> add_to_cart ---> product_attributes: {product_attributes}')
             cart_item_product = CartItemProduct(sku=product.sku, title=product.title, uuid=product.uuid)
             cart_item_with_preview_image = CartItemWithPreviewImage(
                 cart_item=cart_item,
