@@ -114,7 +114,7 @@ class CartService:
         return None
 
     @transaction.atomic
-    def update_item_quantities(self, request: UpdateQuantity, logged_in_user: User) -> None:
+    def update_items(self, request: UpdateQuantity, logged_in_user: User) -> None:
         cart: Cart = self._fetch_user_cart(logged_in_user)
         serialized_data = request.data
         data_list = [dict(item) for item in serialized_data]

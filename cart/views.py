@@ -37,11 +37,11 @@ def add_cart_items(request):
 
 @api_view(['PUT'])
 @permission_classes([IsAuthenticated])
-def update_quantities(request):
+def update_items(request):
     logged_in_user = get_user_from_request(request)
     serializer = UpdateQuantity(data=request.data, many=True)
     if serializer.is_valid(raise_exception=True):
-        cart_service.update_item_quantities(serializer, logged_in_user)
+        cart_service.update_items(serializer, logged_in_user)
         cart_dto = cart_service.fetch_user_cart_dto(logged_in_user)
         response = CartSerializer(cart_dto).data
         return Response(response, status=status.HTTP_200_OK)
