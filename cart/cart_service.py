@@ -38,18 +38,22 @@ class CartService:
         product_preview_images = image_service.find_product_profile_images(product_ids)
         products = product_service.find_products_by_ids(product_ids)
 
-        product_dict = {product.id: product for product in products}
+        product_dict: dict[int, Product] = {product.id: product for product in products}
         product_preview_images_dict = {image.object_id: image for image in product_preview_images}
 
         cart_items_with_preview_images = []
         for cart_item in cart_items:
             product_id = cart_item.product_id
             product = product_dict.get(product_id)
+            product_attributes = product_service.find_product_attributes(product.uuid)
+            logger.info(
+                f'---> CartService ---> add_to_cart ---> product_attributes: {product_attributes}')
             cart_item_product = CartItemProduct(sku=product.sku, title=product.title, uuid=product.uuid)
             cart_item_with_preview_image = CartItemWithPreviewImage(
                 cart_item=cart_item,
                 preview_image=product_preview_images_dict.get(product_id),
-                product_details=cart_item_product
+                product_details=cart_item_product,
+                product_attributes=product_attributes
             )
             cart_items_with_preview_images.append(cart_item_with_preview_image)
 

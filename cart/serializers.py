@@ -1,6 +1,7 @@
 from rest_framework import serializers
 from cfehome.serializers import ModelPaginationSerializer
 from images.serializers import ImagesSerializer
+from products.serializers import ProductAttributesSerializer
 
 from .models import CartItem, Cart
 from .validators import is_quantity_valid
@@ -23,6 +24,7 @@ class CartItemSerializer(serializers.Serializer):
     attributes = serializers.SerializerMethodField('_get_attributes_as_json')
     previewImage = ImagesSerializer(source='preview_image', read_only=True)
     productDetails = CartItemProductSerializer(source='product_details', read_only=True)
+    productAttributes = ProductAttributesSerializer(source='product_attributes', read_only=True)
 
     def _get_attributes_as_json(self, obj):
         cart_item = getattr(obj, 'cart_item')
@@ -41,7 +43,8 @@ class CartItemSerializer(serializers.Serializer):
             'productId',
             'productDetails',
             'attributes',
-            'previewImage'
+            'previewImage',
+            'productAttributes'
         ]
 
 

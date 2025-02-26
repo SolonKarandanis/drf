@@ -37,11 +37,6 @@ class ProductService:
         products_with_preview_images = self.products_to_products_with_preview_images(product_results)
         return products_with_preview_images
 
-    @transaction.atomic
-    def find_product_attributes(self, uuid: str) -> List[ProductAttributeValues]:
-        product = repo.find_by_uuid(uuid, False)
-        return repo.find_product_attributes(product.id)
-
     def find_by_id(self, product_id: int) -> Product:
         return repo.find_by_id(product_id)
 
