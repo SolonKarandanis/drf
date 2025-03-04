@@ -108,8 +108,6 @@ class CartService:
                                  product_attributes: str) -> CartItem | None:
         if len(cart_items) == 0:
             return None
-        logger.info(
-            f'---> CartService ---> add_to_cart ---> product_attributes: {product_attributes}')
         for cart_item in cart_items:
             if cart_item.attributes == product_attributes and cart_item.product_id == product_id:
                 return cart_item
@@ -126,14 +124,36 @@ class CartService:
             cart_item_id = data['cartItemId']
             if "attributes" in data:
                 attributes = data['attributes']
-            existing_cart_item = next(filter(lambda ci: ci.id == cart_item_id, cart.cart_items.all()), None)
-            if existing_cart_item is not None:
-                existing_cart_item.quantity = quantity
-                existing_cart_item.total_price = quantity * existing_cart_item.unit_price
-                cart_repo.update_cart_item(existing_cart_item)
-        cart = self._fetch_user_cart(logged_in_user)
-        cart.recalculate_cart_total_price()
-        self._update_cart(cart)
+            existing_cart_item = self._find_existing_cart_item_for_update(cart_item_id, cart.cart_items.all(),
+                                                                          attributes)
+            logger.info(
+                f'---> CartService ---> update_items ---> existing_cart_item: {existing_cart_item}')
+        #     if existing_cart_item is not None:
+        #         existing_cart_item.quantity = quantity
+        #         existing_cart_item.total_price = quantity * existing_cart_item.unit_price
+        #         if attributes is not None:
+        #             existing_cart_item.attributes = attributes
+        #         cart_repo.update_cart_item(existing_cart_item)
+        # cart = self._fetch_user_cart(logged_in_user)
+        # cart.recalculate_cart_total_price()
+        # self._update_cart(cart)
+
+    def _find_existing_cart_item_for_update(self, cart_item_id: int, cart_items: List[CartItem],
+                                            attributes: str) -> CartItem | None:
+        if len(cart_items) == 0:
+            return None
+        for cart_item in cart_items:
+            logger.info(
+                f'---> CartService ---> update_items ---> _find_existing_cart_item_for_update cart_item: {cart_item}')
+            if attributes is None and cart_item.id == cart_item_id:
+                logger.info(
+                    f'---> CartService ---> update_items ---> _find_existing_cart_item_for_update no attributes')
+                return cart_item
+            if attributes is not None and cart_item.attributes == attributes:
+                logger.info(
+                    f'---> CartService ---> update_items ---> _find_existing_cart_item_for_update with attributes')
+                return cart_item
+        return None
 
     @transaction.atomic
     def delete_cart_items(self, request: DeleteCartItems, logged_in_user: User) -> None:
