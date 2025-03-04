@@ -94,14 +94,16 @@ class AddToCart(serializers.Serializer):
         return f"<AddOrUpdateCart ProductId:{self.product_id},  Quantity:{self.quantity}>"
 
 
-class UpdateQuantity(serializers.Serializer):
+class UpdateItem(serializers.Serializer):
     cartItemId = serializers.IntegerField(source='cart_item_id')
     quantity = serializers.IntegerField(validators=[is_quantity_valid])
+    attributes = serializers.CharField(required=False)
 
     class Meta:
         fields = [
             'cartItemId',
             'quantity',
+            'attributes',
         ]
 
     def __repr__(self):

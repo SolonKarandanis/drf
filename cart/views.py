@@ -5,7 +5,7 @@ from rest_framework import status
 import logging
 
 # Create your views here.
-from .serializers import CartSerializer, AddToCart, UpdateQuantity, DeleteCartItems
+from .serializers import CartSerializer, AddToCart, UpdateItem, DeleteCartItems
 from .cart_service import CartService
 
 cart_service = CartService()
@@ -39,7 +39,7 @@ def add_cart_items(request):
 @permission_classes([IsAuthenticated])
 def update_items(request):
     logged_in_user = get_user_from_request(request)
-    serializer = UpdateQuantity(data=request.data, many=True)
+    serializer = UpdateItem(data=request.data, many=True)
     if serializer.is_valid(raise_exception=True):
         cart_service.update_items(serializer, logged_in_user)
         cart_dto = cart_service.fetch_user_cart_dto(logged_in_user)

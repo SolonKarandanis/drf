@@ -15,7 +15,7 @@ from orders.order_repository import OrderRepository
 
 import logging
 
-from .serializers import AddToCart, UpdateQuantity, DeleteCartItems
+from .serializers import AddToCart, UpdateItem, DeleteCartItems
 
 cart_repo = CartRepository()
 order_repo = OrderRepository()
@@ -116,13 +116,16 @@ class CartService:
         return None
 
     @transaction.atomic
-    def update_items(self, request: UpdateQuantity, logged_in_user: User) -> None:
+    def update_items(self, request: UpdateItem, logged_in_user: User) -> None:
         cart: Cart = self._fetch_user_cart(logged_in_user)
         serialized_data = request.data
         data_list = [dict(item) for item in serialized_data]
         for data in data_list:
+            attributes = None
             quantity = data['quantity']
             cart_item_id = data['cartItemId']
+            if "attributes" in data:
+                attributes = data['attributes']
             existing_cart_item = next(filter(lambda ci: ci.id == cart_item_id, cart.cart_items.all()), None)
             if existing_cart_item is not None:
                 existing_cart_item.quantity = quantity
