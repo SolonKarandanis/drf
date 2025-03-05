@@ -3,7 +3,7 @@ import json
 
 from django.conf import settings
 from django.db import transaction
-
+from rest_framework import serializers
 from images.image_service import ImageService
 from products.constants import SIZE_ATTRIBUTE_OPTION_ID, COLOR_ATTRIBUTE_OPTION_ID
 from products.product_service import ProductService
@@ -122,10 +122,11 @@ class CartService:
             attributes = None
             quantity = data['quantity']
             cart_item_id = data['cartItemId']
+            product_id = data['productId']
             if "attributes" in data:
                 attributes = data['attributes']
-            existing_cart_item = self._find_existing_cart_item_for_update(cart_item_id, cart.cart_items.all(),
-                                                                          attributes)
+            existing_cart_item = self._find_existing_cart_item_for_update(cart_item_id, product_id,
+                                                                          cart.cart_items.all(), attributes)
             logger.info(
                 f'---> CartService ---> update_items ---> existing_cart_item: {existing_cart_item}')
         #     if existing_cart_item is not None:
@@ -138,21 +139,20 @@ class CartService:
         # cart.recalculate_cart_total_price()
         # self._update_cart(cart)
 
-    def _find_existing_cart_item_for_update(self, cart_item_id: int, cart_items: List[CartItem],
+    def _find_existing_cart_item_for_update(self, cart_item_id: int,  product_id: int, cart_items: List[CartItem],
                                             attributes: str) -> CartItem | None:
         if len(cart_items) == 0:
             return None
         for cart_item in cart_items:
-            logger.info(
-                f'---> CartService ---> update_items ---> _find_existing_cart_item_for_update cart_item: {cart_item}')
-            if attributes is None and cart_item.id == cart_item_id:
+            if cart_item.id == cart_item_id:
                 logger.info(
-                    f'---> CartService ---> update_items ---> _find_existing_cart_item_for_update no attributes')
+                    f'---> CartService ---> update_items ---> cart_item.id == cart_item_id')
                 return cart_item
-            if attributes is not None and cart_item.attributes == attributes:
+            if attributes is not None and cart_item.id != cart_item_id and cart_item.product_id == product_id \
+                    and cart_item.attributes == attributes:
                 logger.info(
-                    f'---> CartService ---> update_items ---> _find_existing_cart_item_for_update with attributes')
-                return cart_item
+                    f'---> CartService ---> update_items ---> cart_item.id != cart_item_id')
+                raise serializers.ValidationError({'attributes': "Cart Item already exists with these attributes"})
         return None
 
     @transaction.atomic

@@ -95,13 +95,15 @@ class AddToCart(serializers.Serializer):
 
 
 class UpdateItem(serializers.Serializer):
-    cartItemId = serializers.IntegerField(source='cart_item_id')
+    cartItemId = serializers.IntegerField()
+    productId = serializers.IntegerField()
     quantity = serializers.IntegerField(validators=[is_quantity_valid])
     attributes = serializers.CharField(required=False)
 
     class Meta:
         fields = [
             'cartItemId',
+            'productId',
             'quantity',
             'attributes',
         ]
