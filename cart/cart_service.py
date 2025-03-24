@@ -125,19 +125,21 @@ class CartService:
             product_id = data['productId']
             if "attributes" in data:
                 attributes = data['attributes']
+            self._check_if_product_exists_with_same_attributes(cart_item_id,product_id, cart.cart_items.all(),
+                                                               attributes)
             existing_cart_item = self._find_existing_cart_item_for_update(cart_item_id, product_id,
                                                                           cart.cart_items.all(), attributes)
             logger.info(
                 f'---> CartService ---> update_items ---> existing_cart_item: {existing_cart_item}')
-            if existing_cart_item is not None:
-                existing_cart_item.quantity = quantity
-                existing_cart_item.total_price = quantity * existing_cart_item.unit_price
-                if attributes is not None:
-                    existing_cart_item.attributes = attributes
-                cart_repo.update_cart_item(existing_cart_item)
-        cart = self._fetch_user_cart(logged_in_user)
-        cart.recalculate_cart_total_price()
-        self._update_cart(cart)
+        #     if existing_cart_item is not None:
+        #         existing_cart_item.quantity = quantity
+        #         existing_cart_item.total_price = quantity * existing_cart_item.unit_price
+        #         if attributes is not None:
+        #             existing_cart_item.attributes = attributes
+        #         cart_repo.update_cart_item(existing_cart_item)
+        # cart = self._fetch_user_cart(logged_in_user)
+        # cart.recalculate_cart_total_price()
+        # self._update_cart(cart)
 
     def _find_existing_cart_item_for_update(self, cart_item_id: int,  product_id: int, cart_items: List[CartItem],
                                             attributes: str) -> CartItem | None:
@@ -145,11 +147,17 @@ class CartService:
             return None
         for cart_item in cart_items:
             if cart_item.id == cart_item_id:
+                logger.info(
+                    f'---> CartService ---> update_items ---> _find_existing_cart_item_for_update cart_item.id == cart_item_id')
                 return cart_item
-            if attributes is not None and cart_item.id != cart_item_id and cart_item.product_id == product_id \
+        return None
+
+    def _check_if_product_exists_with_same_attributes(self, cart_item_id: int,  product_id: int,
+                                                      cart_items: List[CartItem],  attributes: str):
+        for cart_item in cart_items:
+            if cart_item.id != cart_item_id and cart_item.product_id == product_id \
                     and cart_item.attributes == attributes:
                 raise serializers.ValidationError({'attributes': "Cart Item already exists with these attributes"})
-        return None
 
     @transaction.atomic
     def delete_cart_items(self, request: DeleteCartItems, logged_in_user: User) -> None:
