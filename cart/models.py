@@ -107,7 +107,7 @@ class CartItem(Model):
     quantity = IntegerField(blank=True, null=True)
     unit_price = FloatField()
     total_price = FloatField()
-    cart = ForeignKey(Cart, on_delete=CASCADE, related_name='cart_items', null=True)
+    cart = ForeignKey(Cart, on_delete=CASCADE, related_name='cart_items', null=False)
     product = ForeignKey(Product, on_delete=PROTECT)
     uuid = UUIDField(default=uuid.uuid4())
     attributes = JSONField(null=True)
