@@ -13,7 +13,28 @@ cart_service = CartService()
 logger = logging.getLogger('django')
 
 
+def my_decorator(f):
+    def wrapped(*args, **kwargs):
+        # ...
+        # insert code that runs before the decorated function
+        # (and optionally decide to not call that function)
+        # ...
+        print('-------------->before', f)
+        response = f(*args, **kwargs)
+        print('-------------->after', f)
+        print('-------------->response', response)
+        # ...
+        # insert code that runs after the decorated function
+        # (and optionally decide to change the response)
+        # ...
+        return response
+
+    print('-------------->decorating', f)
+    return wrapped
+
+
 @api_view(['GET'])
+@my_decorator
 @permission_classes([IsAuthenticated])
 def get_user_cart(request):
     logged_in_user = get_user_from_request(request)
