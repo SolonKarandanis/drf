@@ -1,7 +1,5 @@
 import logging
-from functools import wraps
 from typing import List
-from django.http import HttpResponseForbidden
 from django.contrib.auth.models import Group
 from requests import Response
 from rest_framework import status
