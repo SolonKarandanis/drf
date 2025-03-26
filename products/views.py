@@ -1,5 +1,7 @@
 import logging
 from rest_framework import serializers
+from rest_framework.request import Request
+
 from cfehome.constants.security_constants import ADD_PRODUCT, CHANGE_PRODUCT
 from cfehome.utils.security_utils import SecurityUtils
 from images.serializers import ImagesSerializer
@@ -23,7 +25,7 @@ logger = logging.getLogger('django')
 
 @api_view(['GET'])
 @permission_classes([IsAuthenticated])
-def get_product(request, uuid: str, *args, **kwargs):
+def get_product(request: Request, uuid: str, *args, **kwargs):
     product = product_service.find_by_uuid(uuid, True)
     logger.info(f'---> Product Views ---> product: {product}')
     data = ProductSerializer(product, many=False).data
@@ -32,7 +34,7 @@ def get_product(request, uuid: str, *args, **kwargs):
 
 @api_view(['POST'])
 @permission_classes([IsAuthenticated])
-def get_similar_products(request):
+def get_similar_products(request: Request):
     serializer = SimilarProductsRequestSerializer(data=request.data)
     if serializer.is_valid(raise_exception=True):
         serialized_data = request.data
@@ -47,7 +49,7 @@ def get_similar_products(request):
 
 @api_view(['GET'])
 @permission_classes([IsAuthenticated])
-def get_similar_products_by_uuid(request, uuid: str):
+def get_similar_products_by_uuid(request: Request, uuid: str):
     limit = request.GET.get('limit', 5)
     logger.info(f'---> Product Views ---> limit: {limit}')
     categories = product_service.find_product_categories(uuid)
@@ -59,7 +61,7 @@ def get_similar_products_by_uuid(request, uuid: str):
 
 @api_view(['GET'])
 @permission_classes([IsAuthenticated])
-def get_product_attributes(request, uuid: str):
+def get_product_attributes(request: Request, uuid: str):
     results = product_service.find_product_attributes(uuid)
     data = ProductAttributesSerializer(results).data
     return Response(data)
@@ -67,7 +69,7 @@ def get_product_attributes(request, uuid: str):
 
 @api_view(['GET'])
 @permission_classes([IsAuthenticated])
-def get_product_images(request, uuid: str):
+def get_product_images(request: Request, uuid: str):
     images = product_service.find_product_images_by_uuid(uuid)
     data = ImagesSerializer(images, many=True, read_only=True).data
     return Response(data)
@@ -75,7 +77,7 @@ def get_product_images(request, uuid: str):
 
 @api_view(['GET'])
 @permission_classes([IsAuthenticated])
-def get_supplier_product(request, uuid: str):
+def get_supplier_product(request: Request, uuid: str):
     logged_in_user = request.user
     product = product_service.find_users_product_by_uuid(uuid, logged_in_user)
     data = ProductSerializer(product, many=False).data
@@ -84,7 +86,7 @@ def get_supplier_product(request, uuid: str):
 
 @api_view(['GET'])
 @permission_classes([IsAuthenticated])
-def get_all_products(request):
+def get_all_products(request: Request):
     queryset = product_service.find_all_products()
     serializer = PaginatedProductListSerializer(queryset, request)
     return Response(serializer.page_data)
@@ -92,14 +94,14 @@ def get_all_products(request):
 
 @api_view(['GET'])
 @permission_classes([IsAuthenticated])
-def get_all_supplier_products(request):
+def get_all_supplier_products(request: Request):
     logged_in_user = request.user
     queryset = product_service.find_supplier_products(logged_in_user)
     serializer = PaginatedProductListSerializer(queryset, request)
     return Response(serializer.page_data)
 
 
-def create_page_obj(request, queryset):
+def create_page_obj(request: Request, queryset):
     page = request.GET.get('page', 1)
     size = request.GET.get('size', 10)
     logger.info(f'---> Product Views ---> page: {page}')
@@ -110,7 +112,7 @@ def create_page_obj(request, queryset):
 
 @api_view(['POST'])
 @permission_classes([IsAuthenticated])
-def create_product(request):
+def create_product(request: Request):
     logged_in_user = SecurityUtils.get_user_from_request(request)
     can_add_product = SecurityUtils.has_permission(request, ADD_PRODUCT)
     logger.info(f'---> Product Views ---> create_product ---> can_add_product: {can_add_product}')
@@ -127,7 +129,7 @@ def create_product(request):
 
 @api_view(['PUT'])
 @permission_classes([IsAuthenticated])
-def update_product(request, uuid: str):
+def update_product(request: Request, uuid: str):
     logged_in_user = SecurityUtils.get_user_from_request(request)
     can_update_product = SecurityUtils.has_permission(request, CHANGE_PRODUCT)
     existing_product = product_service.find_by_uuid(uuid, False)
@@ -147,7 +149,7 @@ def update_product(request, uuid: str):
 
 @api_view(['PUT'])
 @permission_classes([IsAuthenticated])
-def post_product_comment(request):
+def post_product_comment(request: Request):
     logged_in_user = request.user
     serializer = PostProductComment(data=request.data, many=False)
     if serializer.is_valid(raise_exception=True):
@@ -159,7 +161,7 @@ def post_product_comment(request):
 
 @api_view(['POST'])
 @permission_classes([IsAuthenticated])
-def search_products(request):
+def search_products(request: Request):
     logged_in_user = SecurityUtils.get_user_from_request(request)
     search_request = ProductSearchRequestSerializer(data=request.data)
     if search_request.is_valid(raise_exception=True):
@@ -173,7 +175,7 @@ def search_products(request):
 
 @api_view(['GET'])
 @permission_classes([IsAuthenticated])
-def get_categories_with_totals(request):
+def get_categories_with_totals(request: Request):
     result = product_service.get_categories_with_totals()
     data = CategoriesWithTotalsSerializer(result, many=True).data
     return Response(data, status=status.HTTP_200_OK)
@@ -181,7 +183,7 @@ def get_categories_with_totals(request):
 
 @api_view(['GET'])
 @permission_classes([IsAuthenticated])
-def get_brands_with_totals(request):
+def get_brands_with_totals(request: Request):
     result = product_service.get_brands_with_totals()
     data = BrandsWithTotalsSerializer(result, many=True).data
     return Response(data, status=status.HTTP_200_OK)
@@ -189,7 +191,7 @@ def get_brands_with_totals(request):
 
 @api_view(['GET'])
 @permission_classes([IsAuthenticated])
-def get_sizes_with_totals(request):
+def get_sizes_with_totals(request: Request):
     result = product_service.get_sizes_with_totals()
     data = SizesWithTotalsSerializer(result, many=True).data
     return Response(data, status=status.HTTP_200_OK)
@@ -197,7 +199,7 @@ def get_sizes_with_totals(request):
 
 @api_view(['GET'])
 @permission_classes([IsAuthenticated])
-def get_all_brands(request):
+def get_all_brands(request: Request):
     result = product_service.find_all_brands()
     data = BrandSerializer(result, many=True).data
     return Response(data, status=status.HTTP_200_OK)
@@ -205,7 +207,7 @@ def get_all_brands(request):
 
 @api_view(['GET'])
 @permission_classes([IsAuthenticated])
-def get_all_categories(request):
+def get_all_categories(request: Request):
     result = product_service.find_all_categories()
     data = CategorySerializer(result, many=True).data
     return Response(data, status=status.HTTP_200_OK)
@@ -213,7 +215,7 @@ def get_all_categories(request):
 
 @api_view(['GET'])
 @permission_classes([IsAuthenticated])
-def get_all_attributes(request):
+def get_all_attributes(request: Request):
     result = product_service.find_all_attributes()
     data = AllAttributeOptionsSerializer(result).data
     return Response(data, status=status.HTTP_200_OK)
@@ -221,7 +223,7 @@ def get_all_attributes(request):
 
 @api_view(['GET'])
 @permission_classes([IsAuthenticated])
-def get_all_sizes(request):
+def get_all_sizes(request: Request):
     result = product_service.find_all_sizes()
     data = AttributeOptionSerializer(result, many=True).data
     return Response(data, status=status.HTTP_200_OK)
@@ -229,7 +231,7 @@ def get_all_sizes(request):
 
 @api_view(['GET'])
 @permission_classes([IsAuthenticated])
-def get_all_colours(request):
+def get_all_colours(request: Request):
     result = product_service.find_all_colours()
     data = AttributeOptionSerializer(result, many=True).data
     return Response(data, status=status.HTTP_200_OK)
@@ -237,7 +239,7 @@ def get_all_colours(request):
 
 @api_view(['GET'])
 @permission_classes([IsAuthenticated])
-def get_all_genders(request):
+def get_all_genders(request: Request):
     result = product_service.find_all_genders()
     data = AttributeOptionSerializer(result, many=True).data
     return Response(data, status=status.HTTP_200_OK)

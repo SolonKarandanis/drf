@@ -6,6 +6,7 @@ from django.contrib.auth import authenticate
 from django.conf import settings
 from rest_framework import status
 from rest_framework import serializers
+from rest_framework.request import Request
 from rest_framework.response import Response
 from rest_framework.decorators import api_view, permission_classes
 from rest_framework.permissions import IsAuthenticated, IsAdminUser, AllowAny
@@ -33,7 +34,7 @@ group_service = GroupService()
 
 @api_view(['POST'])
 @permission_classes([AllowAny])
-def perform_login(request):
+def perform_login(request: Request):
     username = request.data.get("username")
     password = request.data.get("password")
     user_to_login = user_service.find_active_user(username)
@@ -71,7 +72,7 @@ def perform_login(request):
 
 @api_view(['GET'])
 @permission_classes([IsAuthenticated])
-def get_all_users(request):
+def get_all_users(request: Request):
     queryset = user_service.find_all_users()
     serializer = PaginatedUserSerializer(queryset, request)
     return Response(serializer.page_data)
@@ -79,7 +80,7 @@ def get_all_users(request):
 
 @api_view(['POST'])
 @permission_classes([IsAuthenticated])
-def search_users(request):
+def search_users(request: Request):
     logged_in_user = get_user_from_request(request)
     search_request = SearchUsersRequestSerializer(data=request.data)
     if search_request.is_valid(raise_exception=True):
@@ -91,7 +92,7 @@ def search_users(request):
 
 
 @api_view(['POST'])
-def register_user(request):
+def register_user(request: Request):
     serializer = CreateUserSerializer(data=request.data)
     if serializer.is_valid(raise_exception=True):
         created_user = user_service.register_user(serializer)
@@ -103,7 +104,7 @@ def register_user(request):
 
 @api_view(['PUT'])
 @permission_classes([IsAdminUser])
-def activate_user_account(request):
+def activate_user_account(request: Request):
     serializer = ChangeUserStatusSerializer(data=request.data)
     if serializer.is_valid(raise_exception=True):
         serialized_data = serializer.data
@@ -117,7 +118,7 @@ def activate_user_account(request):
 
 @api_view(['PUT'])
 @permission_classes([IsAdminUser])
-def deactivate_user_account(request):
+def deactivate_user_account(request: Request):
     serializer = ChangeUserStatusSerializer(data=request.data)
     if serializer.is_valid(raise_exception=True):
         serialized_data = serializer.data
@@ -131,7 +132,7 @@ def deactivate_user_account(request):
 
 @api_view(['DELETE'])
 @permission_classes([IsAdminUser])
-def delete_user_account(request):
+def delete_user_account(request: Request):
     serializer = ChangeUserStatusSerializer(data=request.data)
     if serializer.is_valid(raise_exception=True):
         serialized_data = serializer.data
@@ -145,7 +146,7 @@ def delete_user_account(request):
 
 @api_view(['PUT'])
 @permission_classes([IsAuthenticated])
-def reset_user_password(request):
+def reset_user_password(request: Request):
     logged_in_user = get_user_from_request(request)
     serializer = ResetUserPasswordSerializer(data=request.data)
     if serializer.is_valid(raise_exception=True):
@@ -162,7 +163,7 @@ def email_check(user):
 
 @api_view(['GET'])
 @permission_classes([IsAuthenticated])
-def get_user(request, uuid):
+def get_user(request: Request, uuid):
     user = user_service.find_user_by_uuid(uuid, True)
     data = UseInfoSerializer(user).data
     return Response(data)
@@ -170,7 +171,7 @@ def get_user(request, uuid):
 
 @api_view(['GET'])
 @permission_classes([IsAuthenticated])
-def get_account(request):
+def get_account(request: Request):
     user = get_user_from_request(request)
     data = UserAccountSerializer(user).data
     return Response(data)
@@ -178,7 +179,7 @@ def get_account(request):
 
 @api_view(['GET'])
 @permission_classes([AllowAny])
-def get_all_groups(request):
+def get_all_groups(request: Request):
     groups = group_service.find_all_groups()
     logger.info(f'---> Auth Views ---> groups: {groups}')
     data = GroupSerializer(groups, many=True).data
@@ -187,7 +188,7 @@ def get_all_groups(request):
 
 @api_view(['GET'])
 @permission_classes([IsAuthenticated])
-def get_user_statuses(request):
+def get_user_statuses(request: Request):
     statuses = user_service.get_user_statuses()
     return Response(statuses)
 
@@ -196,7 +197,7 @@ def get_user_statuses(request):
 @permission_classes([IsAuthenticated])
 # @permission_required("retrive_job", raise_exception=True)
 # @permission_required({"retrive_job","retrive_job"}, raise_exception=True)
-def upload_profile_image(request, uuid):
+def upload_profile_image(request: Request, uuid):
     logged_in_user = get_user_from_request(request)
     is_user_me(logged_in_user, uuid)
     serializer = UploadProfilePictureSerializer(data=request.data)
@@ -211,7 +212,7 @@ def upload_profile_image(request, uuid):
 
 @api_view(['GET'])
 @permission_classes([IsAuthenticated])
-def get_user_image(request, uuid):
+def get_user_image(request: Request, uuid):
     user_image = user_service.get_user_image(uuid)
     if user_image is None:
         return Response(status=status.HTTP_404_NOT_FOUND)
@@ -221,7 +222,7 @@ def get_user_image(request, uuid):
 
 @api_view(['POST'])
 @permission_classes([IsAuthenticated])
-def upload_cv(request, uuid):
+def upload_cv(request: Request, uuid):
     logged_in_user = get_user_from_request(request)
     is_user_me(logged_in_user, uuid)
     serializer = UploadCVSerializer(data=request.data)
@@ -234,7 +235,7 @@ def upload_cv(request, uuid):
 
 @api_view(['PUT'])
 @permission_classes([IsAuthenticated])
-def update_user_contact_info(request, uuid):
+def update_user_contact_info(request: Request, uuid):
     logged_in_user = get_user_from_request(request)
     is_user_me(logged_in_user, uuid)
     serializer = UpldateUserContactInfoSerializer(data=request.data)
@@ -247,7 +248,7 @@ def update_user_contact_info(request, uuid):
 
 @api_view(['PUT'])
 @permission_classes([IsAuthenticated])
-def update_user_bio(request, uuid):
+def update_user_bio(request: Request, uuid):
     logged_in_user = get_user_from_request(request)
     is_user_me(logged_in_user, uuid)
     serializer = UpdateBioSerializer(data=request.data)
@@ -258,7 +259,7 @@ def update_user_bio(request, uuid):
     return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
 
-def get_user_from_request(request):
+def get_user_from_request(request: Request):
     logged_in_user = request.user
     logger.info(f'---> Auth Views ---> logged_in_user: {logged_in_user}')
     return logged_in_user

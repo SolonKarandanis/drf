@@ -1,3 +1,4 @@
+from rest_framework.request import Request
 from rest_framework.response import Response
 from rest_framework.permissions import IsAuthenticated
 from rest_framework.decorators import api_view, permission_classes
@@ -13,30 +14,37 @@ cart_service = CartService()
 logger = logging.getLogger('django')
 
 
-def my_decorator(f):
-    def wrapped(*args, **kwargs):
-        # ...
-        # insert code that runs before the decorated function
-        # (and optionally decide to not call that function)
-        # ...
-        print('-------------->before', f)
-        response = f(*args, **kwargs)
-        print('-------------->after', f)
-        print('-------------->response', response)
-        # ...
-        # insert code that runs after the decorated function
-        # (and optionally decide to change the response)
-        # ...
-        return response
+def my_decorator(arg):
+    def inner_decorator(f):
+        def wrapped(*args, **kwargs):
+            # ...
+            # insert code that runs before the decorated function
+            # (and optionally decide to not call that function)
+            # ...
+            print('-------------->before', f)
+            request: Request = args[0]
+            logged_in_user = request.user
+            print('-------------->logged_in_user', logged_in_user)
+            print('-------------->**kwargs', **kwargs)
+            response = f(*args, **kwargs)
+            print('-------------->response', response)
+            # ...
+            # insert code that runs after the decorated function
+            # (and optionally decide to change the response)
+            # ...
+            print('-------------->after', f)
+            return response
 
-    print('-------------->decorating', f)
-    return wrapped
+        print('--------->decorating', f, 'with argument', arg)
+        return wrapped
+
+    return inner_decorator
 
 
 @api_view(['GET'])
-@my_decorator
+@my_decorator('foo')
 @permission_classes([IsAuthenticated])
-def get_user_cart(request):
+def get_user_cart(request: Request):
     logged_in_user = get_user_from_request(request)
     cart_dto = cart_service.fetch_user_cart_dto(logged_in_user)
     data = CartSerializer(cart_dto).data
@@ -45,7 +53,7 @@ def get_user_cart(request):
 
 @api_view(['PUT'])
 @permission_classes([IsAuthenticated])
-def add_cart_items(request):
+def add_cart_items(request: Request):
     logged_in_user = get_user_from_request(request)
     serializer = AddToCart(data=request.data, many=True)
     if serializer.is_valid(raise_exception=True):
@@ -58,7 +66,7 @@ def add_cart_items(request):
 
 @api_view(['PUT'])
 @permission_classes([IsAuthenticated])
-def update_items(request):
+def update_items(request: Request):
     logged_in_user = get_user_from_request(request)
     serializer = UpdateItem(data=request.data, many=True)
     if serializer.is_valid(raise_exception=True):
@@ -71,7 +79,7 @@ def update_items(request):
 
 @api_view(['DELETE'])
 @permission_classes([IsAuthenticated])
-def delete_cart_items(request):
+def delete_cart_items(request: Request):
     logged_in_user = get_user_from_request(request)
     serializer = DeleteCartItems(data=request.data, many=True)
     if serializer.is_valid(raise_exception=True):
@@ -84,7 +92,7 @@ def delete_cart_items(request):
 
 @api_view(['PUT'])
 @permission_classes([IsAuthenticated])
-def clear_cart(request):
+def clear_cart(request: Request):
     logged_in_user = get_user_from_request(request)
     cart_service.clear_cart(logged_in_user)
     cart_dto = cart_service.fetch_user_cart_dto(logged_in_user)
@@ -94,7 +102,7 @@ def clear_cart(request):
 
 @api_view(['PUT'])
 @permission_classes([IsAuthenticated])
-def add_order_to_cart(request, order_uuid: str):
+def add_order_to_cart(request: Request, order_uuid: str):
     logged_in_user = get_user_from_request(request)
     cart_service.add_order_to_cart(logged_in_user, order_uuid)
     cart_dto = cart_service.fetch_user_cart_dto(logged_in_user)
@@ -104,7 +112,7 @@ def add_order_to_cart(request, order_uuid: str):
 
 @api_view(['PUT'])
 @permission_classes([IsAuthenticated])
-def add_order_item_to_cart(request, order_item_uuid: str):
+def add_order_item_to_cart(request: Request, order_item_uuid: str):
     logged_in_user = get_user_from_request(request)
     cart_service.add_order_item_to_cart(logged_in_user, order_item_uuid)
     cart_dto = cart_service.fetch_user_cart_dto(logged_in_user)
@@ -112,7 +120,7 @@ def add_order_item_to_cart(request, order_item_uuid: str):
     return Response(response, status=status.HTTP_201_CREATED)
 
 
-def get_user_from_request(request):
+def get_user_from_request(request: Request):
     logged_in_user = request.user
     logger.info(f'logged_in_user: {logged_in_user}')
     return logged_in_user
