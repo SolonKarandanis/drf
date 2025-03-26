@@ -3,6 +3,7 @@ from rest_framework import serializers
 from rest_framework.request import Request
 
 from cfehome.constants.security_constants import ADD_PRODUCT, CHANGE_PRODUCT
+from cfehome.decorators.has_permission import has_permission
 from cfehome.utils.security_utils import SecurityUtils
 from images.serializers import ImagesSerializer
 from .serializers import ProductSerializer, SaveProductSerializer, PaginatedProductListSerializer, \
@@ -111,12 +112,9 @@ def create_page_obj(request: Request, queryset):
 
 @api_view(['POST'])
 @permission_classes([IsAuthenticated])
+@has_permission(ADD_PRODUCT)
 def create_product(request: Request):
     logged_in_user = SecurityUtils.get_user_from_request(request)
-    can_add_product = SecurityUtils.has_permission(request, ADD_PRODUCT)
-    logger.info(f'---> Product Views ---> create_product ---> can_add_product: {can_add_product}')
-    if not can_add_product:
-        raise serializers.ValidationError({'error.product.add': "User does not have the permission to add product"})
     serializer = SaveProductSerializer(data=request.data)
     images = request.data.getlist("images")
     if serializer.is_valid(raise_exception=True):
