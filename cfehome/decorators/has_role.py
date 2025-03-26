@@ -3,8 +3,12 @@ from functools import wraps
 from typing import List
 from django.http import HttpResponseForbidden
 from django.contrib.auth.models import Group
+from requests import Response
+from rest_framework import status
+from rest_framework.request import Request
 
 from auth.user_service import UserService
+from cfehome.utils.security_utils import SecurityUtils
 
 logger = logging.getLogger('django')
 user_service = UserService()
@@ -16,17 +20,17 @@ def get_user_groups(username: str) -> List[Group]:
     return user.groups
 
 
-def has_role(role_name):
-    def decorator(view_func):
-        @wraps(view_func)
-        def _wrapped_view(request, *args, **kwargs):
-            if request.user.is_authenticated:
-                user_groups = get_user_groups(request.user)
-                logger.info(f'user_groups: {user_groups}')
-                if user_groups.filter(name=role_name).exists():
-                    return view_func(request, *args, **kwargs)
-            return HttpResponseForbidden("You don't have permission to access this page.")
+def has_role(role: str):
+    def inner_decorator(f):
+        def wrapped(*args, **kwargs):
+            request: Request = args[0]
+            has_user_role: bool = SecurityUtils.has_role(request, role)
+            logger.info(f'-----> has_role: {has_user_role}')
+            if not has_user_role:
+                return Response(status=status.HTTP_401_UNAUTHORIZED)
+            response = f(*args, **kwargs)
+            return response
 
-        return _wrapped_view
+        return wrapped
 
-    return decorator
+    return inner_decorator

@@ -1,3 +1,5 @@
+from typing import List
+
 import jwt
 from django.conf import settings
 import logging
@@ -37,4 +39,13 @@ class SecurityUtils:
         roles = decoded_jwt['groups']
         if role in roles:
             return True
+        return False
+
+    @staticmethod
+    def has_any_permission(request, supplied_permissions: List[str]) -> bool:
+        decoded_jwt = SecurityUtils.get_claims_from_request(request)
+        permissions = decoded_jwt['permissions']
+        for supplied_perm in supplied_permissions:
+            if supplied_perm in permissions:
+                return True
         return False

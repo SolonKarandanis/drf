@@ -1,3 +1,5 @@
+from typing import List
+
 from rest_framework.request import Request
 from rest_framework.response import Response
 from rest_framework.permissions import IsAuthenticated
@@ -6,6 +8,9 @@ from rest_framework import status
 import logging
 
 # Create your views here.
+from cfehome.constants.security_constants import BUYER
+from cfehome.decorators.has_role import has_role
+from cfehome.utils.security_utils import SecurityUtils
 from .serializers import CartSerializer, AddToCart, UpdateItem, DeleteCartItems
 from .cart_service import CartService
 
@@ -14,35 +19,8 @@ cart_service = CartService()
 logger = logging.getLogger('django')
 
 
-def my_decorator(arg):
-    def inner_decorator(f):
-        def wrapped(*args, **kwargs):
-            # ...
-            # insert code that runs before the decorated function
-            # (and optionally decide to not call that function)
-            # ...
-            print('-------------->before', f)
-            request: Request = args[0]
-            logged_in_user = request.user
-            print('-------------->logged_in_user', logged_in_user)
-            print('-------------->**kwargs', **kwargs)
-            response = f(*args, **kwargs)
-            print('-------------->response', response)
-            # ...
-            # insert code that runs after the decorated function
-            # (and optionally decide to change the response)
-            # ...
-            print('-------------->after', f)
-            return response
-
-        print('--------->decorating', f, 'with argument', arg)
-        return wrapped
-
-    return inner_decorator
-
-
 @api_view(['GET'])
-@my_decorator('foo')
+@has_role(BUYER)
 @permission_classes([IsAuthenticated])
 def get_user_cart(request: Request):
     logged_in_user = get_user_from_request(request)

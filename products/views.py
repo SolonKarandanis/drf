@@ -5,7 +5,6 @@ from rest_framework.request import Request
 from cfehome.constants.security_constants import ADD_PRODUCT, CHANGE_PRODUCT
 from cfehome.utils.security_utils import SecurityUtils
 from images.serializers import ImagesSerializer
-from .permissions import IsProductMine
 from .serializers import ProductSerializer, SaveProductSerializer, PaginatedProductListSerializer, \
     PostProductComment, ProductSearchRequestSerializer, CategoriesWithTotalsSerializer, BrandsWithTotalsSerializer, \
     SizesWithTotalsSerializer, PaginatedPOSTProductListSerializer, SimilarProductsRequestSerializer, \
