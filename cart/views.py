@@ -7,7 +7,6 @@ import logging
 
 # Create your views here.
 from cfehome.constants.security_constants import VIEW_CART, ADD_CART_ITEM, CHANGE_CART_ITEM, DELETE_CART_ITEM
-from cfehome.decorators.has_permission import has_permission
 from cfehome.decorators.pre_autorize import pre_authorize
 from .serializers import CartSerializer, AddToCart, UpdateItem, DeleteCartItems
 from .cart_service import CartService
