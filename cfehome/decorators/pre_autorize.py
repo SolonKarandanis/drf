@@ -1,5 +1,6 @@
 import logging
 import re
+from functools import wraps
 
 from requests import Response
 from rest_framework import status
@@ -11,7 +12,8 @@ logger = logging.getLogger('django')
 
 
 def pre_authorize(value: str):
-    def inner_decorator(f):
+    def inner_decorator(function):
+        @wraps(function)
         def wrapped(*args, **kwargs):
             is_authorized = False
             request: Request = args[0]
@@ -27,7 +29,7 @@ def pre_authorize(value: str):
                 is_authorized = _check_user_role(request, role)
             if not is_authorized:
                 return Response(status=status.HTTP_401_UNAUTHORIZED)
-            response = f(*args, **kwargs)
+            response = function(*args, **kwargs)
             return response
 
         return wrapped
