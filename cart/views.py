@@ -8,6 +8,7 @@ import logging
 # Create your views here.
 from cfehome.constants.security_constants import VIEW_CART, ADD_CART_ITEM, CHANGE_CART_ITEM, DELETE_CART_ITEM
 from cfehome.decorators.has_permission import has_permission
+from cfehome.decorators.pre_autorize import pre_authorize
 from .serializers import CartSerializer, AddToCart, UpdateItem, DeleteCartItems
 from .cart_service import CartService
 
@@ -18,7 +19,7 @@ logger = logging.getLogger('django')
 
 @api_view(['GET'])
 @permission_classes([IsAuthenticated])
-@has_permission(VIEW_CART)
+@pre_authorize(f"hasPermission({VIEW_CART})")
 def get_user_cart(request: Request):
     logged_in_user = get_user_from_request(request)
     cart_dto = cart_service.fetch_user_cart_dto(logged_in_user)
@@ -28,7 +29,7 @@ def get_user_cart(request: Request):
 
 @api_view(['PUT'])
 @permission_classes([IsAuthenticated])
-@has_permission(ADD_CART_ITEM)
+@pre_authorize(f"hasPermission({ADD_CART_ITEM})")
 def add_cart_items(request: Request):
     logged_in_user = get_user_from_request(request)
     serializer = AddToCart(data=request.data, many=True)
@@ -42,7 +43,7 @@ def add_cart_items(request: Request):
 
 @api_view(['PUT'])
 @permission_classes([IsAuthenticated])
-@has_permission(CHANGE_CART_ITEM)
+@pre_authorize(f"hasPermission({CHANGE_CART_ITEM})")
 def update_items(request: Request):
     logged_in_user = get_user_from_request(request)
     serializer = UpdateItem(data=request.data, many=True)
@@ -56,7 +57,7 @@ def update_items(request: Request):
 
 @api_view(['DELETE'])
 @permission_classes([IsAuthenticated])
-@has_permission(DELETE_CART_ITEM)
+@pre_authorize(f"hasPermission({DELETE_CART_ITEM})")
 def delete_cart_items(request: Request):
     logged_in_user = get_user_from_request(request)
     serializer = DeleteCartItems(data=request.data, many=True)
@@ -70,7 +71,7 @@ def delete_cart_items(request: Request):
 
 @api_view(['PUT'])
 @permission_classes([IsAuthenticated])
-@has_permission(DELETE_CART_ITEM)
+@pre_authorize(f"hasPermission({DELETE_CART_ITEM})")
 def clear_cart(request: Request):
     logged_in_user = get_user_from_request(request)
     cart_service.clear_cart(logged_in_user)
