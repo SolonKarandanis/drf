@@ -20,6 +20,7 @@ def pre_authorize(value: str):
         def wrapped(*args, **kwargs):
             is_authorized = False
             request: Request = args[0]
+            logger.info(f'-----> request data {request.data}')
             parts_split_by_and = value.split('&&')
             for part in parts_split_by_and:
                 trimmed_part = part.strip()
@@ -33,6 +34,7 @@ def pre_authorize(value: str):
                 if has_role_match:
                     role = has_role_match.group()[8:-1]
                     is_authorized = _check_user_role(request, role)
+
             if not is_authorized:
                 return Response(status=status.HTTP_401_UNAUTHORIZED)
             response = function(*args, **kwargs)

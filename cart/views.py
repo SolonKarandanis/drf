@@ -42,7 +42,7 @@ def add_cart_items(request: Request):
 
 @api_view(['PUT'])
 @permission_classes([IsAuthenticated])
-@pre_authorize(f"hasPermission({CHANGE_CART_ITEM}) && securityService.are_cart_items_mine")
+@pre_authorize(f"hasPermission({CHANGE_CART_ITEM}) && securityService.are_cart_items_mine(cartItemId[])")
 def update_items(request: Request):
     logged_in_user = get_user_from_request(request)
     serializer = UpdateItem(data=request.data, many=True)
