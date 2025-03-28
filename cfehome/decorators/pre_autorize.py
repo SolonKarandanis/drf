@@ -6,9 +6,12 @@ from requests import Response
 from rest_framework import status
 from rest_framework.request import Request
 
+from cfehome.security_service import SecurityService
 from cfehome.utils.security_utils import SecurityUtils
 
 logger = logging.getLogger('django')
+
+security_service = SecurityService()
 
 
 def pre_authorize(value: str):
@@ -38,12 +41,15 @@ def pre_authorize(value: str):
 
 
 def _check_user_permission(request: Request, permission: str) -> bool:
+    logged_in_user = request.user
     has_user_permission: bool = SecurityUtils.has_permission(request, permission)
-    logger.info(f'-----> has_user_permission: {permission} => {has_user_permission}')
+    logger.info(
+        f'-----> logged_in_user: {logged_in_user.username} -> has_permission: {permission} => {has_user_permission}')
     return has_user_permission
 
 
 def _check_user_role(request: Request, role: str) -> bool:
+    logged_in_user = request.user
     has_user_role: bool = SecurityUtils.has_role(request, role)
-    logger.info(f'-----> has_user_role: {role} => {has_user_role}')
+    logger.info(f'------> logged_in_user: {logged_in_user.username} -> has_role: {role} => {has_user_role}')
     return has_user_role
