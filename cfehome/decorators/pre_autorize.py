@@ -1,3 +1,4 @@
+import inspect
 import logging
 import re
 from functools import wraps
@@ -39,10 +40,31 @@ def pre_authorize(value: str):
                 if has_security_service_match:
                     security_method_expression = has_security_service_match.group()
                     method = security_method_expression.split('.')[1]
-                    logger.info(f'-----> {method=}')
-                    methods_list = [method for method in dir(SecurityService)
-                                    if callable(getattr(SecurityService, method)) and not method.startswith('__')]
-                    logger.info(f'-----> {methods_list=}')
+                    splitted = method.split('(')
+                    method_name = splitted[0]
+                    method_arguments = splitted[1][:-1]
+                    logger.info(f'-----> {method_name=}')
+                    logger.info(f'-----> {method_arguments=}')
+                    methods_list = [method for method in dir(security_service) if
+                                    callable(getattr(security_service, method)) and not method.startswith('__')]
+                    for method in methods_list:
+                        if method == method_name:
+                            func = getattr(security_service, method_name)
+                            logger.info(f'  {method=} {func=}')
+                    # attrs = (getattr(security_service, name) for name in dir(security_service))
+                    # methods = filter(inspect.ismethod, attrs)
+                    # for method in methods:
+                    #     logger.info(f'  {vars(method)=}')
+
+                    # for method in methods_list:
+                    #     logger.info(f'  {type(method)=}')
+                    # functions = inspect.getmembers(security_service, predicate=inspect.ismethod)
+                    # for name, function in functions:
+                    #     logger.info(f' {name=} {function=}')
+                    #     if name == method_name:
+                    #         is_authorized = True
+                    #     sig = inspect.signature(function)
+                    #     logger.info(f'Function "{name}" has a params {sig}')
 
             if not is_authorized:
                 return Response(status=status.HTTP_401_UNAUTHORIZED)

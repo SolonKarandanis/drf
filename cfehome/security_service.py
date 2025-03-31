@@ -16,6 +16,9 @@ product_service = ProductService()
 
 class SecurityService:
 
+    def __can_execute(self, method_name):
+        return method_name in dir(self)
+
     def is_product_mine(self, product_item_id: int) -> bool:
         return True
 
