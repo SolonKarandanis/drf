@@ -34,6 +34,15 @@ def pre_authorize(value: str):
                 if has_role_match:
                     role = has_role_match.group()[8:-1]
                     is_authorized = _check_user_role(request, role)
+                has_security_service_pattern = re.compile(r"securityService(.+)", re.IGNORECASE)
+                has_security_service_match = has_security_service_pattern.match(trimmed_part)
+                if has_security_service_match:
+                    security_method_expression = has_security_service_match.group()
+                    method = security_method_expression.split('.')[1]
+                    logger.info(f'-----> {method=}')
+                    methods_list = [method for method in dir(SecurityService)
+                                    if callable(getattr(SecurityService, method)) and not method.startswith('__')]
+                    logger.info(f'-----> {methods_list=}')
 
             if not is_authorized:
                 return Response(status=status.HTTP_401_UNAUTHORIZED)
