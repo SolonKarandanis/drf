@@ -56,7 +56,7 @@ def update_items(request: Request):
 
 @api_view(['DELETE'])
 @permission_classes([IsAuthenticated])
-@pre_authorize(f"hasPermission({DELETE_CART_ITEM})")
+@pre_authorize(f"hasPermission({DELETE_CART_ITEM}) && securityService.are_cart_items_mine(cartItemId[])")
 def delete_cart_items(request: Request):
     logged_in_user = get_user_from_request(request)
     serializer = DeleteCartItems(data=request.data, many=True)

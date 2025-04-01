@@ -56,6 +56,7 @@ def pre_authorize(value: str):
                             if type(data) == list and "[]" in method_arguments:
                                 variable_name = method_arguments.split("[]")[0]
                                 arg = [d[variable_name] for d in data]
+                                logger.info(f'  {arg=}')
                                 is_authorized = security_service.execute_method(method_name, logged_in_user, arg)
 
                     # attrs = (getattr(security_service, name) for name in dir(security_service))
