@@ -3,7 +3,7 @@ import logging
 import re
 from functools import wraps
 
-from requests import Response
+from rest_framework.response import Response
 from rest_framework import status
 from rest_framework.request import Request
 
@@ -22,6 +22,7 @@ def pre_authorize(value: str):
             is_authorized = False
             request: Request = args[0]
             data = request.data
+            logged_in_user = request.user
             logger.info(f'-----> request data {data}')
             parts_split_by_and = value.split('&&')
             for part in parts_split_by_and:
@@ -55,7 +56,7 @@ def pre_authorize(value: str):
                             if type(data) == list and "[]" in method_arguments:
                                 variable_name = method_arguments.split("[]")[0]
                                 arg = [d[variable_name] for d in data]
-                                is_authorized = security_service.execute_method(method_name, arg)
+                                is_authorized = security_service.execute_method(method_name, logged_in_user, arg)
 
                     # attrs = (getattr(security_service, name) for name in dir(security_service))
                     # methods = filter(inspect.ismethod, attrs)

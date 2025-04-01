@@ -1,7 +1,7 @@
 import logging
 from typing import List
 from django.contrib.auth.models import Group
-from requests import Response
+from rest_framework.response import Response
 from rest_framework import status
 from rest_framework.request import Request
 
