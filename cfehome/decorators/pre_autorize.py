@@ -21,7 +21,8 @@ def pre_authorize(value: str):
         def wrapped(*args, **kwargs):
             is_authorized = False
             request: Request = args[0]
-            logger.info(f'-----> request data {request.data}')
+            data = request.data
+            logger.info(f'-----> request data {data}')
             parts_split_by_and = value.split('&&')
             for part in parts_split_by_and:
                 trimmed_part = part.strip()
@@ -51,6 +52,11 @@ def pre_authorize(value: str):
                         if method == method_name:
                             func = getattr(security_service, method_name)
                             logger.info(f'  {method=} {func=}')
+                            if type(data) == list and "[]" in method_arguments:
+                                variable_name = method_arguments.split("[]")[0]
+                                arg = [d[variable_name] for d in data]
+                                is_authorized = security_service.execute_method(method_name, arg)
+
                     # attrs = (getattr(security_service, name) for name in dir(security_service))
                     # methods = filter(inspect.ismethod, attrs)
                     # for method in methods:
