@@ -33,10 +33,9 @@ class SecurityService:
     def are_cart_items_mine(self, logged_in_user: User, cart_item_ids: List[int]) -> bool:
         result = True
         cart = cart_service.fetch_user_cart(logged_in_user)
-        cart_items = cart.cart_items.all()
-        if len(cart_items) == 0:
+        existing_cart_item_ids = [d.id for d in cart.cart_items.all()]
+        if len(existing_cart_item_ids) == 0:
             return False
-        for cart_item in cart_items:
-            if cart_item.id not in cart_item_ids:
-                return False
+        if not set(cart_item_ids).issubset(existing_cart_item_ids):
+            return False
         return result
