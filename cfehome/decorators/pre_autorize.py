@@ -45,18 +45,14 @@ def pre_authorize(value: str):
                     splitted = method.split('(')
                     method_name = splitted[0]
                     method_arguments = splitted[1][:-1]
-                    logger.info(f'-----> {method_name=}')
-                    logger.info(f'-----> {method_arguments=}')
                     methods_list = [method for method in dir(security_service) if
                                     callable(getattr(security_service, method)) and not method.startswith('__')]
                     for method in methods_list:
                         if method == method_name:
                             func = getattr(security_service, method_name)
-                            logger.info(f'  {method=} {func=}')
                             if type(data) == list and "[]" in method_arguments:
                                 variable_name = method_arguments.split("[]")[0]
                                 arg = [d[variable_name] for d in data]
-                                logger.info(f'  {arg=}')
                                 is_authorized = security_service.execute_method(method_name, logged_in_user, arg)
 
                     # attrs = (getattr(security_service, name) for name in dir(security_service))
