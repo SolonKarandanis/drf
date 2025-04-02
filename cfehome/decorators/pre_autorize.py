@@ -53,7 +53,8 @@ def pre_authorize(value: str):
                                 arg = [d[variable_name] for d in data]
                                 is_authorized.append(security_service.execute_method(method_name,
                                                                                      logged_in_user=logged_in_user,
-                                                                                     variable_name=arg, **kwargs))
+                                                                                     arg=arg,
+                                                                                     **kwargs))
                             else:
                                 is_authorized.append(security_service.execute_method(method_name,
                                                                                      logged_in_user=logged_in_user,

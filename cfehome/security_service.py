@@ -50,7 +50,7 @@ class SecurityService:
         result = True
         logger.info(f'----->is_user_me----> request kwargs {kwargs}')
         logged_in_user = kwargs.get('logged_in_user')
-        cart_item_ids = kwargs.get('cart_item_ids')
+        cart_item_ids = kwargs.get('arg')
         cart = cart_service.fetch_user_cart(logged_in_user)
         existing_cart_item_ids = [d.id for d in cart.cart_items.all()]
         if len(existing_cart_item_ids) == 0:
