@@ -19,7 +19,7 @@ def pre_authorize(value: str):
     def inner_decorator(function):
         @wraps(function)
         def wrapped(*args, **kwargs):
-            is_authorized = False
+            is_authorized = []
             request: Request = args[0]
             data = request.data
             logged_in_user = request.user
@@ -31,12 +31,12 @@ def pre_authorize(value: str):
                 has_permission_match = has_permission_pattern.match(trimmed_part)
                 if has_permission_match:
                     permission = has_permission_match.group()[14:-1]
-                    is_authorized = _check_user_permission(request, permission)
+                    is_authorized.append(_check_user_permission(request, permission))
                 has_role_pattern = re.compile(r"(hasRole)(.+)", re.IGNORECASE)
                 has_role_match = has_role_pattern.match(trimmed_part)
                 if has_role_match:
                     role = has_role_match.group()[8:-1]
-                    is_authorized = _check_user_role(request, role)
+                    is_authorized.append(_check_user_role(request, role))
                 has_security_service_pattern = re.compile(r"securityService(.+)", re.IGNORECASE)
                 has_security_service_match = has_security_service_pattern.match(trimmed_part)
                 if has_security_service_match:
@@ -53,7 +53,7 @@ def pre_authorize(value: str):
                             if type(data) == list and "[]" in method_arguments:
                                 variable_name = method_arguments.split("[]")[0]
                                 arg = [d[variable_name] for d in data]
-                                is_authorized = security_service.execute_method(method_name, logged_in_user, arg)
+                                is_authorized.append(security_service.execute_method(method_name, logged_in_user, arg))
 
                     # attrs = (getattr(security_service, name) for name in dir(security_service))
                     # methods = filter(inspect.ismethod, attrs)
@@ -70,7 +70,7 @@ def pre_authorize(value: str):
                     #     sig = inspect.signature(function)
                     #     logger.info(f'Function "{name}" has a params {sig}')
 
-            if not is_authorized:
+            if not all(is_authorized):
                 return Response(status=status.HTTP_401_UNAUTHORIZED)
             response = function(*args, **kwargs)
             return response
