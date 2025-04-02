@@ -195,10 +195,9 @@ def get_user_statuses(request: Request):
 
 @api_view(['POST'])
 @permission_classes([IsAuthenticated])
-@pre_authorize(f"hasPermission({CHANGE_USER})")
+@pre_authorize(f"hasPermission({CHANGE_USER}) && securityService.is_user_me(uuid)")
 def upload_profile_image(request: Request, uuid):
     logged_in_user = get_user_from_request(request)
-    is_user_me(logged_in_user, uuid)
     serializer = UploadProfilePictureSerializer(data=request.data)
     if serializer.is_valid(raise_exception=True):
         image: InMemoryUploadedFile = request.FILES.get('image')
@@ -221,10 +220,9 @@ def get_user_image(request: Request, uuid):
 
 @api_view(['POST'])
 @permission_classes([IsAuthenticated])
-@pre_authorize(f"hasPermission({CHANGE_USER})")
+@pre_authorize(f"hasPermission({CHANGE_USER}) && securityService.is_user_me(uuid)")
 def upload_cv(request: Request, uuid):
     logged_in_user = get_user_from_request(request)
-    is_user_me(logged_in_user, uuid)
     serializer = UploadCVSerializer(data=request.data)
     if serializer.is_valid(raise_exception=True):
         cv: InMemoryUploadedFile = request.FILES.get('cv')
@@ -235,10 +233,9 @@ def upload_cv(request: Request, uuid):
 
 @api_view(['PUT'])
 @permission_classes([IsAuthenticated])
-@pre_authorize(f"hasPermission({CHANGE_USER})")
+@pre_authorize(f"hasPermission({CHANGE_USER}) && securityService.is_user_me(uuid)")
 def update_user_contact_info(request: Request, uuid):
     logged_in_user = get_user_from_request(request)
-    is_user_me(logged_in_user, uuid)
     serializer = UpldateUserContactInfoSerializer(data=request.data)
     if serializer.is_valid(raise_exception=True):
         user = user_service.update_user_contact_info(uuid, serializer)
@@ -249,10 +246,9 @@ def update_user_contact_info(request: Request, uuid):
 
 @api_view(['PUT'])
 @permission_classes([IsAuthenticated])
-@pre_authorize(f"hasPermission({CHANGE_USER})")
+@pre_authorize(f"hasPermission({CHANGE_USER}) && securityService.is_user_me(uuid)")
 def update_user_bio(request: Request, uuid):
     logged_in_user = get_user_from_request(request)
-    is_user_me(logged_in_user, uuid)
     serializer = UpdateBioSerializer(data=request.data)
     if serializer.is_valid(raise_exception=True):
         user = user_service.update_user_bio(uuid, serializer)
