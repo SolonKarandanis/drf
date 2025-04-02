@@ -27,7 +27,7 @@ class SecurityService:
             return func(*args)
         return False
 
-    def is_product_mine(self, product_item_id: int) -> bool:
+    def is_product_mine(self, product_item_uuid: str) -> bool:
         return True
 
     def are_cart_items_mine(self, logged_in_user: User, cart_item_ids: List[int]) -> bool:

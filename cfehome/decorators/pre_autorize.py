@@ -20,6 +20,8 @@ def pre_authorize(value: str):
         @wraps(function)
         def wrapped(*args, **kwargs):
             is_authorized = []
+            logger.info(f'-----> request args {args}')
+            logger.info(f'-----> request kwargs {kwargs}')
             request: Request = args[0]
             data = request.data
             logged_in_user = request.user
@@ -49,7 +51,6 @@ def pre_authorize(value: str):
                                     callable(getattr(security_service, method)) and not method.startswith('__')]
                     for method in methods_list:
                         if method == method_name:
-                            func = getattr(security_service, method_name)
                             if type(data) == list and "[]" in method_arguments:
                                 variable_name = method_arguments.split("[]")[0]
                                 arg = [d[variable_name] for d in data]

@@ -3,7 +3,7 @@ from rest_framework import serializers
 from rest_framework.request import Request
 
 from cfehome.constants.security_constants import ADD_PRODUCT, CHANGE_PRODUCT
-from cfehome.decorators.has_permission import has_permission
+from cfehome.decorators.pre_autorize import pre_authorize
 from cfehome.utils.security_utils import SecurityUtils
 from images.serializers import ImagesSerializer
 from .serializers import ProductSerializer, SaveProductSerializer, PaginatedProductListSerializer, \
@@ -112,7 +112,7 @@ def create_page_obj(request: Request, queryset):
 
 @api_view(['POST'])
 @permission_classes([IsAuthenticated])
-@has_permission(ADD_PRODUCT)
+@pre_authorize(f"hasPermission({ADD_PRODUCT})")
 def create_product(request: Request):
     logged_in_user = SecurityUtils.get_user_from_request(request)
     serializer = SaveProductSerializer(data=request.data)
@@ -126,14 +126,14 @@ def create_product(request: Request):
 
 @api_view(['PUT'])
 @permission_classes([IsAuthenticated])
+@pre_authorize(f"hasPermission({CHANGE_PRODUCT})")
 def update_product(request: Request, uuid: str):
     logged_in_user = SecurityUtils.get_user_from_request(request)
-    can_update_product = SecurityUtils.has_permission(request, CHANGE_PRODUCT)
     existing_product = product_service.find_by_uuid(uuid, False)
     if existing_product is None:
         raise serializers.ValidationError({'error.product': "Product does not exist"})
     is_product_mine = existing_product.user == logged_in_user
-    if not is_product_mine and not can_update_product:
+    if not is_product_mine:
         raise serializers.ValidationError({'error.product.update': "Only the owner can update this product"})
     serializer = UpdateProductSerializer(data=request.data)
     images = request.data.getlist("images")
