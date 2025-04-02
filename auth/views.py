@@ -14,6 +14,8 @@ from rest_framework_simplejwt.tokens import RefreshToken
 from rest_framework import exceptions
 from celery.result import AsyncResult
 
+from cfehome.constants.security_constants import ADMIN, CHANGE_USER
+from cfehome.decorators.pre_autorize import pre_authorize
 from images.serializers import ImagesSerializer
 from socials.social_service import SocialService
 from .group_service import GroupService
@@ -104,6 +106,7 @@ def register_user(request: Request):
 
 @api_view(['PUT'])
 @permission_classes([IsAdminUser])
+@pre_authorize(f"hasRole({ADMIN})")
 def activate_user_account(request: Request):
     serializer = ChangeUserStatusSerializer(data=request.data)
     if serializer.is_valid(raise_exception=True):
@@ -118,6 +121,7 @@ def activate_user_account(request: Request):
 
 @api_view(['PUT'])
 @permission_classes([IsAdminUser])
+@pre_authorize(f"hasRole({ADMIN})")
 def deactivate_user_account(request: Request):
     serializer = ChangeUserStatusSerializer(data=request.data)
     if serializer.is_valid(raise_exception=True):
@@ -132,6 +136,7 @@ def deactivate_user_account(request: Request):
 
 @api_view(['DELETE'])
 @permission_classes([IsAdminUser])
+@pre_authorize(f"hasRole({ADMIN})")
 def delete_user_account(request: Request):
     serializer = ChangeUserStatusSerializer(data=request.data)
     if serializer.is_valid(raise_exception=True):
@@ -146,6 +151,7 @@ def delete_user_account(request: Request):
 
 @api_view(['PUT'])
 @permission_classes([IsAuthenticated])
+@pre_authorize(f"hasPermission({CHANGE_USER})")
 def reset_user_password(request: Request):
     logged_in_user = get_user_from_request(request)
     serializer = ResetUserPasswordSerializer(data=request.data)
@@ -153,12 +159,6 @@ def reset_user_password(request: Request):
         user_service.reset_password(serializer, logged_in_user)
         return Response(status=status.HTTP_204_NO_CONTENT)
     return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
-
-
-def email_check(user):
-    # security service checks
-    logger.info(f'user: {user}')
-    return True
 
 
 @api_view(['GET'])
@@ -195,8 +195,7 @@ def get_user_statuses(request: Request):
 
 @api_view(['POST'])
 @permission_classes([IsAuthenticated])
-# @permission_required("retrive_job", raise_exception=True)
-# @permission_required({"retrive_job","retrive_job"}, raise_exception=True)
+@pre_authorize(f"hasPermission({CHANGE_USER})")
 def upload_profile_image(request: Request, uuid):
     logged_in_user = get_user_from_request(request)
     is_user_me(logged_in_user, uuid)
@@ -222,6 +221,7 @@ def get_user_image(request: Request, uuid):
 
 @api_view(['POST'])
 @permission_classes([IsAuthenticated])
+@pre_authorize(f"hasPermission({CHANGE_USER})")
 def upload_cv(request: Request, uuid):
     logged_in_user = get_user_from_request(request)
     is_user_me(logged_in_user, uuid)
@@ -235,6 +235,7 @@ def upload_cv(request: Request, uuid):
 
 @api_view(['PUT'])
 @permission_classes([IsAuthenticated])
+@pre_authorize(f"hasPermission({CHANGE_USER})")
 def update_user_contact_info(request: Request, uuid):
     logged_in_user = get_user_from_request(request)
     is_user_me(logged_in_user, uuid)
@@ -248,6 +249,7 @@ def update_user_contact_info(request: Request, uuid):
 
 @api_view(['PUT'])
 @permission_classes([IsAuthenticated])
+@pre_authorize(f"hasPermission({CHANGE_USER})")
 def update_user_bio(request: Request, uuid):
     logged_in_user = get_user_from_request(request)
     is_user_me(logged_in_user, uuid)
