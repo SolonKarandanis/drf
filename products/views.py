@@ -126,15 +126,12 @@ def create_product(request: Request):
 
 @api_view(['PUT'])
 @permission_classes([IsAuthenticated])
-@pre_authorize(f"hasPermission({CHANGE_PRODUCT})")
+@pre_authorize(f"hasPermission({CHANGE_PRODUCT}) && securityService.is_product_mine(uuid)")
 def update_product(request: Request, uuid: str):
     logged_in_user = SecurityUtils.get_user_from_request(request)
     existing_product = product_service.find_by_uuid(uuid, False)
     if existing_product is None:
         raise serializers.ValidationError({'error.product': "Product does not exist"})
-    is_product_mine = existing_product.user == logged_in_user
-    if not is_product_mine:
-        raise serializers.ValidationError({'error.product.update': "Only the owner can update this product"})
     serializer = UpdateProductSerializer(data=request.data)
     images = request.data.getlist("images")
     if serializer.is_valid(raise_exception=True):

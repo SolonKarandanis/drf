@@ -20,12 +20,9 @@ def pre_authorize(value: str):
         @wraps(function)
         def wrapped(*args, **kwargs):
             is_authorized = []
-            logger.info(f'-----> request args {args}')
-            logger.info(f'-----> request kwargs {kwargs}')
             request: Request = args[0]
             data = request.data
             logged_in_user = request.user
-            logger.info(f'-----> request data {data}')
             parts_split_by_and = value.split('&&')
             for part in parts_split_by_and:
                 trimmed_part = part.strip()
@@ -54,23 +51,14 @@ def pre_authorize(value: str):
                             if type(data) == list and "[]" in method_arguments:
                                 variable_name = method_arguments.split("[]")[0]
                                 arg = [d[variable_name] for d in data]
-                                is_authorized.append(security_service.execute_method(method_name, logged_in_user, arg))
-
-                    # attrs = (getattr(security_service, name) for name in dir(security_service))
-                    # methods = filter(inspect.ismethod, attrs)
-                    # for method in methods:
-                    #     logger.info(f'  {vars(method)=}')
-
-                    # for method in methods_list:
-                    #     logger.info(f'  {type(method)=}')
-                    # functions = inspect.getmembers(security_service, predicate=inspect.ismethod)
-                    # for name, function in functions:
-                    #     logger.info(f' {name=} {function=}')
-                    #     if name == method_name:
-                    #         is_authorized = True
-                    #     sig = inspect.signature(function)
-                    #     logger.info(f'Function "{name}" has a params {sig}')
-
+                                is_authorized.append(security_service.execute_method(method_name,
+                                                                                     logged_in_user=logged_in_user,
+                                                                                     variable_name=arg, **kwargs))
+                            else:
+                                is_authorized.append(security_service.execute_method(method_name,
+                                                                                     logged_in_user=logged_in_user,
+                                                                                     method_arguments=method_arguments,
+                                                                                     **kwargs))
             if not all(is_authorized):
                 return Response(status=status.HTTP_401_UNAUTHORIZED)
             response = function(*args, **kwargs)
