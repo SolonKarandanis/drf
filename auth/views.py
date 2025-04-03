@@ -222,7 +222,6 @@ def get_user_image(request: Request, uuid):
 @permission_classes([IsAuthenticated])
 @pre_authorize(f"hasPermission({CHANGE_USER}) && securityService.is_user_me(uuid)")
 def upload_cv(request: Request, uuid):
-    logged_in_user = get_user_from_request(request)
     serializer = UploadCVSerializer(data=request.data)
     if serializer.is_valid(raise_exception=True):
         cv: InMemoryUploadedFile = request.FILES.get('cv')
@@ -235,7 +234,6 @@ def upload_cv(request: Request, uuid):
 @permission_classes([IsAuthenticated])
 @pre_authorize(f"hasPermission({CHANGE_USER}) && securityService.is_user_me(uuid)")
 def update_user_contact_info(request: Request, uuid):
-    logged_in_user = get_user_from_request(request)
     serializer = UpldateUserContactInfoSerializer(data=request.data)
     if serializer.is_valid(raise_exception=True):
         user = user_service.update_user_contact_info(uuid, serializer)
@@ -248,7 +246,6 @@ def update_user_contact_info(request: Request, uuid):
 @permission_classes([IsAuthenticated])
 @pre_authorize(f"hasPermission({CHANGE_USER}) && securityService.is_user_me(uuid)")
 def update_user_bio(request: Request, uuid):
-    logged_in_user = get_user_from_request(request)
     serializer = UpdateBioSerializer(data=request.data)
     if serializer.is_valid(raise_exception=True):
         user = user_service.update_user_bio(uuid, serializer)
