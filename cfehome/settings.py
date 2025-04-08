@@ -63,7 +63,8 @@ INSTALLED_APPS = [
     'comments',
     'images',
     'socials',
-    'billing'
+    'billing',
+    'wishlist'
 ]
 
 MIDDLEWARE = [
