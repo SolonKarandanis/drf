@@ -5,7 +5,6 @@ from rest_framework.decorators import api_view, permission_classes
 from rest_framework import status
 import logging
 
-# Create your views here.
 from cfehome.constants.security_constants import VIEW_CART, ADD_CART_ITEM, CHANGE_CART_ITEM, DELETE_CART_ITEM
 from cfehome.decorators.pre_autorize import pre_authorize
 from .serializers import CartSerializer, AddToCart, UpdateItem, DeleteCartItems
