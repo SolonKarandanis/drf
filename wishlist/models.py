@@ -11,16 +11,15 @@ class WishListItemQuerySet(QuerySet):
     def with_product(self):
         return self.select_related('product')
 
+    def owned_by(self, user):
+        return self.get(user=user)
+
 
 class WishListItemManager(Manager):
 
     def create_wish_list_item(self, product: Product, user: User, attributes: str):
         cart_item = self.create(product=product, user=user, attributes=attributes, uuid=uuid.uuid4())
         return cart_item
-
-    def update_cart_item(self, wish_list__item):
-        wish_list__item = wish_list__item.save()
-        return wish_list__item
 
     def get_queryset(self, *args, **kwargs):
         return WishListItemQuerySet(self.model, using=self._db)
