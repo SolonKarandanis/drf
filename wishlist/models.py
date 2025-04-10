@@ -1,5 +1,5 @@
 from django.db.models import Model, ForeignKey, PROTECT, SET_NULL, DateTimeField, UUIDField, QuerySet, Manager, \
-    JSONField
+    JSONField, Index
 from django.conf import settings
 import uuid
 from products.models import Product
@@ -14,15 +14,13 @@ class WishListItemQuerySet(QuerySet):
 
 class WishListItemManager(Manager):
 
-    # def create_wish_list_item(self, quantity: int, unit_price: float, total_price: float, product_id: int, cart: Cart,
-    #                      attributes: str):
-    #     cart_item = self.create(quantity=quantity, unit_price=unit_price, total_price=total_price,
-    #                             attributes=attributes, product_id=product_id, cart=cart, uuid=uuid.uuid4())
-    #     return cart_item
-    #
-    # def update_cart_item(self, cart_item):
-    #     cart_item = cart_item.save()
-    #     return cart_item
+    def create_wish_list_item(self, product: Product, user: User, attributes: str):
+        cart_item = self.create(product=product, user=user, attributes=attributes, uuid=uuid.uuid4())
+        return cart_item
+
+    def update_cart_item(self, wish_list__item):
+        wish_list__item = wish_list__item.save()
+        return wish_list__item
 
     def get_queryset(self, *args, **kwargs):
         return WishListItemQuerySet(self.model, using=self._db)
@@ -41,6 +39,14 @@ class WishListItem(Model):
         return self.attributes
 
     objects = WishListItemManager()
+
+    class Meta:
+        indexes = [
+            Index(
+                name='wishlist_item_user_id',
+                fields=['user_id'],
+            )
+        ]
 
     def __repr__(self):
         return f"<WishListItem {self.id}>"
