@@ -37,3 +37,7 @@ urlpatterns = [
 websocket_urlpatterns = [
     path("ws/notifications/", NotificationConsumer.as_asgi())
 ]
+
+handle404 = 'utils.views.error_404'
+handle500 = 'utils.views.error_500'
+

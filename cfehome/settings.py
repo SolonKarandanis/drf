@@ -33,6 +33,7 @@ ALLOWED_HOSTS = [
 # Application definition
 
 INSTALLED_APPS = [
+    'channels',
     "daphne",
     'django.contrib.admin',
     'django.contrib.auth',
@@ -51,7 +52,6 @@ INSTALLED_APPS = [
     "django_celery_results",
     'django_celery_beat',
     "django_elasticsearch_dsl",
-    'channels',
     'celery',
     'auth',
     'products',
