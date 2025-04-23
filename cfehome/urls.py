@@ -35,6 +35,7 @@ urlpatterns = [
 
 
 websocket_urlpatterns = [
+    # ws://localhost/ws/notifications/chat/
     path("ws/notifications/", NotificationConsumer.as_asgi())
 ]
 
