@@ -2,7 +2,7 @@ from typing import List
 from datetime import timedelta, date
 from django.db.models import Q
 from django.core.exceptions import ObjectDoesNotExist
-from .models import User, UserDetails
+from .models import User, UserDetails, UserManager
 from django.contrib.auth.models import Group, Permission
 import logging
 
@@ -11,12 +11,15 @@ logger = logging.getLogger('django')
 
 class UserRepository:
 
+    def _model_manager(self) -> UserManager:
+        return User.objects
+
     def find_all_users(self) -> List[User]:
-        return User.objects.all()
+        return self._model_manager().all()
 
     def find_active_user(self, username: str) -> User | None:
         try:
-            return User.objects.get_queryset().is_verified().is_active().get(username=username)
+            return self._model_manager().get_queryset().is_verified().is_active().get(username=username)
         except ObjectDoesNotExist:
             return None
 
@@ -24,31 +27,31 @@ class UserRepository:
         return user.groups.all()
 
     def user_email_exists(self, email: str) -> bool:
-        exists = User.objects.filter(email=email).exists()
+        exists = self._model_manager().filter(email=email).exists()
         return exists
 
     def find_user_by_username(self, username: str) -> User:
-        return User.objects.get_queryset().with_groups().get(username=username)
+        return self._model_manager().get_queryset().with_groups().get(username=username)
 
     def find_user_by_email(self, email: str) -> User:
-        return User.objects.get_queryset().with_groups().get(email=email)
+        return self._model_manager().get_queryset().with_groups().get(email=email)
 
     def user_username_exists(self, username: str) -> bool:
-        exists = User.objects.filter(username=username).exists()
+        exists = self._model_manager().filter(username=username).exists()
         return exists
 
     def user_user_id_exists(self, id: int) -> bool:
-        exists = User.objects.filter(id=id).exists()
+        exists = self._model_manager().filter(id=id).exists()
         return exists
 
     def find_user_by_id(self, user_id: int) -> User:
-        return User.objects.get_queryset().with_details().with_groups().get(pk=user_id)
+        return self._model_manager().get_queryset().with_details().with_groups().get(pk=user_id)
 
     def find_user_by_uuid_with_relations(self, uuid: str) -> User:
-        return User.objects.get_queryset().with_details().with_groups().get(uuid=uuid)
+        return self._model_manager().get_queryset().with_details().with_groups().get(uuid=uuid)
 
     def find_user_by_uuid(self, uuid: str) -> User:
-        return User.objects.get(uuid=uuid)
+        return self._model_manager().get(uuid=uuid)
 
     def search(self, request, logged_user: User):
         user_fields_map = {
@@ -60,7 +63,6 @@ class UserRepository:
             "createdDate": "created_date",
             "updatedDate": "updated_date"
         }
-        user_manager = User.objects
         user_filter = Q()
         paging = request["paging"]
         isAdmin = logged_user.is_staff
@@ -97,7 +99,7 @@ class UserRepository:
         if not isAdmin:
             user_filter.add(Q(is_verified=True) & Q(is_active=True), Q.AND)
 
-        search_filter = user_manager.filter(user_filter)
+        search_filter = self._model_manager().filter(user_filter)
 
         if "sortField" in paging:
             sort_field = paging["sortField"]
@@ -111,20 +113,20 @@ class UserRepository:
         return search_filter
 
     def update_user(self, user: User) -> User:
-        return User.objects.update_user(user)
+        return self._model_manager().update_user(user)
 
     def update_user_fields(self, user: User, fields: List[str]) -> User:
         return user.save(update_fields=fields)
 
     def remove_unverified_users(self, days: int) -> None:
-        users = User.objects.filter(is_verified=False)
+        users = self._model_manager().filter(is_verified=False)
         today = date.today()
 
         for x in users:
             start_date = x.created_date.date()
             end_date = start_date + timedelta(days=days)
             if end_date < today:
-                User.objects.get(pk=x.id).delete()
+                self._model_manager().get(pk=x.id).delete()
                 logger.info(f'Just deleted  {x.username}')
 
     def user_details_user_id_exists(self, id: int) -> bool:
@@ -144,7 +146,7 @@ class UserRepository:
         return UserDetails.objects.update_details(user_details)
 
     def create_user(self, email: str, password: str, **extra_fields) -> User:
-        return User.objects.create_user(email, password, **extra_fields)
+        return self._model_manager().create_user(email, password, **extra_fields)
 
     def create_superuser(self, email: str, password: str, **extra_fields) -> User:
-        return User.objects.create_superuser(email, password, **extra_fields)
+        return self._model_manager().create_superuser(email, password, **extra_fields)

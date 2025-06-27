@@ -6,7 +6,7 @@ from django.db.models import Count
 
 from .constants import SIZE_ATTRIBUTE_OPTION_ID, COLOR_ATTRIBUTE_OPTION_ID, GENDER_ATTRIBUTE_OPTION_ID
 from .dtos import CategoriesWithTotals, BrandsWithTotals, SizesWithTotals
-from .models import Product, Category, Brand, AttributeOptions, ProductAttributeValues
+from .models import Product, Category, Brand, AttributeOptions, ProductAttributeValues, ProductManager
 
 User = settings.AUTH_USER_MODEL
 logger = logging.getLogger('django')
@@ -14,64 +14,67 @@ logger = logging.getLogger('django')
 
 class ProductRepository:
 
+    def _model_manager(self) -> ProductManager:
+        return Product.objects
+
     def find_by_uuid(self, uuid: str, fetch_children: bool = True) -> Product:
-        qs = Product.objects.get_queryset()
+        qs = self._model_manager().get_queryset()
         if fetch_children:
             return qs.with_brand().with_comments().with_categories().with_owner().by_uuid(uuid)
         return qs.by_uuid(uuid)
 
     def find_products_by_category_ids(self, category_ids: List[int], limit: int = 7) -> List[Product]:
-        return Product.objects.filter(categories__id__in=category_ids)[:limit]
+        return self._model_manager().filter(categories__id__in=category_ids)[:limit]
 
     def find_product_attributes(self, product_id: int) -> List[ProductAttributeValues]:
         return ProductAttributeValues.objects.get_queryset().with_attribute().filter(product__id=product_id)
 
     def find_by_id(self, product_id: int) -> Product:
-        product = Product.objects.get_queryset().with_comments().get(pk=product_id)
+        product = self._model_manager().get_queryset().with_comments().get(pk=product_id)
         return product
 
     def find_users_product_by_id(self, product_id: int, logged_in_user: User) -> Product:
-        product = Product.objects.get_queryset().owned_by(logged_in_user) \
+        product = self._model_manager().get_queryset().owned_by(logged_in_user) \
             .with_comments().get(pk=product_id)
         return product
 
     def find_users_product_by_uuid(self, uuid: str, logged_in_user: User) -> Product:
-        product = Product.objects.get_queryset().owned_by(logged_in_user) \
+        product = self._model_manager().get_queryset().owned_by(logged_in_user) \
             .with_comments().by_uuid(uuid)
         return product
 
     def find_all_products(self) -> List[Product]:
-        products = Product.objects.all()
+        products = self._model_manager().all()
         return products
 
     def find_supplier_products(self, logged_in_user: User) -> List[Product]:
-        products = Product.objects.get_queryset().owned_by(logged_in_user)
+        products = self._model_manager().get_queryset().owned_by(logged_in_user)
         return products
 
     def find_products_by_ids(self, product_ids: List[int]) -> List[Product]:
-        products = Product.objects.filter(pk__in=product_ids)
+        products = self._model_manager().filter(pk__in=product_ids)
         return products
 
     def exists_product_by_sku(self, sku: str) -> bool:
-        return Product.objects.filter(sku=sku).exists()
+        return self._model_manager().filter(sku=sku).exists()
 
     def exists_product_by_id(self, product_id: int) -> bool:
-        return Product.objects.filter(pk=product_id).exists()
+        return self._model_manager().filter(pk=product_id).exists()
 
     def update_product_price(self, product: Product) -> Product:
         product.save(update_fields=['price'])
         return product
 
     def find_public_products(self) -> List[Product]:
-        products = Product.objects.get_queryset().is_public()
+        products = self._model_manager().get_queryset().is_public()
         return products
 
     def find_product_skus(self) -> List[str]:
-        return Product.objects.get_queryset().product_skus()
+        return self._model_manager().get_queryset().product_skus()
 
     def search_products(self, query: str, categories: List[int],
                         brands: List[int], sizes: List[int], user: User) -> List[Product]:
-        return Product.objects.get_queryset().fts_search(query, categories, brands, sizes, user)
+        return self._model_manager().get_queryset().fts_search(query, categories, brands, sizes, user)
 
     def get_categories_with_totals(self) -> List[CategoriesWithTotals]:
         categories_with_totals_qs = Category.objects \
