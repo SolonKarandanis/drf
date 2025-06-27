@@ -13,7 +13,7 @@ logger = logging.getLogger('django')
 @permission_classes([IsAuthenticated])
 # @pre_authorize(f"hasPermission({VIEW_CART})")
 def get_user_wishlist_items(request: Request):
-    pass
+    logged_in_user = get_user_from_request(request)
 
 
 @api_view(['PUT'])
