@@ -13,6 +13,7 @@ class CartItemProductSerializer(serializers.Serializer):
     title = serializers.CharField(read_only=True)
     uuid = serializers.CharField(read_only=True)
 
+
 class CartItemSerializer(serializers.Serializer):
     id = serializers.IntegerField(source='cart_item.id', read_only=True)
     modificationAlert = serializers.BooleanField(source='cart_item.modification_alert', read_only=True)

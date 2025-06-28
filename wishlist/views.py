@@ -5,6 +5,11 @@ from rest_framework.decorators import api_view, permission_classes
 from rest_framework import status
 import logging
 
+from wishlist.serializers import WishListItemSerializer
+from wishlist.wishlist_service import WishlistService
+
+wishlist_service = WishlistService()
+
 logger = logging.getLogger('django')
 
 
@@ -14,6 +19,9 @@ logger = logging.getLogger('django')
 # @pre_authorize(f"hasPermission({VIEW_CART})")
 def get_user_wishlist_items(request: Request):
     logged_in_user = get_user_from_request(request)
+    wishlist_items = wishlist_service.fetch_user_wish_list_items_dto(logged_in_user)
+    data = WishListItemSerializer(wishlist_items, many=True).data
+    return Response(data)
 
 
 @api_view(['PUT'])

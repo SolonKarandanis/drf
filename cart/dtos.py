@@ -10,7 +10,7 @@ from products.dtos import ProductAttributes
 class CartItemProduct:
     sku: str
     title: str
-    uuid:str
+    uuid: str
 
 
 @dataclass
