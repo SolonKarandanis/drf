@@ -49,7 +49,7 @@ class WishListItemSerializer(serializers.Serializer):
         ]
 
 
-class PaginatedPOSTWishListItemSSerializer:
+class PaginatedPOSTWishListItemsSerializer:
 
     def __init__(self, data, paging):
         limit = paging["limit"]
