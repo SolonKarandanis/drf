@@ -18,8 +18,8 @@ class WishListItemQuerySet(QuerySet):
 class WishListItemManager(Manager):
 
     def create_wish_list_item(self, product: Product, user: User, attributes: str):
-        cart_item = self.create(product=product, user=user, attributes=attributes, uuid=uuid.uuid4())
-        return cart_item
+        wishlist_item = self.create(product=product, user=user, attributes=attributes, uuid=uuid.uuid4())
+        return wishlist_item
 
     def get_queryset(self, *args, **kwargs):
         return WishListItemQuerySet(self.model, using=self._db)
