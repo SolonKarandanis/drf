@@ -38,6 +38,7 @@ class WishListItemProductSerializer(serializers.Serializer):
 
 class WishListItemSerializer(serializers.Serializer):
     uuid = serializers.CharField(source='wish_list_item.uuid', read_only=True)
+    attributes = serializers.CharField(source='wish_list_item.attributes', read_only=True)
     previewImage = ImagesSerializer(source='preview_image', read_only=True)
     productDetails = WishListItemProductSerializer(source='product_details', read_only=True)
 
@@ -45,7 +46,8 @@ class WishListItemSerializer(serializers.Serializer):
         fields = [
             'productDetails',
             'previewImage'
-            'uuid'
+            'uuid',
+            'attributes'
         ]
 
 

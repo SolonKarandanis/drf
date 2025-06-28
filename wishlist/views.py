@@ -16,7 +16,7 @@ logger = logging.getLogger('django')
 # Create your views here.
 @api_view(['GET'])
 @permission_classes([IsAuthenticated])
-# @pre_authorize(f"hasPermission({VIEW_CART})")
+# @pre_authorize(f"hasPermission({VIEW_WISH_LIST_ITEM})")
 def get_user_wishlist_items(request: Request):
     logged_in_user = get_user_from_request(request)
     wishlist_items = wishlist_service.fetch_user_wish_list_items_dto(logged_in_user)
@@ -26,20 +26,21 @@ def get_user_wishlist_items(request: Request):
 
 @api_view(['PUT'])
 @permission_classes([IsAuthenticated])
-# @pre_authorize(f"hasPermission({ADD_CART_ITEM})")
+# @pre_authorize(f"hasPermission({ADD_WISH_LIST_ITEM})")
 def add_to_wishlist(request: Request):
     pass
 
 
 @api_view(['DELETE'])
 @permission_classes([IsAuthenticated])
-# @pre_authorize(f"hasPermission({DELETE_CART_ITEM}) && securityService.are_cart_items_mine(cartItemId[])")
+# @pre_authorize(f"hasPermission({DELETE_WISH_LIST_ITEM}) && securityService.are_cart_items_mine(cartItemId[])")
 def remove_wishlist_item(request: Request):
     pass
 
 
 @api_view(['PUT'])
 @permission_classes([IsAuthenticated])
+# @pre_authorize(f"hasPermission({ADD_CART_ITEM})")
 def add_item_to_cart(request: Request, uuid: str):
     pass
 
