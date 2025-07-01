@@ -26,3 +26,11 @@ class WishListRepository:
 
     def initialize_wish_list_item(self, product: Product, user: User, attributes: str) -> WishListItem:
         return self._model_manager().create_wish_list_item(product, user, attributes)
+
+    def exists_by_user_and_product_and_attributes(self, product: Product, logged_in_user: User,
+                                                  attributes: str) -> bool:
+        return self._model_manager().get_queryset() \
+            .owned_by(logged_in_user) \
+            .filter(product=product) \
+            .filter(attributes=attributes) \
+            .exists()

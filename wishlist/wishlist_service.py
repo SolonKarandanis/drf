@@ -70,7 +70,10 @@ class WishlistService:
                 default_attributes = {SIZE_ATTRIBUTE_OPTION_ID: size_product_attribute.attribute_option_id,
                                       COLOR_ATTRIBUTE_OPTION_ID: color_product_attribute.attribute_option_id}
                 product_attributes = json.dumps(default_attributes)
-                wishlist_item = wishlist_repo.initialize_wish_list_item(product=product, user=logged_in_user, attributes=product_attributes)
+                existing_wishlist_item = wishlist_repo\
+                    .exists_by_user_and_product_and_attributes(product, logged_in_user,product_attributes)
+                wishlist_item = wishlist_repo.initialize_wish_list_item(product=product, user=logged_in_user,
+                                                                        attributes=product_attributes)
                 items.append(wishlist_item)
 
     @transaction.atomic
