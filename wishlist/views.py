@@ -5,7 +5,7 @@ from rest_framework.decorators import api_view, permission_classes
 from rest_framework import status
 import logging
 
-from wishlist.serializers import WishListItemSerializer
+from wishlist.serializers import WishListItemSerializer, AddToWishList
 from wishlist.wishlist_service import WishlistService
 
 wishlist_service = WishlistService()
@@ -28,7 +28,14 @@ def get_user_wishlist_items(request: Request):
 @permission_classes([IsAuthenticated])
 # @pre_authorize(f"hasPermission({ADD_WISH_LIST_ITEM})")
 def add_to_wishlist(request: Request):
-    pass
+    logged_in_user = get_user_from_request(request)
+    serializer = AddToWishList(data=request.data, many=True)
+    if serializer.is_valid(raise_exception=True):
+        wishlist_service.add_wishlist_item(serializer, logged_in_user)
+        wishlist_items = wishlist_service.fetch_user_wish_list_items_dto(logged_in_user)
+        data = WishListItemSerializer(wishlist_items, many=True).data
+        return Response(data)
+    return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
 
 @api_view(['DELETE'])
