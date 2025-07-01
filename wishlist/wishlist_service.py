@@ -70,13 +70,15 @@ class WishlistService:
                 default_attributes = {SIZE_ATTRIBUTE_OPTION_ID: size_product_attribute.attribute_option_id,
                                       COLOR_ATTRIBUTE_OPTION_ID: color_product_attribute.attribute_option_id}
                 product_attributes = json.dumps(default_attributes)
-                existing_wishlist_item = wishlist_repo\
-                    .exists_by_user_and_product_and_attributes(product, logged_in_user,product_attributes)
+            wishlist_item_exists = wishlist_repo \
+                .exists_by_user_and_product_and_attributes(product, logged_in_user, product_attributes)
+            if not wishlist_item_exists:
                 wishlist_item = wishlist_repo.initialize_wish_list_item(product=product, user=logged_in_user,
                                                                         attributes=product_attributes)
                 items.append(wishlist_item)
+        if len(items) >= 0:
+            wishlist_repo.create_wishlist_items(items)
 
     @transaction.atomic
     def delete_wish_list_items(self, request, logged_in_user: User) -> None:
         items = self.fetch_user_wish_list_items(logged_in_user)
-

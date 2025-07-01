@@ -34,3 +34,6 @@ class WishListRepository:
             .filter(product=product) \
             .filter(attributes=attributes) \
             .exists()
+
+    def create_wishlist_items(self, items: List[WishListItem]) -> None:
+        return self._model_manager().bulk_create(items)
