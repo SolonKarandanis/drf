@@ -52,13 +52,6 @@ def remove_wishlist_item(request: Request):
     return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
 
-@api_view(['PUT'])
-@permission_classes([IsAuthenticated])
-# @pre_authorize(f"hasPermission({ADD_CART_ITEM})")
-def add_item_to_cart(request: Request, uuid: str):
-    pass
-
-
 def get_user_from_request(request: Request):
     logged_in_user = request.user
     logger.info(f'logged_in_user: {logged_in_user}')
