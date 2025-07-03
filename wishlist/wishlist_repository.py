@@ -15,9 +15,14 @@ class WishListRepository:
     def _model_manager(self) -> WishListItemManager:
         return WishListItem.objects
 
-    def fetch_user_wish_list_items(self, logged_in_user: User) -> List[WishListItem]:
+    def fetch_user_wish_list_items_with_product(self, logged_in_user: User) -> List[WishListItem]:
         items = self._model_manager().get_queryset() \
             .with_product() \
+            .owned_by(logged_in_user)
+        return items
+
+    def fetch_user_wish_list_items(self, logged_in_user: User) -> List[WishListItem]:
+        items = self._model_manager().get_queryset() \
             .owned_by(logged_in_user)
         return items
 

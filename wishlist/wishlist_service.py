@@ -12,7 +12,7 @@ from products.models import Product
 from products.product_service import ProductService
 from wishlist.dtos import WishlistItemWithPreviewImage, WishlistItemProduct
 from wishlist.models import WishListItem
-from wishlist.serializers import AddToWishList
+from wishlist.serializers import AddToWishList, RemoveWishListItem
 from wishlist.wishlist_repository import WishListRepository
 
 wishlist_repo = WishListRepository()
@@ -28,7 +28,7 @@ class WishlistService:
 
     @transaction.atomic
     def fetch_user_wish_list_items_dto(self, logged_in_user: User) -> List[WishlistItemWithPreviewImage]:
-        wishlist_items = self.fetch_user_wish_list_items(logged_in_user)
+        wishlist_items = self.fetch_user_wish_list_items_with_product(logged_in_user)
         product_ids = [wishlist_item.product_id for wishlist_item in wishlist_items]
         product_preview_images = image_service.find_product_profile_images(product_ids)
         products = product_service.find_products_by_ids(product_ids)
@@ -50,6 +50,9 @@ class WishlistService:
 
     def fetch_user_wish_list_items(self, logged_in_user: User) -> List[WishListItem]:
         return wishlist_repo.fetch_user_wish_list_items(logged_in_user)
+
+    def fetch_user_wish_list_items_with_product(self, logged_in_user: User) -> List[WishListItem]:
+        return wishlist_repo.fetch_user_wish_list_items_with_product(logged_in_user)
 
     @transaction.atomic
     def add_wishlist_item(self, request: AddToWishList, logged_in_user: User) -> None:
@@ -80,5 +83,12 @@ class WishlistService:
             wishlist_repo.create_wishlist_items(items)
 
     @transaction.atomic
-    def delete_wish_list_items(self, request, logged_in_user: User) -> None:
+    def delete_wish_list_items(self, request: RemoveWishListItem, logged_in_user: User) -> None:
         items = self.fetch_user_wish_list_items(logged_in_user)
+        serialized_data = request.data
+        data_list = [dict(item) for item in serialized_data]
+        wishlist_item_ids = [d['wishListItemId'] for d in data_list]
+        existing_wishlist_items = list(filter(lambda ci: ci.id in wishlist_item_ids, items))
+        existing_wishlist_item_ids = [item.id for item in existing_wishlist_items]
+        if existing_wishlist_item_ids is not None:
+            wishlist_repo.delete_wish_list_items_by_ids(existing_wishlist_item_ids)
