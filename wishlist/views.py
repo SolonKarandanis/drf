@@ -5,6 +5,7 @@ from rest_framework.decorators import api_view, permission_classes
 from rest_framework import status
 import logging
 
+from cfehome.constants.security_constants import ADD_WISH_LIST_ITEM
 from wishlist.serializers import WishListItemSerializer, AddToWishList, RemoveWishListItem
 from wishlist.wishlist_service import WishlistService
 
