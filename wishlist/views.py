@@ -25,7 +25,7 @@ def get_user_wishlist_items(request: Request):
     return Response(data)
 
 
-@api_view(['PUT'])
+@api_view(['POST'])
 @permission_classes([IsAuthenticated])
 # @pre_authorize(f"hasPermission({ADD_WISH_LIST_ITEM})")
 def add_to_wishlist(request: Request):
