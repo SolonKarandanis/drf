@@ -21,7 +21,8 @@ logger = logging.getLogger('django')
 # @pre_authorize(f"hasPermission({VIEW_WISH_LIST_ITEM})")
 def get_user_wishlist_items(request: Request):
     logged_in_user = SecurityUtils.get_user_from_request(request)
-    wishlist_items = wishlist_service.fetch_user_wish_list_items_dto(logged_in_user)
+    query = request.GET.get('q', '')
+    wishlist_items = wishlist_service.fetch_user_wish_list_items_dto(logged_in_user, query)
     data = WishListItemSerializer(wishlist_items, many=True).data
     return Response(data)
 

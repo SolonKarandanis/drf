@@ -27,7 +27,8 @@ logger = logging.getLogger('django')
 class WishlistService:
 
     @transaction.atomic
-    def fetch_user_wish_list_items_dto(self, logged_in_user: User) -> List[WishlistItemWithPreviewImage]:
+    def fetch_user_wish_list_items_dto(self,  logged_in_user: User, query: str = '') \
+            -> List[WishlistItemWithPreviewImage]:
         wishlist_items = self.fetch_user_wish_list_items_with_product(logged_in_user)
         product_ids = [wishlist_item.product_id for wishlist_item in wishlist_items]
         product_preview_images = image_service.find_product_profile_images(product_ids)
