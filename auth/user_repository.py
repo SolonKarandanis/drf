@@ -3,7 +3,7 @@ from datetime import timedelta, date
 from django.db.models import Q
 from django.core.exceptions import ObjectDoesNotExist
 from .models import User, UserDetails, UserManager
-from django.contrib.auth.models import Group, Permission
+from django.contrib.auth.models import Group
 import logging
 
 logger = logging.getLogger('django')
