@@ -217,10 +217,6 @@ class Product(Model):
                 name='product_uuid',
                 fields=['uuid'],
             ),
-            Index(
-                name='product_user_id',
-                fields=['user_id'],
-            )
         ]
 
     objects = ProductManager()

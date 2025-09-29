@@ -67,13 +67,6 @@ class Cart(Model):
             )
         ]
 
-        indexes = [
-            Index(
-                name='cart_user_id',
-                fields=['user_id'],
-            )
-        ]
-
     def recalculate_cart_total_price(self) -> None:
         self.total_price = sum(ci.total_price for ci in self.cart_items.all())
 

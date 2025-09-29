@@ -105,10 +105,10 @@ class Order(Model):
     date_created = DateTimeField(auto_now_add=True, null=False)
     status = CharField(max_length=40, choices=OrderStatus.choices)
     total_price = FloatField()
-    buyer = ForeignKey(User, on_delete=CASCADE, related_name='buyer')
+    buyer = ForeignKey(User, on_delete=CASCADE, related_name='buyer', db_index=False)
     is_shipped = BooleanField(db_default=False)
     date_shipped = DateTimeField(null=True)
-    supplier = ForeignKey(User, on_delete=CASCADE, related_name='supplier')
+    supplier = ForeignKey(User, on_delete=CASCADE, related_name='supplier', db_index=False)
     uuid = UUIDField(default=uuid.uuid4())
     comments = GenericRelation("comments.Comment", related_query_name='order')
 
