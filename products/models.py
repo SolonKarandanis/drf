@@ -3,7 +3,7 @@ from decimal import Decimal
 from django.core.exceptions import ObjectDoesNotExist
 from django.db.models import Q, QuerySet, Manager, Model, SET_NULL, ForeignKey, CharField, TextField, \
     FloatField, BooleanField, IntegerField, UUIDField, Index, SlugField, GeneratedField, PROTECT, ManyToManyField, \
-    CASCADE, TextChoices, DateTimeField, DecimalField, Subquery
+    CASCADE, TextChoices, DateTimeField, DecimalField, Subquery, UniqueConstraint
 from django.conf import settings
 from django.contrib.contenttypes.fields import GenericRelation
 from django.contrib.postgres.search import SearchVector, SearchVectorField
@@ -316,7 +316,12 @@ class ProductsDiscount(Model):
     )
 
     class Meta:
-        unique_together = (("product_id", "discount_id"),)
+        constraints = [
+            UniqueConstraint(
+                name='one_discount_per_product',
+                fields=['product_id', 'discount_id']
+            )
+        ]
         verbose_name_plural = "Products Discounts"
         db_table = 'products_product_discount'
 
