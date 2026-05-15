@@ -12,7 +12,7 @@ class WishListItemQuerySet(QuerySet):
         return self.select_related('product')
 
     def owned_by(self, user):
-        return self.get(user=user)
+        return self.filter(user=user)
 
 
 class WishListItemManager(Manager):

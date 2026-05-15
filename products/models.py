@@ -131,27 +131,27 @@ class ProductQuerySet(QuerySet):
                    brands: List[int], sizes: List[int], user=None):
         qs = self.is_public()
         if query:
-            lookup = Q(title__search=query) | Q(content__search=query) | Q(sku__search=query) | \
-                     Q(fabric_details__search=query) | Q(care_instructions__search=query)
-            qs = self.filter(lookup)
+            # __icontains: case-insensitive substring match. Replaces __search
+            # (Postgres FTS) so partial words like "air" find "AirSense Jacket"
+            # instead of only matching whole tokens.
+            lookup = Q(title__icontains=query) | Q(content__icontains=query) | Q(sku__icontains=query) | \
+                     Q(fabric_details__icontains=query) | Q(care_instructions__icontains=query)
+            qs = qs.filter(lookup)
         if categories and len(categories) > 0:
-            lookup = Q(categories__in=categories)
-            qs = self.filter(lookup)
+            qs = qs.filter(categories__in=categories)
 
         if brands and len(brands) > 0:
-            lookup = Q(brand__in=brands)
-            qs = self.filter(lookup)
+            qs = qs.filter(brand__in=brands)
 
         if sizes and len(sizes) > 0:
             lookup = Q(attribute_id=1) & Q(attribute_option__in=sizes)
             subquery = ProductAttributeValues.objects.filter(lookup)
-
-            qs = self.filter(id__in=Subquery(subquery.values('product_id')))
+            qs = qs.filter(id__in=Subquery(subquery.values('product_id')))
 
         if user is not None:
             qs2 = self.filter(user=user)
             qs = (qs | qs2).distinct()
-        return qs
+        return qs.distinct()
 
 
 class ProductManager(Manager):

@@ -33,7 +33,7 @@ class CartRepository:
         return cart
 
     def update_cart_item(self, cart_item: CartItem) -> CartItem:
-        item = self._model_manager().update_cart_item(cart_item)
+        item = CartItem.objects.update_cart_item(cart_item)
         return item
 
     def delete_cart_items(self, cart: Cart) -> None:
