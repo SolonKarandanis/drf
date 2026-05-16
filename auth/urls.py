@@ -1,15 +1,15 @@
 from django.urls import path
 from rest_framework.authtoken.views import obtain_auth_token
-from rest_framework_simplejwt.views import  TokenRefreshView, TokenVerifyView
+from rest_framework_simplejwt.views import TokenVerifyView
 from .views import get_all_users, register_user, get_user, get_account, run_task, get_status, get_all_groups, \
     search_users, activate_user_account, deactivate_user_account, delete_user_account, upload_cv, upload_profile_image, \
     get_user_statuses, get_user_image, update_user_bio, update_user_contact_info, reset_user_password, \
-    perform_login
+    perform_login, CustomTokenRefreshView
 
 urlpatterns = [
     path('', obtain_auth_token),
     path('token/', perform_login, name='token_obtain_pair'),
-    path('token/refresh/', TokenRefreshView.as_view(), name='token_refresh'),
+    path('token/refresh/', CustomTokenRefreshView.as_view(), name='token_refresh'),
     path('token/verify/', TokenVerifyView.as_view(), name='token_verify'),
     path('users/', get_all_users,  name='get-users'),
     path('users/activate/', activate_user_account,  name='activate-user-account'),

@@ -11,6 +11,8 @@ from rest_framework.response import Response
 from rest_framework.decorators import api_view, permission_classes
 from rest_framework.permissions import IsAuthenticated, IsAdminUser, AllowAny
 from rest_framework_simplejwt.tokens import RefreshToken
+from rest_framework_simplejwt.views import TokenRefreshView
+from rest_framework_simplejwt.exceptions import InvalidToken, TokenError
 from rest_framework import exceptions
 from celery.result import AsyncResult
 
@@ -70,6 +72,39 @@ def perform_login(request: Request):
         'refresh': str(refresh_token),
         'access': str(encoded),
     })
+
+
+class CustomTokenRefreshView(TokenRefreshView):
+    """Re-injects the custom JWT claims (email, username, groups, permissions)
+    that perform_login embeds, so @pre_authorize keeps working after a reactive
+    token refresh. The standard SimpleJWT TokenRefreshView omits those claims."""
+
+    def post(self, request, *args, **kwargs):
+        serializer = self.get_serializer(data=request.data)
+        try:
+            serializer.is_valid(raise_exception=True)
+        except TokenError as e:
+            raise InvalidToken(e.args[0])
+
+        new_access_str = serializer.validated_data['access']
+
+        # Decode the freshly-issued access token, add our claims, re-encode.
+        decoded = jwt.decode(str(new_access_str), settings.SECRET_KEY, algorithms=["HS256"])
+        refresh = RefreshToken(request.data.get('refresh'))
+        user_id = refresh.payload.get('user_id')
+        try:
+            user = user_service.find_user_by_id(user_id)
+            decoded['email'] = user.email
+            decoded['username'] = user.username
+            decoded['groups'] = [g.name for g in user_service.find_user_groups(user)]
+            decoded['permissions'] = list(user.get_group_permissions())
+        except Exception:
+            # If the DB look-up fails for any reason, still return the plain token
+            # rather than crashing the refresh flow entirely.
+            logger.warning('CustomTokenRefreshView: could not inject custom claims for user_id=%s', user_id)
+
+        encoded = jwt.encode(decoded, settings.SECRET_KEY, algorithm="HS256")
+        return Response({'access': str(encoded)})
 
 
 @api_view(['GET'])
@@ -195,7 +230,7 @@ def get_user_statuses(request: Request):
 
 @api_view(['POST'])
 @permission_classes([IsAuthenticated])
-@pre_authorize(f"hasPermission({CHANGE_USER}) && securityService.is_user_me(uuid)")
+@pre_authorize(f"hasPermission({CHANGE_USER}) || securityService.is_user_me(uuid)")
 def upload_profile_image(request: Request, uuid):
     logged_in_user = get_user_from_request(request)
     serializer = UploadProfilePictureSerializer(data=request.data)
@@ -220,7 +255,7 @@ def get_user_image(request: Request, uuid):
 
 @api_view(['POST'])
 @permission_classes([IsAuthenticated])
-@pre_authorize(f"hasPermission({CHANGE_USER}) && securityService.is_user_me(uuid)")
+@pre_authorize(f"hasPermission({CHANGE_USER}) || securityService.is_user_me(uuid)")
 def upload_cv(request: Request, uuid):
     serializer = UploadCVSerializer(data=request.data)
     if serializer.is_valid(raise_exception=True):
@@ -232,7 +267,7 @@ def upload_cv(request: Request, uuid):
 
 @api_view(['PUT'])
 @permission_classes([IsAuthenticated])
-@pre_authorize(f"hasPermission({CHANGE_USER}) && securityService.is_user_me(uuid)")
+@pre_authorize(f"hasPermission({CHANGE_USER}) || securityService.is_user_me(uuid)")
 def update_user_contact_info(request: Request, uuid):
     serializer = UpldateUserContactInfoSerializer(data=request.data)
     if serializer.is_valid(raise_exception=True):
@@ -244,7 +279,7 @@ def update_user_contact_info(request: Request, uuid):
 
 @api_view(['PUT'])
 @permission_classes([IsAuthenticated])
-@pre_authorize(f"hasPermission({CHANGE_USER}) && securityService.is_user_me(uuid)")
+@pre_authorize(f"hasPermission({CHANGE_USER}) || securityService.is_user_me(uuid)")
 def update_user_bio(request: Request, uuid):
     serializer = UpdateBioSerializer(data=request.data)
     if serializer.is_valid(raise_exception=True):
