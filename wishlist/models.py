@@ -30,7 +30,7 @@ class WishListItem(Model):
     user = ForeignKey(User, default=1, null=True, on_delete=SET_NULL)
     date_created = DateTimeField(auto_now_add=True, null=False)
     date_modified = DateTimeField(auto_now=True, null=False)
-    uuid = UUIDField(default=uuid.uuid4())
+    uuid = UUIDField(default=uuid.uuid4)
     attributes = JSONField(null=True)
 
     @property

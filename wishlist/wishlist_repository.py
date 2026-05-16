@@ -30,7 +30,8 @@ class WishListRepository:
         self._model_manager().filter(pk__in=item_ids).delete()
 
     def initialize_wish_list_item(self, product: Product, user: User, attributes: str) -> WishListItem:
-        return self._model_manager().create_wish_list_item(product, user, attributes)
+        import uuid as _uuid
+        return WishListItem(product=product, user=user, attributes=attributes, uuid=_uuid.uuid4())
 
     def exists_by_user_and_product_and_attributes(self, product: Product, logged_in_user: User,
                                                   attributes: str) -> bool:

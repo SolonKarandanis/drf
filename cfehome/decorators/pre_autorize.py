@@ -1,4 +1,3 @@
-import inspect
 import logging
 import re
 from functools import wraps

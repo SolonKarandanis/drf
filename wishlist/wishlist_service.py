@@ -80,7 +80,7 @@ class WishlistService:
                 wishlist_item = wishlist_repo.initialize_wish_list_item(product=product, user=logged_in_user,
                                                                         attributes=product_attributes)
                 items.append(wishlist_item)
-        if len(items) >= 0:
+        if items:
             wishlist_repo.create_wishlist_items(items)
 
     @transaction.atomic
