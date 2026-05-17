@@ -2,8 +2,10 @@ import logging
 from rest_framework import serializers
 from rest_framework.request import Request
 
+from cfehome.authorization import HasPermission, SecurityCheck
 from cfehome.constants.security_constants import ADD_PRODUCT, CHANGE_PRODUCT
 from cfehome.decorators.pre_autorize import pre_authorize
+from cfehome.security_service import security_service
 from cfehome.utils.security_utils import SecurityUtils
 from images.serializers import ImagesSerializer
 from .serializers import ProductSerializer, SaveProductSerializer, PaginatedProductListSerializer, \
@@ -112,7 +114,7 @@ def create_page_obj(request: Request, queryset):
 
 @api_view(['POST'])
 @permission_classes([IsAuthenticated])
-@pre_authorize(f"hasPermission({ADD_PRODUCT})")
+@pre_authorize(HasPermission(ADD_PRODUCT))
 def create_product(request: Request):
     logged_in_user = SecurityUtils.get_user_from_request(request)
     serializer = SaveProductSerializer(data=request.data)
@@ -126,7 +128,7 @@ def create_product(request: Request):
 
 @api_view(['PUT'])
 @permission_classes([IsAuthenticated])
-@pre_authorize(f"hasPermission({CHANGE_PRODUCT}) && securityService.is_product_mine(uuid)")
+@pre_authorize(HasPermission(CHANGE_PRODUCT) & SecurityCheck(security_service.is_product_mine))
 def update_product(request: Request, uuid: str):
     logged_in_user = SecurityUtils.get_user_from_request(request)
     existing_product = product_service.find_by_uuid(uuid, False)

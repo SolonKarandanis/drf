@@ -5,8 +5,10 @@ from rest_framework.decorators import api_view, permission_classes
 from rest_framework import status
 import logging
 
+from cfehome.authorization import HasPermission, SecurityCheckList
 from cfehome.constants.security_constants import VIEW_CART, ADD_CART_ITEM, CHANGE_CART_ITEM, DELETE_CART_ITEM
 from cfehome.decorators.pre_autorize import pre_authorize
+from cfehome.security_service import security_service
 from cfehome.utils.security_utils import SecurityUtils
 from .serializers import CartSerializer, AddToCart, UpdateItem, DeleteCartItems
 from .cart_service import CartService
@@ -18,7 +20,7 @@ logger = logging.getLogger('django')
 
 @api_view(['GET'])
 @permission_classes([IsAuthenticated])
-@pre_authorize(f"hasPermission({VIEW_CART})")
+@pre_authorize(HasPermission(VIEW_CART))
 def get_user_cart(request: Request):
     logged_in_user = SecurityUtils.get_user_from_request(request)
     cart_dto = cart_service.fetch_user_cart_dto(logged_in_user)
@@ -28,7 +30,7 @@ def get_user_cart(request: Request):
 
 @api_view(['PUT'])
 @permission_classes([IsAuthenticated])
-@pre_authorize(f"hasPermission({ADD_CART_ITEM})")
+@pre_authorize(HasPermission(ADD_CART_ITEM))
 def add_cart_items(request: Request):
     logged_in_user = SecurityUtils.get_user_from_request(request)
     serializer = AddToCart(data=request.data, many=True)
@@ -42,7 +44,7 @@ def add_cart_items(request: Request):
 
 @api_view(['PUT'])
 @permission_classes([IsAuthenticated])
-@pre_authorize(f"hasPermission({CHANGE_CART_ITEM}) && securityService.are_cart_items_mine(cartItemId[])")
+@pre_authorize(HasPermission(CHANGE_CART_ITEM) & SecurityCheckList(security_service.are_cart_items_mine, "cartItemId"))
 def update_items(request: Request):
     logged_in_user = SecurityUtils.get_user_from_request(request)
     serializer = UpdateItem(data=request.data, many=True)
@@ -56,7 +58,7 @@ def update_items(request: Request):
 
 @api_view(['DELETE'])
 @permission_classes([IsAuthenticated])
-@pre_authorize(f"hasPermission({DELETE_CART_ITEM}) && securityService.are_cart_items_mine(cartItemId[])")
+@pre_authorize(HasPermission(DELETE_CART_ITEM) & SecurityCheckList(security_service.are_cart_items_mine, "cartItemId"))
 def delete_cart_items(request: Request):
     logged_in_user = SecurityUtils.get_user_from_request(request)
     serializer = DeleteCartItems(data=request.data, many=True)
@@ -70,7 +72,7 @@ def delete_cart_items(request: Request):
 
 @api_view(['PUT'])
 @permission_classes([IsAuthenticated])
-@pre_authorize(f"hasPermission({DELETE_CART_ITEM})")
+@pre_authorize(HasPermission(DELETE_CART_ITEM))
 def clear_cart(request: Request):
     logged_in_user = SecurityUtils.get_user_from_request(request)
     cart_service.clear_cart(logged_in_user)

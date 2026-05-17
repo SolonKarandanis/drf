@@ -58,3 +58,6 @@ class SecurityService:
         if not set(cart_item_ids).issubset(existing_cart_item_ids):
             return False
         return result
+
+
+security_service = SecurityService()

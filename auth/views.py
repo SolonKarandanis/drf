@@ -16,8 +16,10 @@ from rest_framework_simplejwt.exceptions import InvalidToken, TokenError
 from rest_framework import exceptions
 from celery.result import AsyncResult
 
+from cfehome.authorization import HasPermission, HasRole, SecurityCheck
 from cfehome.constants.security_constants import ADMIN, CHANGE_USER
 from cfehome.decorators.pre_autorize import pre_authorize
+from cfehome.security_service import security_service
 from images.serializers import ImagesSerializer
 from socials.social_service import SocialService
 from .group_service import GroupService
@@ -141,7 +143,7 @@ def register_user(request: Request):
 
 @api_view(['PUT'])
 @permission_classes([IsAdminUser])
-@pre_authorize(f"hasRole({ADMIN})")
+@pre_authorize(HasRole(ADMIN))
 def activate_user_account(request: Request):
     serializer = ChangeUserStatusSerializer(data=request.data)
     if serializer.is_valid(raise_exception=True):
@@ -156,7 +158,7 @@ def activate_user_account(request: Request):
 
 @api_view(['PUT'])
 @permission_classes([IsAdminUser])
-@pre_authorize(f"hasRole({ADMIN})")
+@pre_authorize(HasRole(ADMIN))
 def deactivate_user_account(request: Request):
     serializer = ChangeUserStatusSerializer(data=request.data)
     if serializer.is_valid(raise_exception=True):
@@ -171,7 +173,7 @@ def deactivate_user_account(request: Request):
 
 @api_view(['DELETE'])
 @permission_classes([IsAdminUser])
-@pre_authorize(f"hasRole({ADMIN})")
+@pre_authorize(HasRole(ADMIN))
 def delete_user_account(request: Request):
     serializer = ChangeUserStatusSerializer(data=request.data)
     if serializer.is_valid(raise_exception=True):
@@ -186,7 +188,7 @@ def delete_user_account(request: Request):
 
 @api_view(['PUT'])
 @permission_classes([IsAuthenticated])
-@pre_authorize(f"hasPermission({CHANGE_USER})")
+@pre_authorize(HasPermission(CHANGE_USER))
 def reset_user_password(request: Request):
     logged_in_user = get_user_from_request(request)
     serializer = ResetUserPasswordSerializer(data=request.data)
@@ -230,7 +232,7 @@ def get_user_statuses(request: Request):
 
 @api_view(['POST'])
 @permission_classes([IsAuthenticated])
-@pre_authorize(f"hasPermission({CHANGE_USER}) || securityService.is_user_me(uuid)")
+@pre_authorize(HasPermission(CHANGE_USER) | SecurityCheck(security_service.is_user_me))
 def upload_profile_image(request: Request, uuid):
     logged_in_user = get_user_from_request(request)
     serializer = UploadProfilePictureSerializer(data=request.data)
@@ -255,7 +257,7 @@ def get_user_image(request: Request, uuid):
 
 @api_view(['POST'])
 @permission_classes([IsAuthenticated])
-@pre_authorize(f"hasPermission({CHANGE_USER}) || securityService.is_user_me(uuid)")
+@pre_authorize(HasPermission(CHANGE_USER) | SecurityCheck(security_service.is_user_me))
 def upload_cv(request: Request, uuid):
     serializer = UploadCVSerializer(data=request.data)
     if serializer.is_valid(raise_exception=True):
@@ -267,7 +269,7 @@ def upload_cv(request: Request, uuid):
 
 @api_view(['PUT'])
 @permission_classes([IsAuthenticated])
-@pre_authorize(f"hasPermission({CHANGE_USER}) || securityService.is_user_me(uuid)")
+@pre_authorize(HasPermission(CHANGE_USER) | SecurityCheck(security_service.is_user_me))
 def update_user_contact_info(request: Request, uuid):
     serializer = UpldateUserContactInfoSerializer(data=request.data)
     if serializer.is_valid(raise_exception=True):
@@ -279,7 +281,7 @@ def update_user_contact_info(request: Request, uuid):
 
 @api_view(['PUT'])
 @permission_classes([IsAuthenticated])
-@pre_authorize(f"hasPermission({CHANGE_USER}) || securityService.is_user_me(uuid)")
+@pre_authorize(HasPermission(CHANGE_USER) | SecurityCheck(security_service.is_user_me))
 def update_user_bio(request: Request, uuid):
     serializer = UpdateBioSerializer(data=request.data)
     if serializer.is_valid(raise_exception=True):
