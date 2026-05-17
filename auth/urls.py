@@ -4,11 +4,12 @@ from rest_framework_simplejwt.views import TokenVerifyView
 from .views import get_all_users, register_user, get_user, get_account, run_task, get_status, get_all_groups, \
     search_users, activate_user_account, deactivate_user_account, delete_user_account, upload_cv, upload_profile_image, \
     get_user_statuses, get_user_image, update_user_bio, update_user_contact_info, reset_user_password, \
-    perform_login, CustomTokenRefreshView
+    perform_login, CustomTokenRefreshView, logout_user, forgot_password
 
 urlpatterns = [
     path('', obtain_auth_token),
     path('token/', perform_login, name='token_obtain_pair'),
+    path('logout/', logout_user, name='logout'),
     path('token/refresh/', CustomTokenRefreshView.as_view(), name='token_refresh'),
     path('token/verify/', TokenVerifyView.as_view(), name='token_verify'),
     path('users/', get_all_users,  name='get-users'),
@@ -21,6 +22,7 @@ urlpatterns = [
     path('users/groups/', get_all_groups, name='get-groups'),
     path('users/statuses/', get_user_statuses, name='get-statuses'),
     path('users/reset-password/', reset_user_password, name='reset-password'),
+    path('users/forgot-password/', forgot_password, name='forgot-password'),
     path('users/<str:uuid>/', get_user, name='get-user'),
     path('users/<str:uuid>/image/', get_user_image,  name='get-user-image'),
     path('users/<str:uuid>/upload-cv/', upload_cv,  name='upload-cv'),

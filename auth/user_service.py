@@ -228,3 +228,17 @@ class UserService:
 
         user.set_password(new_password)
         repo.update_user_fields(user, ["password"])
+
+    @transaction.atomic
+    def forgot_password(self, serializer: ResetUserPasswordSerializer) -> None:
+        data = dict(serializer.data)
+        new_password = data['newPassword']
+        confirm_password = data['confirmPassword']
+        if new_password != confirm_password:
+            raise serializers.ValidationError({'password': 'Passwords must match.'})
+        try:
+            user = repo.find_user_by_email(data['email'])
+        except Exception:
+            raise serializers.ValidationError({'email': 'No account found with this email.'})
+        user.set_password(new_password)
+        repo.update_user_fields(user, ['password'])

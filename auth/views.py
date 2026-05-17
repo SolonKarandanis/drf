@@ -106,7 +106,31 @@ class CustomTokenRefreshView(TokenRefreshView):
             logger.warning('CustomTokenRefreshView: could not inject custom claims for user_id=%s', user_id)
 
         encoded = jwt.encode(decoded, settings.SECRET_KEY, algorithm="HS256")
+        try:
+            refresh.blacklist()
+        except Exception:
+            logger.warning('CustomTokenRefreshView: failed to blacklist refresh token for user_id=%s', user_id)
         return Response({'access': str(encoded)})
+
+
+@api_view(['POST'])
+@permission_classes([AllowAny])
+def forgot_password(request: Request):
+    serializer = ResetUserPasswordSerializer(data=request.data)
+    if serializer.is_valid(raise_exception=True):
+        user_service.forgot_password(serializer)
+        return Response(status=status.HTTP_204_NO_CONTENT)
+
+
+@api_view(['POST'])
+@permission_classes([IsAuthenticated])
+def logout_user(request: Request):
+    try:
+        token = RefreshToken(request.data.get('refresh'))
+        token.blacklist()
+    except Exception:
+        pass
+    return Response(status=status.HTTP_204_NO_CONTENT)
 
 
 @api_view(['GET'])

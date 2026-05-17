@@ -64,7 +64,8 @@ INSTALLED_APPS = [
     'images',
     'socials',
     'billing',
-    'wishlist'
+    'wishlist',
+    'rest_framework_simplejwt.token_blacklist',
 ]
 
 MIDDLEWARE = [
