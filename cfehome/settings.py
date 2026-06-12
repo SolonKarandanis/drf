@@ -264,14 +264,14 @@ EMAIL_HOST_USER = "skarandanis@gmail.com"
 EMAIL_HOST_PASSWORD = ""
 DEFAULT_FROM_EMAIL = "Testing <>"
 
-# CHANNEL_LAYERS = {
-#     'default': {
-#         'BACKEND': 'channels_redis.core.RedisChannelLayer',
-#         'CONFIG': {
-#             "hosts": [('192.168.1.5', 6379)],
-#         },
-#     },
-# }
+CHANNEL_LAYERS = {
+    'default': {
+        'BACKEND': 'channels_redis.core.RedisChannelLayer',
+        'CONFIG': {
+            "hosts": [('localhost', 6379)],
+        },
+    },
+}
 
 # CACHES = {
 #     'default': {
