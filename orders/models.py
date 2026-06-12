@@ -121,8 +121,8 @@ class Order(Model):
         constraints = [
             UniqueConstraint(
                 name='limit_pending_orders',
-                fields=['buyer_id', 'is_shipped'],
-                condition=Q(is_shipped=False)
+                fields=['buyer_id', 'supplier_id'],
+                condition=Q(status='purchase.order.draft')
             )
         ]
 
