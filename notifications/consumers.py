@@ -7,7 +7,16 @@ from django.contrib.auth import get_user_model
 User = get_user_model()
 
 
+from urllib.parse import parse_qs
+
+
 def _get_token_from_scope(scope) -> str | None:
+    # Browsers cannot set headers on WS upgrades; token arrives as ?token= query param.
+    qs = parse_qs(scope.get('query_string', b'').decode())
+    token_list = qs.get('token')
+    if token_list:
+        return token_list[0]
+    # Fallback: Authorization header (useful for non-browser clients / tests).
     for header_name, header_value in scope.get('headers', []):
         if header_name == b'authorization':
             parts = header_value.decode().split()
