@@ -13,10 +13,9 @@ logger = logging.getLogger('django')
 class OrderItemSerializer(serializers.ModelSerializer):
     productId = serializers.IntegerField(source='product_id', read_only=True)
     productName = serializers.CharField(source='product_name', read_only=True)
-    startDate = serializers.DateField(source='start_date', read_only=True)
-    endDate = serializers.DateField(source='end_date', read_only=True)
-    totalPrice = serializers.IntegerField(source='total_price', read_only=True)
-
+    startDate = serializers.DateTimeField(source='start_date', read_only=True)
+    endDate = serializers.DateTimeField(source='end_date', read_only=True)
+    totalPrice = serializers.FloatField(source='total_price', read_only=True)
 
     class Meta:
         model = OrderItem
@@ -37,20 +36,20 @@ class OrderItemSerializer(serializers.ModelSerializer):
 
 
 class OrderSerializer(serializers.ModelSerializer):
-    orderItems = OrderItemSerializer(many=True, read_only=True)
+    orderItems = OrderItemSerializer(many=True, read_only=True, source='order_items')
     comments = CommentSerializer(many=True, read_only=True)
     buyerId = serializers.IntegerField(source='buyer_id', read_only=True)
     supplierId = serializers.IntegerField(source='supplier_id', read_only=True)
-    productName = serializers.CharField(source='product_name', read_only=True)
-    dateShipped = serializers.DateField(source='date_shipped', read_only=True)
+    dateCreated = serializers.DateTimeField(source='date_created', read_only=True)
+    dateShipped = serializers.DateTimeField(source='date_shipped', read_only=True)
     isShipped = serializers.BooleanField(source='is_shipped', read_only=True)
-    totalPrice = serializers.IntegerField(source='total_price', read_only=True)
+    totalPrice = serializers.FloatField(source='total_price', read_only=True)
 
     class Meta:
         model = Order
         fields = [
             'id',
-            'date_created',
+            'dateCreated',
             'buyerId',
             'supplierId',
             'status',
@@ -64,12 +63,12 @@ class OrderSerializer(serializers.ModelSerializer):
 
 
 class OrderListSerializer(serializers.ModelSerializer):
-    dateCreated = serializers.DateField(source='date_created', read_only=True)
+    dateCreated = serializers.DateTimeField(source='date_created', read_only=True)
     buyerId = serializers.IntegerField(source='buyer_id', read_only=True)
     supplierId = serializers.IntegerField(source='supplier_id', read_only=True)
-    totalPrice = serializers.IntegerField(source='total_price', read_only=True)
+    totalPrice = serializers.FloatField(source='total_price', read_only=True)
     isShipped = serializers.BooleanField(source='is_shipped', read_only=True)
-    dateShipped = serializers.DateField(source='date_shipped', read_only=True)
+    dateShipped = serializers.DateTimeField(source='date_shipped', read_only=True)
 
     class Meta:
         model = Order

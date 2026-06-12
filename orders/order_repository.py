@@ -46,26 +46,29 @@ class OrderRepository:
         return self._model_manager().get_queryset().by_uuid(uuid)
 
     def find_order_by_uuid_with_products(self, uuid: str, fetch_items: bool) -> Order:
-        query = self._model_manager()
+        qs = self._model_manager().get_queryset()
         if fetch_items:
-            order_items_prefect = Prefetch('order_items', queryset=OrderItem.objects.select_related('product'))
+            order_items_prefetch = Prefetch('order_items', queryset=OrderItem.objects.select_related('product'))
             comments_prefetch = Prefetch('comments')
-            query.prefetch_related(order_items_prefect, comments_prefetch)
-        return query.get(uuid=uuid)
+            qs = qs.prefetch_related(order_items_prefetch, comments_prefetch)
+        return qs.get(uuid=uuid)
 
     def find_order_by_id(self, order_id: int, fetch_items: bool) -> Order:
-        query = self._model_manager()
+        qs = self._model_manager().get_queryset()
         if fetch_items:
-            query.get_queryset().with_order_items()
-        return query.get(pk=order_id)
+            qs = qs.prefetch_related(
+                Prefetch('order_items', queryset=OrderItem.objects.select_related('product')),
+                Prefetch('comments'),
+            )
+        return qs.get(pk=order_id)
 
     def find_order_by_id_with_products(self, order_id: int, fetch_items: bool) -> Order:
-        query = self._model_manager()
+        qs = self._model_manager().get_queryset()
         if fetch_items:
-            order_items_prefect = Prefetch('order_items', queryset=OrderItem.objects.select_related('product'))
+            order_items_prefetch = Prefetch('order_items', queryset=OrderItem.objects.select_related('product'))
             comments_prefetch = Prefetch('comments')
-            query.prefetch_related(order_items_prefect, comments_prefetch)
-        return query.get(pk=order_id)
+            qs = qs.prefetch_related(order_items_prefetch, comments_prefetch)
+        return qs.get(pk=order_id)
 
     def find_orders_by_requested_status(self, requested_status: str) -> List[Order]:
         return self._model_manager().get_queryset().by_status(requested_status)
