@@ -8,6 +8,8 @@ from .order_repository import OrderRepository
 from cart.cart_service import CartService
 from cart.models import Cart
 from comments.comment_repository import CommentRepository
+from notifications.models import NotificationEventType
+from notifications.notification_service import notification_service
 
 from .serializers import PostOrderComment
 
@@ -16,6 +18,15 @@ User = settings.AUTH_USER_MODEL
 order_repo = OrderRepository()
 comment_repo = CommentRepository()
 cart_service = CartService()
+
+
+_STATUS_TO_EVENT = {
+    Order.OrderStatus.BUYER_REJECTED: NotificationEventType.BUYER_REJECTED,
+    Order.OrderStatus.SUPPLIER_REJECTED: NotificationEventType.SUPPLIER_REJECTED,
+    Order.OrderStatus.APPROVED: NotificationEventType.APPROVED,
+    Order.OrderStatus.SHIPPED: NotificationEventType.SHIPPED,
+    Order.OrderStatus.RECEIVED: NotificationEventType.RECEIVED,
+}
 
 
 class OrderService:
@@ -47,7 +58,15 @@ class OrderService:
             new_order.recalculate_order_total_price()
             self.update_order(new_order)
         cart_service.clear_cart(logged_in_user)
-        return self.find_orders_by_ids(order_ids)
+        orders = list(self.find_orders_by_ids(order_ids))
+        for order in orders:
+            _buyer = order.buyer
+            _supplier = order.supplier
+            _payload = {'order_uuid': str(order.uuid), 'order_total': float(order.total_price)}
+            transaction.on_commit(lambda b=_buyer, s=_supplier, p=_payload: notification_service.notify_order_event(
+                NotificationEventType.ORDER_CREATED, b, s, p,
+            ))
+        return orders
 
     @transaction.atomic
     def post_order_comment(self, request: PostOrderComment, logged_in_user: User) -> Order:
@@ -68,6 +87,12 @@ class OrderService:
             order.is_shipped = True
             order.date_shipped = timezone.now()
         self.update_order(order)
+        event_type = _STATUS_TO_EVENT.get(status)
+        if event_type:
+            _buyer = order.buyer
+            _supplier = order.supplier
+            _payload = {'order_uuid': str(order.uuid), 'order_total': float(order.total_price)}
+            transaction.on_commit(lambda et=event_type, b=_buyer, s=_supplier, p=_payload: notification_service.notify_order_event(et, b, s, p))
 
     def change_order_status_to_buyer_rejected(self, uuid: str) -> None:
         status = Order.OrderStatus.BUYER_REJECTED

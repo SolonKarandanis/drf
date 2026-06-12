@@ -5,8 +5,6 @@ from django.db.models import Q, Max, Sum, Manager, QuerySet, Model, DateTimeFiel
     ForeignKey, BooleanField, CASCADE, UniqueConstraint, Index, IntegerField, PROTECT, Case, When, TextChoices, Count, \
     Value, UUIDField
 from django.conf import settings
-from django.db.models.signals import post_save, pre_save
-from django.dispatch import receiver
 from django.utils import timezone
 from django.contrib.contenttypes.fields import GenericRelation
 from django.contrib.postgres import indexes, search as fts
@@ -151,18 +149,6 @@ class Order(Model):
 
     def recalculate_order_total_price(self) -> None:
         self.total_price = sum(oi.total_price for oi in self.order_items.all())
-
-
-# notify supplier for new order
-@receiver(pre_save, sender=Order, dispatch_uid='order_created')
-def order_created_handler(sender, instance, **kwargs):
-    supplier_id = instance.supplier.id
-
-
-# notify buyer and supplier of order status
-@receiver(pre_save, sender=Order, dispatch_uid='order_status_changed')
-def order_status_changed_handler(sender, instance, **kwargs):
-    supplier_id = instance.supplier.id
 
 
 vector = fts.SearchVector("product_name", "sku", "manufacturer", config="english")
