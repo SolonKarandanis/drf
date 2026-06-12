@@ -31,6 +31,7 @@ urlpatterns = [
     path('api/orders/', include('orders.urls')),
     path('api/socials/', include('socials.urls')),
     path('api/billing/', include('billing.urls')),
+    path('api/notifications/', include('notifications.urls')),
     # path('api/v2/', include('cfehome.routers'))
 ]+static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)
 
