@@ -34,6 +34,9 @@ class OrderQuerySet(QuerySet):
     def owned_by(self, user):
         return self.filter(buyer=user)
 
+    def involving(self, user):
+        return self.filter(Q(buyer=user) | Q(supplier=user))
+
     def supplied_by(self, user):
         return self.filter(supplier=user)
 

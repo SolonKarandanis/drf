@@ -16,7 +16,7 @@ class OrderRepository:
         return self._model_manager().get_queryset().order_ids_with_is_shipped()
 
     def find_users_orders(self, user: User) -> List[Order]:
-        return self._model_manager().get_queryset().owned_by(user=user)
+        return self._model_manager().get_queryset().involving(user=user)
 
     def find_users_order_number(self, user: User) -> int:
         return self._model_manager().get_queryset().owned_by(user=user).count()
