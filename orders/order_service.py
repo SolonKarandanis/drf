@@ -115,6 +115,8 @@ class OrderService:
         self.change_order_status(uuid, status)
 
     def find_users_orders(self, user: User) -> List[Order]:
+        if user.groups.filter(name='ADMIN').exists():
+            return order_repo.find_all_orders()
         return order_repo.find_users_orders(user)
 
     def find_orders_by_ids(self, order_ids: List[int]) -> List[Order]:

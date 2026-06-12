@@ -65,8 +65,8 @@ class OrderSerializer(serializers.ModelSerializer):
 
 class OrderListSerializer(serializers.ModelSerializer):
     dateCreated = serializers.DateTimeField(source='date_created', read_only=True)
-    buyerId = serializers.IntegerField(source='buyer_id', read_only=True)
-    supplierId = serializers.IntegerField(source='supplier_id', read_only=True)
+    buyer = UserPublicSerializer(read_only=True)
+    supplier = UserPublicSerializer(read_only=True)
     totalPrice = serializers.FloatField(source='total_price', read_only=True)
     isShipped = serializers.BooleanField(source='is_shipped', read_only=True)
     dateShipped = serializers.DateTimeField(source='date_shipped', read_only=True)
@@ -76,8 +76,8 @@ class OrderListSerializer(serializers.ModelSerializer):
         fields = [
             'id',
             'dateCreated',
-            'buyerId',
-            'supplierId',
+            'buyer',
+            'supplier',
             'status',
             'totalPrice',
             'isShipped',
