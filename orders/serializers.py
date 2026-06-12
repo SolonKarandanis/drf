@@ -4,6 +4,7 @@ from rest_framework import serializers
 from .models import Order, OrderItem
 from cfehome.serializers import ModelPaginationSerializer
 from comments.serializers import CommentSerializer
+from auth.serializers import UserPublicSerializer
 
 from .validators import order_exists
 
@@ -38,8 +39,8 @@ class OrderItemSerializer(serializers.ModelSerializer):
 class OrderSerializer(serializers.ModelSerializer):
     orderItems = OrderItemSerializer(many=True, read_only=True, source='order_items')
     comments = CommentSerializer(many=True, read_only=True)
-    buyerId = serializers.IntegerField(source='buyer_id', read_only=True)
-    supplierId = serializers.IntegerField(source='supplier_id', read_only=True)
+    buyer = UserPublicSerializer(read_only=True)
+    supplier = UserPublicSerializer(read_only=True)
     dateCreated = serializers.DateTimeField(source='date_created', read_only=True)
     dateShipped = serializers.DateTimeField(source='date_shipped', read_only=True)
     isShipped = serializers.BooleanField(source='is_shipped', read_only=True)
@@ -50,8 +51,8 @@ class OrderSerializer(serializers.ModelSerializer):
         fields = [
             'id',
             'dateCreated',
-            'buyerId',
-            'supplierId',
+            'buyer',
+            'supplier',
             'status',
             'totalPrice',
             'isShipped',

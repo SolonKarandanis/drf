@@ -46,7 +46,7 @@ class OrderRepository:
         return self._model_manager().get_queryset().by_uuid(uuid)
 
     def find_order_by_uuid_with_products(self, uuid: str, fetch_items: bool) -> Order:
-        qs = self._model_manager().get_queryset()
+        qs = self._model_manager().get_queryset().select_related('buyer', 'supplier')
         if fetch_items:
             order_items_prefetch = Prefetch('order_items', queryset=OrderItem.objects.select_related('product'))
             comments_prefetch = Prefetch('comments')
