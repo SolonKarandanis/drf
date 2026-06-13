@@ -5,10 +5,13 @@ from rest_framework import status
 from django.utils.translation import gettext_lazy as _
 
 import logging
+
+from cfehome.authorization import HasPermission
+from cfehome.constants.security_constants import VIEW_ORDER, ADD_ORDER, CHANGE_ORDER
+from cfehome.decorators.pre_autorize import pre_authorize
 from .models import Order
 from .order_service import OrderService
 from .serializers import OrderSerializer, OrderListSerializer, PostOrderComment, SearchOrderItems, OrderItemSerializer
-# from .publisher import publish
 
 order_service = OrderService()
 
@@ -18,6 +21,7 @@ logger = logging.getLogger('django')
 
 @api_view(['GET'])
 @permission_classes([IsAuthenticated])
+@pre_authorize(HasPermission(VIEW_ORDER))
 def get_user_orders(request):
     logged_in_user = get_user_from_request(request)
     orders = order_service.find_users_orders(logged_in_user)
@@ -27,6 +31,7 @@ def get_user_orders(request):
 
 @api_view(['GET'])
 @permission_classes([IsAuthenticated])
+@pre_authorize(HasPermission(VIEW_ORDER))
 def get_order(request, uuid):
     logged_in_user = get_user_from_request(request)
     order: Order = order_service.find_order_by_uuid(uuid)
@@ -37,6 +42,7 @@ def get_order(request, uuid):
 
 @api_view(['POST'])
 @permission_classes([IsAuthenticated])
+@pre_authorize(HasPermission(ADD_ORDER))
 def place_draft_orders(request):
     logged_in_user = get_user_from_request(request)
     try:
@@ -63,6 +69,7 @@ def post_order_comment(request):
 
 @api_view(['PUT'])
 @permission_classes([IsAuthenticated])
+@pre_authorize(HasPermission(CHANGE_ORDER))
 def order_buyer_rejected(request, uuid):
     logged_in_user = get_user_from_request(request)
     order_service.change_order_status_to_buyer_rejected(uuid)
@@ -73,6 +80,7 @@ def order_buyer_rejected(request, uuid):
 
 @api_view(['PUT'])
 @permission_classes([IsAuthenticated])
+@pre_authorize(HasPermission(CHANGE_ORDER))
 def order_supplier_rejected(request, uuid):
     logged_in_user = get_user_from_request(request)
     order_service.change_order_status_to_supplier_rejected(uuid)
@@ -83,6 +91,7 @@ def order_supplier_rejected(request, uuid):
 
 @api_view(['PUT'])
 @permission_classes([IsAuthenticated])
+@pre_authorize(HasPermission(CHANGE_ORDER))
 def order_approved(request, uuid):
     logged_in_user = get_user_from_request(request)
     order_service.change_order_status_to_approved(uuid)
@@ -93,6 +102,7 @@ def order_approved(request, uuid):
 
 @api_view(['PUT'])
 @permission_classes([IsAuthenticated])
+@pre_authorize(HasPermission(CHANGE_ORDER))
 def order_shipped(request, uuid):
     logged_in_user = get_user_from_request(request)
     order_service.change_order_status_to_shipped(uuid)
@@ -103,6 +113,7 @@ def order_shipped(request, uuid):
 
 @api_view(['PUT'])
 @permission_classes([IsAuthenticated])
+@pre_authorize(HasPermission(CHANGE_ORDER))
 def order_received(request, uuid):
     logged_in_user = get_user_from_request(request)
     order_service.change_order_status_to_received(uuid)
@@ -113,6 +124,7 @@ def order_received(request, uuid):
 
 @api_view(['POST'])
 @permission_classes([IsAuthenticated])
+@pre_authorize(HasPermission(VIEW_ORDER))
 def search_order_items(request):
     logged_in_user = get_user_from_request(request)
     serializer = SearchOrderItems(data=request.data, many=False)
