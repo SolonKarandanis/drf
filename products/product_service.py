@@ -303,6 +303,10 @@ class ProductService:
         product_attributes = ProductAttributes(colors=colors, sizes=sizes, genders=genders)
         return product_attributes
 
+    def find_product_attributes_bulk(self, product_ids: List[int]) -> dict:
+        """Returns {product_id: ProductAttributes} in a single DB query."""
+        return repo.find_product_attributes_for_product_ids(product_ids)
+
     def find_all_categories(self) -> List[Category]:
         return repo.find_all_categories()
 

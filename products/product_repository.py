@@ -130,6 +130,33 @@ class ProductRepository:
             .filter(product__uuid=product_uuid)\
             .filter(attribute__id=SIZE_ATTRIBUTE_OPTION_ID)
 
+    def find_product_attributes_for_product_ids(self, product_ids: List[int]) -> dict:
+        """Single query for all (color/size/gender) attribute values across many products.
+        Returns {product_id: ProductAttributes}."""
+        from .dtos import ProductAttributes
+        rows = (
+            ProductAttributeValues.objects.get_queryset()
+            .filter(
+                product_id__in=product_ids,
+                attribute_id__in=[COLOR_ATTRIBUTE_OPTION_ID, SIZE_ATTRIBUTE_OPTION_ID, GENDER_ATTRIBUTE_OPTION_ID],
+            )
+            .select_related('attribute')
+        )
+        buckets: dict[int, dict] = {pid: {'colors': [], 'sizes': [], 'genders': []} for pid in product_ids}
+        for row in rows:
+            pid = row.product_id
+            aid = row.attribute_id
+            if aid == COLOR_ATTRIBUTE_OPTION_ID:
+                buckets[pid]['colors'].append(row)
+            elif aid == SIZE_ATTRIBUTE_OPTION_ID:
+                buckets[pid]['sizes'].append(row)
+            elif aid == GENDER_ATTRIBUTE_OPTION_ID:
+                buckets[pid]['genders'].append(row)
+        return {
+            pid: ProductAttributes(colors=b['colors'], sizes=b['sizes'], genders=b['genders'])
+            for pid, b in buckets.items()
+        }
+
     def find_first_product_attribute_value_size_by_product_id(self, product_id: int) -> ProductAttributeValues:
         return self.find_first_product_attribute_value_by_product_id_and_attribute_id(product_id,
                                                                                       SIZE_ATTRIBUTE_OPTION_ID)
