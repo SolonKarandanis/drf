@@ -37,13 +37,11 @@ class SecurityService:
         return result
 
     def is_product_mine(self, **kwargs) -> bool:
-        result = True
-        existing_product = product_service.find_by_uuid(kwargs.get('uuid'), False)
-        logged_in_user = kwargs.get('logged_in_user')
-        is_product_mine = existing_product.user == logged_in_user
-        logger.info(f'-----> is_product_mine ----> {is_product_mine=}')
-        if not is_product_mine:
-            result = False
+        result = product_service.product_belongs_to_user(
+            uuid=kwargs.get('uuid'),
+            user=kwargs.get('logged_in_user'),
+        )
+        logger.info(f'-----> is_product_mine ----> {result=}')
         return result
 
     def are_cart_items_mine(self, **kwargs) -> bool:
@@ -57,6 +55,10 @@ class SecurityService:
             return False
         if not set(cart_item_ids).issubset(existing_cart_item_ids):
             return False
+        return result
+
+    def am_i_associated_with_order(self,**kwargs)-> bool:
+        result = True
         return result
 
 

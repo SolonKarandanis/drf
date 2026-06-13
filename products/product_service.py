@@ -26,6 +26,9 @@ class ProductService:
     def find_by_uuid(self, uuid: str, fetch_children: bool = True) -> Product:
         return repo.find_by_uuid(uuid, fetch_children)
 
+    def product_belongs_to_user(self, uuid: str, user) -> bool:
+        return repo.product_belongs_to_user(uuid, user)
+
     @transaction.atomic
     def find_product_images_by_uuid(self, uuid: str) -> List[Images]:
         product = repo.find_by_uuid(uuid, False)

@@ -17,6 +17,9 @@ class ProductRepository:
     def _model_manager(self) -> ProductManager:
         return Product.objects
 
+    def product_belongs_to_user(self, uuid: str, user) -> bool:
+        return self._model_manager().filter(uuid=uuid, user=user).exists()
+
     def find_by_uuid(self, uuid: str, fetch_children: bool = True) -> Product:
         qs = self._model_manager().get_queryset()
         if fetch_children:
