@@ -140,7 +140,7 @@ DATABASES = {
         'NAME': 'drf',
         'USER': 'drf',
         'PASSWORD': 'drf',
-        'HOST': '192.168.1.6',
+        'HOST': '192.168.1.28',
         # 'HOST': 'localhost',
         'PORT': '5432',
         "OPTIONS": {
